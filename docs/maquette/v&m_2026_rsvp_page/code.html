@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RSVP for V&amp;M 2026</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#556B2F",
+              "background-light": "#F5F5DC",
+              "background-dark": "#1A1D1A",
+              "text-light": "#36454F",
+              "text-dark": "#EAE8E1",
+              "accent": "#D2B48C",
+              "card-light": "#FAF9F4",
+              "card-dark": "#242823",
+              "border-light": "#EAE8E1",
+              "border-dark": "#363A35",
+              "muted-light": "#6A7A6E",
+              "muted-dark": "#A0A89F"
+            },
+            fontFamily: {
+              "display": ["Cormorant Garamond", "serif"],
+              "body": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-body bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
+<!-- Top Navigation -->
+<header class="absolute top-0 left-0 right-0 flex items-center justify-between whitespace-nowrap px-6 sm:px-10 py-5">
+<div class="flex items-center gap-3 text-text-light dark:text-text-dark">
+<span class="material-symbols-outlined text-2xl">eco</span>
+<h2 class="font-display text-xl font-bold tracking-wider">V&amp;M 2026</h2>
+</div>
+<nav class="hidden sm:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary dark:hover:text-accent" href="#">Details</a>
+<a class="text-sm font-medium hover:text-primary dark:hover:text-accent" href="#">Venue</a>
+<a class="text-sm font-medium hover:text-primary dark:hover:text-accent" href="#">Registry</a>
+<a class="text-sm font-bold text-primary dark:text-accent" href="#">RSVP</a>
+</nav>
+</header>
+<!-- Main Content -->
+<main class="flex w-full max-w-lg flex-col items-center justify-center py-20">
+<div class="w-full rounded-lg bg-card-light dark:bg-card-dark p-8 sm:p-10 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+<div class="text-center">
+<h1 class="font-display text-4xl sm:text-5xl font-bold tracking-tight text-text-light dark:text-text-dark">Bonjour, Vincent</h1>
+<p class="mt-2 text-base text-muted-light dark:text-muted-dark">Kindly confirm your attendance for our celebration.</p>
+</div>
+<div class="mt-8 space-y-8">
+<!-- Presence Toggle -->
+<div class="space-y-3">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark" for="presence">Will you be able to celebrate with us?</label>
+<div class="flex h-12 w-full items-center rounded-lg bg-background-light dark:bg-background-dark p-1.5 border border-border-light dark:border-border-dark">
+<label class="flex h-full flex-1 cursor-pointer items-center justify-center rounded-md text-center has-[:checked]:bg-primary has-[:checked]:text-white has-[:checked]:shadow-sm text-muted-light dark:text-muted-dark text-sm font-medium transition-colors">
+<span class="truncate">Yes, with pleasure</span>
+<input checked="" class="sr-only" name="presence" type="radio" value="Yes"/>
+</label>
+<label class="flex h-full flex-1 cursor-pointer items-center justify-center rounded-md text-center has-[:checked]:bg-muted-light/20 dark:has-[:checked]:bg-muted-dark/20 has-[:checked]:text-text-light dark:has-[:checked]:text-text-dark text-muted-light dark:text-muted-dark text-sm font-medium transition-colors">
+<span class="truncate">No, with regrets</span>
+<input class="sr-only" name="presence" type="radio" value="No"/>
+</label>
+</div>
+</div>
+<!-- Conditional Form Fields -->
+<div class="space-y-8">
+<!-- Number of Adults -->
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark">
+<span class="material-symbols-outlined text-muted-light dark:text-muted-dark">group</span>
+</div>
+<p class="text-base font-normal leading-normal">Number of adults attending</p>
+</div>
+<div class="flex shrink-0 items-center gap-3 text-text-light dark:text-text-dark">
+<button class="flex h-8 w-8 items-center justify-center rounded-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-lg font-medium cursor-pointer hover:bg-border-light dark:hover:bg-border-dark transition-colors">-</button>
+<span class="w-4 text-center text-lg font-medium">1</span>
+<button class="flex h-8 w-8 items-center justify-center rounded-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-lg font-medium cursor-pointer hover:bg-border-light dark:hover:bg-border-dark transition-colors">+</button>
+</div>
+</div>
+<!-- Dietary Restrictions -->
+<div class="space-y-3">
+<label class="block text-sm font-medium text-text-light dark:text-text-dark" for="dietary">Dietary Restrictions</label>
+<textarea class="block w-full rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-4 py-3 text-sm placeholder:text-muted-light dark:placeholder:text-muted-dark focus:border-primary dark:focus:border-accent focus:ring-primary dark:focus:ring-accent" id="dietary" placeholder="e.g., vegetarian, gluten-free, nut allergy..." rows="3"></textarea>
+<p class="text-xs text-muted-light dark:text-muted-dark">Please let us know of any allergies or preferences.</p>
+</div>
+</div>
+<!-- Confirm Button -->
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold leading-normal tracking-wide hover:opacity-90 transition-opacity">
+<span class="truncate">Confirm RSVP</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
