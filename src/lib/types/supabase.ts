@@ -17,6 +17,7 @@ export interface Database {
 					children_count: number;
 					dietary_restrictions: string | null;
 					expected_count: number;
+					managed_by_id: string | null;
 				};
 				Insert: {
 					id?: string;
@@ -31,6 +32,7 @@ export interface Database {
 					children_count?: number;
 					dietary_restrictions?: string | null;
 					expected_count?: number;
+					managed_by_id?: string | null;
 				};
 				Update: {
 					id?: string;
@@ -45,6 +47,7 @@ export interface Database {
 					children_count?: number;
 					dietary_restrictions?: string | null;
 					expected_count?: number;
+					managed_by_id?: string | null;
 				};
 			};
 			photos: {
@@ -74,6 +77,46 @@ export interface Database {
 					owner_id?: string;
 					status?: 'pending' | 'approved' | 'rejected';
 					caption?: string | null;
+				};
+			};
+			photo_likes: {
+				Row: {
+					user_id: string;
+					photo_id: string;
+					created_at: string;
+				};
+				Insert: {
+					user_id: string;
+					photo_id: string;
+					created_at?: string;
+				};
+				Update: {
+					user_id?: string;
+					photo_id?: string;
+					created_at?: string;
+				};
+			};
+			photo_comments: {
+				Row: {
+					id: string;
+					photo_id: string;
+					user_id: string;
+					content: string;
+					created_at: string;
+				};
+				Insert: {
+					id?: string;
+					photo_id: string;
+					user_id: string;
+					content: string;
+					created_at?: string;
+				};
+				Update: {
+					id?: string;
+					photo_id?: string;
+					user_id?: string;
+					content?: string;
+					created_at?: string;
 				};
 			};
 		};
