@@ -2,11 +2,17 @@
 	import UploadButton from './upload-button.svelte';
 	import PhotoGrid from './photo-grid.svelte';
 	import Lightbox from './lightbox.svelte';
+	import { Heart, Image as ImageIcon } from 'lucide-svelte';
 
 	let { data } = $props();
 	let { photos, supabase, session, userRole } = $derived(data);
 
+	let filter = $state<'all' | 'likes'>('all');
 	let selectedPhotoIndex = $state(-1);
+
+	let filteredPhotos = $derived(
+		filter === 'likes' ? photos.filter((p: any) => p.is_liked_by_user) : photos
+	);
 
 	function handlePhotoClick(index: number) {
 		selectedPhotoIndex = index;
@@ -23,8 +29,31 @@
 		<p class="text-muted-foreground">Partagez vos photos et découvrez celles des autres invités.</p>
 	</div>
 
+	<div class="mb-6 flex gap-2">
+		<button
+			class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors {filter ===
+			'all'
+				? 'bg-sage-600 text-white'
+				: 'bg-stone-100 text-stone-600 hover:bg-stone-200'}"
+			onclick={() => (filter = 'all')}
+		>
+			<ImageIcon class="h-4 w-4" />
+			Toutes les photos
+		</button>
+		<button
+			class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors {filter ===
+			'likes'
+				? 'bg-sage-600 text-white'
+				: 'bg-stone-100 text-stone-600 hover:bg-stone-200'}"
+			onclick={() => (filter = 'likes')}
+		>
+			<Heart class="h-4 w-4 {filter === 'likes' ? 'fill-current' : ''}" />
+			Mes Favoris
+		</button>
+	</div>
+
 	<PhotoGrid
-		{photos}
+		photos={filteredPhotos}
 		{supabase}
 		currentUserId={session?.user?.id}
 		{userRole}
@@ -34,6 +63,12 @@
 	<UploadButton />
 
 	{#if selectedPhotoIndex >= 0}
-		<Lightbox {photos} initialIndex={selectedPhotoIndex} {supabase} onClose={handleClose} />
+		<Lightbox
+			photos={filteredPhotos}
+			initialIndex={selectedPhotoIndex}
+			{supabase}
+			user={session?.user}
+			onClose={handleClose}
+		/>
 	{/if}
 </div>

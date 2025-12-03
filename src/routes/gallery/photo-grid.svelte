@@ -3,10 +3,16 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { Clock, Trash2 } from 'lucide-svelte';
+	import { Clock, Trash2, Heart, MessageCircle } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { photos, supabase, currentUserId, userRole, onPhotoClick } = $props();
+	let { photos: initialPhotos = [], supabase, currentUserId, userRole, onPhotoClick } = $props();
+
+	let photos = $state(initialPhotos);
+
+	$effect(() => {
+		photos = initialPhotos;
+	});
 
 	function getPublicUrl(path: string) {
 		const { data } = supabase.storage.from('photos').getPublicUrl(path);
@@ -14,13 +20,13 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 	{#each photos as photo, index (photo.id)}
-		<Card.Root class="overflow-hidden group">
-			<div class="relative aspect-square">
+		<Card.Root class="overflow-hidden group flex flex-col h-full">
+			<div class="relative w-full pt-[100%]">
 				<button
 					type="button"
-					class="h-full w-full cursor-zoom-in border-0 p-0 bg-transparent block"
+					class="absolute inset-0 h-full w-full cursor-zoom-in border-0 p-0 bg-transparent block"
 					onclick={() => onPhotoClick(index)}
 					aria-label="Voir la photo en grand"
 				>
@@ -31,17 +37,6 @@
 						loading="lazy"
 					/>
 				</button>
-				{#if photo.status === 'pending'}
-					<div class="absolute left-2 top-2 pointer-events-none">
-						<Badge
-							variant="secondary"
-							class="flex items-center gap-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-						>
-							<Clock class="h-3 w-3" />
-							En attente
-						</Badge>
-					</div>
-				{/if}
 
 				{#if currentUserId && (photo.owner_id === currentUserId || userRole === 'admin')}
 					<div
@@ -75,16 +70,87 @@
 					</div>
 				{/if}
 			</div>
-			{#if photo.caption || photo.guests?.full_name}
-				<div class="p-2 text-sm">
-					{#if photo.caption}
-						<p class="font-medium truncate">{photo.caption}</p>
-					{/if}
-					{#if photo.guests?.full_name}
-						<p class="text-xs text-muted-foreground truncate">Par {photo.guests.full_name}</p>
-					{/if}
+
+			<!-- Social Actions Bar -->
+			<div class="p-3">
+				<div class="flex items-center gap-4 mb-2">
+					<!-- Like Button -->
+					<form
+						action="?/toggleLike"
+						method="POST"
+						use:enhance={() => {
+							// Optimistic UI
+							const wasLiked = photo.is_liked_by_user;
+							photo.is_liked_by_user = !wasLiked;
+							photo.likes_count += wasLiked ? -1 : 1;
+
+							return async ({ result, update }) => {
+								if (result.type === 'failure') {
+									// Revert on failure
+									photo.is_liked_by_user = wasLiked;
+									photo.likes_count += wasLiked ? 1 : -1;
+									toast.error('Erreur lors du like');
+								}
+								await update({ reset: false });
+							};
+						}}
+					>
+						<input type="hidden" name="photoId" value={photo.id} />
+						<button
+							type="submit"
+							class="flex items-center gap-1 transition-transform active:scale-95"
+							aria-label={photo.is_liked_by_user ? "Je n'aime plus" : "J'aime"}
+						>
+							<Heart
+								class="h-6 w-6 transition-colors {photo.is_liked_by_user
+									? 'fill-red-500 text-red-500'
+									: 'text-stone-600 hover:text-stone-900'}"
+							/>
+						</button>
+					</form>
+
+					<!-- Comment Button -->
+					<button
+						type="button"
+						class="flex items-center gap-1 text-stone-600 transition-colors hover:text-sage-600"
+						onclick={() => onPhotoClick(index)}
+						aria-label="Commenter"
+					>
+						<MessageCircle class="h-6 w-6" />
+					</button>
 				</div>
-			{/if}
+
+				<!-- Likes Count -->
+				<div class="mb-1 text-sm font-semibold text-stone-900">
+					{photo.likes_count} J'aime
+				</div>
+
+				<!-- Caption -->
+				{#if photo.caption}
+					<div class="mb-1 text-sm line-clamp-2">
+						<span class="font-bold mr-1">{photo.guests?.full_name || 'Invité'}</span>
+						<span class="text-stone-700">{photo.caption}</span>
+					</div>
+				{/if}
+
+				<!-- View Comments Link -->
+				{#if photo.comments_count > 0}
+					<button
+						class="mb-2 text-sm text-stone-500 hover:text-stone-700"
+						onclick={() => onPhotoClick(index)}
+					>
+						Voir les {photo.comments_count} commentaires
+					</button>
+				{/if}
+
+				<!-- Fake Input -->
+				<button
+					class="w-full text-left text-sm text-stone-400 hover:text-stone-600"
+					onclick={() => onPhotoClick(index)}
+				>
+					Ajouter un commentaire...
+				</button>
+			</div>
 		</Card.Root>
 	{/each}
 </div>
