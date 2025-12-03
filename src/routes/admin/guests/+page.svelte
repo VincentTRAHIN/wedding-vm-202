@@ -5,14 +5,45 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
 	import * as Card from '$lib/components/ui/card';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Badge } from '$lib/components/ui/badge';
 	import { toast } from 'svelte-sonner';
-	import { Plus, Loader2, AlertTriangle } from 'lucide-svelte';
+	import { Plus, Loader2, Users, ArrowUpDown } from 'lucide-svelte';
+	import EditGuestDialog from './EditGuestDialog.svelte';
 
-	let { data, form } = $props();
+	let { data } = $props();
 	let { guests } = $derived(data);
 
 	let isAdding = $state(false);
+	let isChild = $state(false);
+
+	// Sorting state
+	type SortColumn = 'full_name' | 'rsvp_status';
+	let sortColumn = $state<SortColumn>('full_name');
+	let sortDirection = $state<'asc' | 'desc'>('asc');
+
+	function toggleSort(column: SortColumn) {
+		if (sortColumn === column) {
+			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+		} else {
+			sortColumn = column;
+			sortDirection = 'asc';
+		}
+	}
+
+	let sortedGuests = $derived(
+		[...guests].sort((a, b) => {
+			const modifier = sortDirection === 'asc' ? 1 : -1;
+			if (sortColumn === 'full_name') {
+				return (a.full_name || '').localeCompare(b.full_name || '') * modifier;
+			} else if (sortColumn === 'rsvp_status') {
+				const statusA = a.rsvp_status || '';
+				const statusB = b.rsvp_status || '';
+				return statusA.localeCompare(statusB) * modifier;
+			}
+			return 0;
+		})
+	);
 </script>
 
 <div class="grid gap-8 lg:grid-cols-3">
@@ -20,7 +51,7 @@
 	<Card.Root class="h-fit lg:col-span-1">
 		<Card.Header>
 			<Card.Title>Ajouter un invité</Card.Title>
-			<Card.Description>Ajoutez un email à la liste blanche.</Card.Description>
+			<Card.Description>Ajoutez un invité à la liste.</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<form
@@ -32,6 +63,7 @@
 						isAdding = false;
 						if (result.type === 'success') {
 							toast.success('Invité ajouté avec succès !');
+							isChild = false;
 						} else if (result.type === 'failure') {
 							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							toast.error((result.data as any)?.message || "Erreur lors de l'ajout.");
@@ -42,17 +74,28 @@
 				class="space-y-4"
 			>
 				<div class="space-y-2">
-					<Label for="email">Email</Label>
-					<Input type="email" id="email" name="email" placeholder="email@exemple.com" required />
+					<Label for="full_name">Nom complet <span class="text-red-500">*</span></Label>
+					<Input type="text" id="full_name" name="full_name" placeholder="Jean Dupont" required />
 				</div>
+
 				<div class="space-y-2">
-					<Label for="full_name">Nom complet (optionnel)</Label>
-					<Input type="text" id="full_name" name="full_name" placeholder="Jean Dupont" />
+					<Label for="email">Email (optionnel)</Label>
+					<Input type="email" id="email" name="email" placeholder="email@exemple.com" />
+					<p class="text-xs text-muted-foreground">
+						Laisser vide si l'invité n'a pas d'email (ex: enfant).
+					</p>
 				</div>
-				<div class="space-y-2">
-					<Label for="expected_count">Nombre attendu</Label>
-					<Input type="number" id="expected_count" name="expected_count" value="1" min="1" />
+
+				<div class="flex items-center space-x-2">
+					<Checkbox id="is_child" bind:checked={isChild} name="is_child" />
+					<Label
+						for="is_child"
+						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+					>
+						Cet invité est un enfant (-18 ans)
+					</Label>
 				</div>
+
 				<Button type="submit" class="w-full" disabled={isAdding}>
 					{#if isAdding}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
@@ -74,17 +117,44 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						<Table.Head>Nom / Email</Table.Head>
-						<Table.Head>Statut</Table.Head>
-						<Table.Head class="text-right">Total</Table.Head>
+						<Table.Head>
+							<Button variant="ghost" onclick={() => toggleSort('full_name')} class="-ml-4">
+								Nom / Email
+								<ArrowUpDown class="ml-2 h-4 w-4" />
+							</Button>
+						</Table.Head>
+						<Table.Head>Validé par</Table.Head>
+						<Table.Head>
+							<Button variant="ghost" onclick={() => toggleSort('rsvp_status')} class="-ml-4">
+								Statut
+								<ArrowUpDown class="ml-2 h-4 w-4" />
+							</Button>
+						</Table.Head>
+						<Table.Head class="w-[50px]"></Table.Head>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each guests as guest}
+					{#each sortedGuests as guest}
 						<Table.Row>
 							<Table.Cell>
-								<div class="font-medium">{guest.full_name || 'Sans nom'}</div>
-								<div class="text-xs text-muted-foreground">{guest.email}</div>
+								<div class="flex items-center gap-2">
+									<div class="font-medium">{guest.full_name || 'Sans nom'}</div>
+									{#if guest.is_child}
+										<Badge variant="outline" class="text-[10px] h-5 px-1.5">Enfant</Badge>
+									{/if}
+								</div>
+								{#if guest.email}
+									<div class="text-xs text-muted-foreground">{guest.email}</div>
+								{/if}
+							</Table.Cell>
+							<Table.Cell>
+								{#if guest.managed_by}
+									<Badge variant="secondary" class="font-normal text-xs">
+										via {guest.managed_by.full_name}
+									</Badge>
+								{:else}
+									<span class="text-muted-foreground">-</span>
+								{/if}
 							</Table.Cell>
 							<Table.Cell>
 								{#if guest.rsvp_status === 'present'}
@@ -95,20 +165,8 @@
 									<Badge variant="secondary">En attente</Badge>
 								{/if}
 							</Table.Cell>
-							<Table.Cell class="text-right">
-								{#if guest.rsvp_status === 'present'}
-									{@const total = (guest.adults_count || 0) + (guest.children_count || 0)}
-									<div class="flex items-center justify-end gap-2">
-										<span>{total}</span>
-										{#if total > guest.expected_count}
-											<div title={`Attendu: ${guest.expected_count}`}>
-												<AlertTriangle class="h-4 w-4 text-yellow-500" />
-											</div>
-										{/if}
-									</div>
-								{:else}
-									-
-								{/if}
+							<Table.Cell>
+								<EditGuestDialog {guest} allGuests={guests} />
 							</Table.Cell>
 						</Table.Row>
 					{/each}
