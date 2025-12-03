@@ -97,8 +97,7 @@
 			</h2>
 			<p class="mb-10 text-lg leading-relaxed text-stone-600">
 				Nous sommes ravis de partager ce moment unique avec vous. Explorez notre site pour trouver
-				toutes les informations nécessaires et n'oubliez pas de nous faire part de votre présence.
-			</p>
+				toutes les informations nécessaires et n'oubliez pas de nous faire part de votre présence.			</p>
 
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 				<Button

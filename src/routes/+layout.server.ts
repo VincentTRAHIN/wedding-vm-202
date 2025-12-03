@@ -12,7 +12,8 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
 		// Use Admin Client to bypass RLS recursion issues
 		const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
-		const { data: guest } = await supabaseAdmin
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { data: guest } = await (supabaseAdmin as any)
 			.from('guests')
 			.select('role')
 			.eq('auth_id', user.id)
