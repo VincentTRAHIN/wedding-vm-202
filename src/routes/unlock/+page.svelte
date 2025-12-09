@@ -9,15 +9,15 @@
 	let { form } = $props();
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-[#FDFBF7] p-4">
+<div class="flex min-h-screen items-center justify-center bg-stone-50 p-4">
 	<Card.Root class="w-full max-w-md shadow-lg">
 		<Card.Header class="text-center">
 			<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
 				<Lock class="h-6 w-6 text-primary" />
 			</div>
-			<Card.Title class="text-2xl font-serif">Espace Privé</Card.Title>
+			<Card.Title class="text-2xl font-serif">V&M 2026</Card.Title>
 			<Card.Description>
-				Veuillez entrer le code d'accès pour accéder au site du mariage.
+				Espace Privé. Veuillez entrer le code d'accès présent sur votre invitation.
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>

@@ -60,7 +60,7 @@ const passwordWall: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	const hasPass = event.cookies.get('wedding_pass');
+	const hasPass = event.cookies.get('wedding_access');
 
 	if (!hasPass) {
 		throw redirect(303, '/unlock');

@@ -1,71 +1,58 @@
-.PHONY: help dev build check lint format install clean db-start db-stop db-reset db-push db-types
+# Variables
+SUPABASE_PROJECT_ID=lrrygafrwyxnzbwaxntn
 
-# --- Project Commands ---
+# Phony targets
+.PHONY: help install dev build preview lint format check qa types deploy clean
 
-# Affiche l'aide
-help:
-	@echo "Commandes disponibles :"
-	@echo "  make dev         - Lance le serveur de développement"
-	@echo "  make build       - Compile le projet pour la production"
-	@echo "  make check       - Vérifie les types TypeScript"
-	@echo "  make lint        - Vérifie le style du code (ESLint)"
-	@echo "  make format      - Formate le code (Prettier)"
-	@echo "  make install     - Installe les dépendances"
-	@echo "  make clean       - Nettoie les fichiers de build"
-	@echo ""
-	@echo "--- Supabase ---"
-	@echo "  make db-start    - Lance Supabase localement"
-	@echo "  make db-stop     - Arrête Supabase localement"
-	@echo "  make db-reset    - Réinitialise la base de données locale"
-	@echo "  make db-push     - Pousse les migrations vers la base distante"
-	@echo "  make db-types    - Génère les types TypeScript depuis la DB locale"
+# Default target
+.DEFAULT_GOAL := help
 
-# Lance le serveur de développement
-dev:
-	npm run dev
+# Help command
+help: ## Affiche cette aide
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-# Compile le projet
-build:
-	npm run build
+# --- Développement ---
 
-# Vérifie les types
-check:
-	npm run check
-
-# Vérifie le code
-lint:
-	npm run lint
-
-# Formate le code
-format:
-	npm run format
-
-# Installe les dépendances
-install:
+install: ## Installe les dépendances du projet
 	npm install
 
-# Nettoie les dossiers générés
-clean:
+dev: ## Lance le serveur de développement
+	npm run dev
+
+build: ## Compile le projet pour la production
+	npm run build
+
+preview: ## Prévisualise la version de production localement
+	npm run preview
+
+clean: ## Nettoie les fichiers de build
 	rm -rf .svelte-kit build
 
-# --- Supabase Commands ---
+# --- Qualité Code ---
 
-# Lance Supabase (Docker doit être lancé)
-db-start:
-	npx supabase start
+lint: ## Lance le linter (ESLint)
+	npm run lint
 
-# Arrête Supabase
-db-stop:
-	npx supabase stop
+format: ## Formate le code (Prettier)
+	npm run format
 
-# Réinitialise la DB locale (Attention: supprime les données)
-db-reset:
-	npx supabase db reset
+check: ## Vérifie les types TypeScript et la synchro SvelteKit
+	npm run check
 
-# Applique les migrations sur la base distante liée
-db-push:
-	npx supabase db push
+qa: lint check ## Lance tous les contrôles de qualité (Lint + Types)
 
-# Génère les types TypeScript (basé sur la DB locale)
-db-types:
-	npx supabase gen types typescript --local > src/lib/types/supabase.ts
+# --- Base de Données ---
+
+types: ## Régénère les types TypeScript depuis Supabase (Projet Distant)
+	npx supabase gen types typescript --project-id $(SUPABASE_PROJECT_ID) --schema public > src/lib/types/supabase.ts
+
+# --- Déploiement (Workflow) ---
+
+deploy: qa ## Déploie en production (Merge develop -> main -> push)
+	@echo "Début du déploiement..."
+	git checkout main
+	git pull origin main
+	git merge develop
+	git push origin main
+	git checkout develop
+	@echo "Déploiement terminé ! Retour sur la branche develop."

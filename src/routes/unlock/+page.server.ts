@@ -16,7 +16,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Code incorrect' });
 		}
 
-		cookies.set('wedding_pass', 'true', {
+		cookies.set('wedding_access', 'true', {
 			path: '/',
 			httpOnly: true,
 			secure: true,
