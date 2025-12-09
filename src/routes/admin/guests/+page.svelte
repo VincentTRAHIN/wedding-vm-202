@@ -8,8 +8,9 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Badge } from '$lib/components/ui/badge';
 	import { toast } from 'svelte-sonner';
-	import { Plus, Loader2, Users, ArrowUpDown } from 'lucide-svelte';
+	import { Plus, Loader2, Users, ArrowUpDown, Link } from 'lucide-svelte';
 	import EditGuestDialog from './EditGuestDialog.svelte';
+	import DeleteGuestDialog from './DeleteGuestDialog.svelte';
 
 	let { data } = $props();
 	let { guests } = $derived(data);
@@ -22,6 +23,8 @@
 	let sortColumn = $state<SortColumn>('full_name');
 	let sortDirection = $state<'asc' | 'desc'>('asc');
 
+	let searchQuery = $state('');
+
 	function toggleSort(column: SortColumn) {
 		if (sortColumn === column) {
 			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -32,17 +35,24 @@
 	}
 
 	let sortedGuests = $derived(
-		[...guests].sort((a, b) => {
-			const modifier = sortDirection === 'asc' ? 1 : -1;
-			if (sortColumn === 'full_name') {
-				return (a.full_name || '').localeCompare(b.full_name || '') * modifier;
-			} else if (sortColumn === 'rsvp_status') {
-				const statusA = a.rsvp_status || '';
-				const statusB = b.rsvp_status || '';
-				return statusA.localeCompare(statusB) * modifier;
-			}
-			return 0;
-		})
+		guests
+			.filter((g) => {
+				const q = searchQuery.toLowerCase();
+				return (
+					(g.full_name || '').toLowerCase().includes(q) || (g.email || '').toLowerCase().includes(q)
+				);
+			})
+			.sort((a, b) => {
+				const modifier = sortDirection === 'asc' ? 1 : -1;
+				if (sortColumn === 'full_name') {
+					return (a.full_name || '').localeCompare(b.full_name || '') * modifier;
+				} else if (sortColumn === 'rsvp_status') {
+					const statusA = a.rsvp_status || '';
+					const statusB = b.rsvp_status || '';
+					return statusA.localeCompare(statusB) * modifier;
+				}
+				return 0;
+			})
 	);
 </script>
 
@@ -111,7 +121,12 @@
 	<!-- Guest List -->
 	<Card.Root class="lg:col-span-2">
 		<Card.Header>
-			<Card.Title>Liste des invités ({guests.length})</Card.Title>
+			<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<Card.Title>Liste des invités ({sortedGuests.length})</Card.Title>
+				<div class="relative w-full sm:w-64">
+					<Input type="search" placeholder="Rechercher un invité..." bind:value={searchQuery} />
+				</div>
+			</div>
 		</Card.Header>
 		<Card.Content>
 			<Table.Root>
@@ -139,6 +154,11 @@
 							<Table.Cell>
 								<div class="flex items-center gap-2">
 									<div class="font-medium">{guest.full_name || 'Sans nom'}</div>
+									{#if guest.auth_id}
+										<span title="Compte lié">
+											<Link class="h-3 w-3 text-blue-500" />
+										</span>
+									{/if}
 									{#if guest.is_child}
 										<Badge variant="outline" class="text-[10px] h-5 px-1.5">Enfant</Badge>
 									{/if}
@@ -166,7 +186,10 @@
 								{/if}
 							</Table.Cell>
 							<Table.Cell>
-								<EditGuestDialog {guest} allGuests={guests} />
+								<div class="flex items-center gap-2">
+									<EditGuestDialog {guest} allGuests={guests} />
+									<DeleteGuestDialog {guest} />
+								</div>
 							</Table.Cell>
 						</Table.Row>
 					{/each}
