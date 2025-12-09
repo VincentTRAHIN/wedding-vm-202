@@ -1,0 +1,42 @@
+import { fail, redirect } from '@sveltejs/kit';
+import type { Actions } from './$types';
+
+export const actions: Actions = {
+	login_google: async ({ locals: { supabase }, url }) => {
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				redirectTo: `${url.origin}/auth/callback`
+			}
+		});
+
+		if (error) {
+			console.error('Google Auth Error:', error);
+			return fail(500, { message: 'Something went wrong.' });
+		}
+
+		throw redirect(303, data.url);
+	},
+
+	login_password: async ({ request, locals: { supabase } }) => {
+		const formData = await request.formData();
+		const email = formData.get('email') as string;
+		const password = formData.get('password') as string;
+
+		if (!email || !password) {
+			return fail(400, { email, missing: true });
+		}
+
+		const { error } = await supabase.auth.signInWithPassword({
+			email,
+			password
+		});
+
+		if (error) {
+			console.error('Login Error:', error);
+			return fail(400, { message: 'Invalid credentials.' });
+		}
+
+		throw redirect(303, '/');
+	}
+};

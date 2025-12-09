@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>V&amp;M 2026 - Our Gallery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#556B2F",
+              "background-light": "#F5F5DC",
+              "background-dark": "#1F2923", /* A darker green to complement the Eucalyptus */
+              "text-light": "#36454F",
+              "text-dark": "#EAE8E1",
+              "accent": "#B87333",
+            },
+            fontFamily: {
+              "display": ["Playfair Display", "serif"],
+              "sans": ["Inter", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative min-h-screen w-full">
+<!-- Main Content Area -->
+<div class="flex h-full grow flex-col">
+<div class="flex flex-1 justify-center py-5 px-4 sm:px-10 lg:px-20">
+<div class="flex w-full max-w-7xl flex-col">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-text-light/20 dark:border-text-dark/20 px-6 sm:px-10 py-4">
+<div class="flex items-center gap-4 text-text-light dark:text-text-dark">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="font-display text-xl font-bold tracking-wide">V&amp;M 2026</h2>
+</div>
+<nav class="hidden md:flex flex-1 justify-end items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Schedule</a>
+<a class="text-sm font-medium text-primary dark:text-accent" href="#">Gallery</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">RSVP</a>
+</nav>
+</header>
+<main class="flex-grow">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between gap-4 p-6 sm:p-10">
+<div class="flex flex-col gap-3">
+<p class="font-display text-4xl lg:text-5xl font-bold tracking-wide">Our Gallery</p>
+<p class="text-base font-normal leading-normal text-text-light/80 dark:text-text-dark/70">Help us capture the magic. Upload your photos from our special day.</p>
+</div>
+</div>
+<!-- ProgressBar -->
+<div class="flex flex-col gap-2 p-6 sm:p-10 pt-0">
+<div class="flex gap-6 justify-between"><p class="text-sm font-medium leading-normal">Uploading 3 photos...</p></div>
+<div class="rounded-full bg-primary/20 dark:bg-text-dark/20 h-2"><div class="h-2 rounded-full bg-accent" style="width: 65%;"></div></div>
+<p class="text-xs font-normal leading-normal text-text-light/60 dark:text-text-dark/60">Upload in progress...</p>
+</div>
+<!-- ImageGrid -->
+<div class="p-6 sm:p-10 pt-0" style="columns: 2; column-gap: 1rem; sm:columns: 3; md:columns: 4;">
+<img class="mb-4 rounded-lg w-full" data-alt="A smiling couple holding hands during their wedding ceremony." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIa4jff2jaf-UaP2yvvsS21BQ_XIGD_dxCwknB6-0ivCThpw5ucR7XeGTfYmFTR_eOuQD7Mak_LCHl_e9uz1RqzJKqTGxRHWXOWCvZ4eNSNae-Ughjvdcr_eY5ON7GAcam8PPCIR8ubnep23DmwGd-5ilWxwbF_P5-g7M90h3TG4uICvbeftaD0BcTW5d4McWC1nvb3csgzT2-0pFUV-tj0PNou9fZSZhZwQ7G1TF49X3yM-OUhIe7eSb1WPmkYLu_I4wy2vqRr7Iw"/>
+<img class="mb-4 rounded-lg w-full" data-alt="Close-up of a wedding bouquet with white and pink flowers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDulPhVis6gz91022-rrYUPUbtD8DkFZnY2IOaAqt3Z1xddYI2meVrAc4aeo83oU7ypx5Q9Zu5yTZy5SMumZ-mz3j_te0mJjLitrWzY8PXD6DrinC2UbwyTLIrgFem7gXcWXYAoOp0NDJ0gDQdZVU7W6tXwYdouY5NXNHwhppcBTWwHRDyPqzBc8HPoJqRc8U0ywarAYo1xNIcBGp9tNsq7ush1zIIGYhv7Zz_qYkA27HOwurwwE_YZoeExiXzfWZIeVmm9Lp3JcYQq"/>
+<img class="mb-4 rounded-lg w-full" data-alt="Guests tossing confetti at the newly married couple." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHVmjoxOZrzi_mH-yGiiYB4FKokWq7MTqhE4bxsaz9eCAwB7nzXOiQHDIHDGncvfK-q-M0oVs4Diw0unNhUB5Kdw7vXMYf17pWIx4LI8Nwf8m4qyK6W7Z0AbTY8h_qBHnpkaGnPz4DAvFs6pA33-kSyiqy_eg319E_BZFUuN3xwdds4d1OqwkDzYw6wkc2r0O0smBnubczFh-3wP78Dj0bpIS_mAKUrjLNBrSoZXyjzIMJwab1U1NLJ0XMkMX7HAs-2zOO2QRE_UIh"/>
+<img class="mb-4 rounded-lg w-full" data-alt="A three-tiered wedding cake decorated with fresh flowers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWxEwUMhkzusj6YgcUmFwBxqo5PY2AZHaLyXo9lwsHa-uCUcXkFF8wPYhCWgmak_U0HbakImBlOSvlJt4umvFKEBJjcIVDUr_eBdyiAtJMNIYesbZT6zr93aX2t0I9J04cYUxmhkewUYmR2tcDaACGnka2Esuxorq5NBVMjfeA8Q7Mstt4lqJO6MyBh-4CEjtfErl_EXk17NeHmXWBFxXM-Jhr56dj-zEL5DtunttUzzUhLgoiMZZ17OzdrwpjjAXsZ7GST_bLHMt-"/>
+<img class="mb-4 rounded-lg w-full" data-alt="An outdoor wedding reception venue with string lights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKZojilMFiUNdczLFbGi_YpBa3U5oMvAkJznsNhLUahcFvZJ7VyFKBX9HhAxUexJi-CmtkAmp2O5nO2M1mQ73xgSwj9bYhQ8Gga1R-uW4XAKG0rtFBGwhHcTLqKr1iMW7ggt9v8Af15cUsyjFEnKmHMKlWhlUSV_zpVBlbkHjOA--vX2J0OTWaRbjYI9PXZ22D_ngGmwlFBYwRAa4kwj3-otVD94G3p7G57YWRYxVLusDPgPhqH8S-e8dtj9ZH10DmQwZTl3lNJoII"/>
+<img class="mb-4 rounded-lg w-full" data-alt="The bride and groom sharing their first dance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHhOVDuKGoz8xCd0FB23ca6pQiUU47dkLvm83UugD-1i_BiJout22lQLq3z4oDU5sZbWmmC311E2X6dDauv8-l8bWhRikov6LxWySE1w7aJtMkAGGhY0Ka97dSpO5zNi7geB5su8Mf1KZ8CY98PTxGfZZJsOQ49uviOqXWJ-kKPuvKsdXk-puX8Qm3FLYl8YQHyB8lA7ajPguCl8AnfHRYFjp9A2uHxwi1ntfP8_C2caAlM0IuijdnT8LpypI47TmXxwcXMTjqQlWs"/>
+<img class="mb-4 rounded-lg w-full" data-alt="A table setting at the wedding with elegant dinnerware." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB20UXaH4ExQye7YbsbP5YeRnBkRO7b5AGT7KCRqckiBhu9g8q5v4hRk92e6KWE7kZwdUhF5umVW1CLJqR3jrDFA87jd7AE3QnwB5TMKRDoxLVHKLWbP-p1xuEACDLPA6V36S4rv3Jm5lZgNs4mchSx8NsBtClVZgzZf0OmNzyZh11n4UiNQvEVH7wleMbRbf_EMKw1OBB4ulgQbKsVdXELtaC5QxGtXrbLbylUZPfubd5tLwGvSEpk1C2jveJnBXIuivAzd3-AMIUt"/>
+<img class="mb-4 rounded-lg w-full" data-alt="A candid photo of guests laughing and talking." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQG4YF3StjXuWGPH00yUusTMKEMf3F4QKX69jbEPZ48kD0Dl15WoSav9yiwhABRhrX0PCs3b4u5-RhMjeKxqYRqvNxcEok8fM-ve8-FLt5_dQ1rCX09YLgac1P3BDT1OfwZpjPjmTsXxH8T6e96QEknmwT6tWHPPHwgEUlDpxfeq1Dia1P9AQhN-gteO_vm6ddyJp7MoLSYEDw8YZcB-pnJsgfmXDyMJYyCTm4gEm43g3vjUKxCAgt4myp1rso7m5Qa6bfFhF30yEr"/>
+<img class="mb-4 rounded-lg w-full" data-alt="Wedding rings displayed on a leaf." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv9kZM5DslXkFuyk6Vap_hKhXP9Lhm-n5ETNNm5zv4DYoYDlXQdENssU2RYTvrvZTYKd5WPEJupmctYX4rGyjBFTKN1V8qIUhMl7owkHP6CLOcfLzYqthhAv4_TIarp7PCva1xRSwp0gGAv_RH1SOmPXan4niIE7GtvQAXnYXj2Y_ApkDsP4uKpdIXRyB-U-JpIfsOqud9j0etGFXUSYvYDPGv1Eo5hXjeqJHLsOYZ6rpXnB2pLsDcNsCan2mjcYEVrHwoFXHnJ0uw"/>
+<img class="mb-4 rounded-lg w-full" data-alt="Couple walking away hand in hand into a forest path." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwqd01B5xc_Z5Skavq32OHUZzH2nSpHKKc4cims_t9LPgM_5sNA1glKKiRhYj4LxeRTijbJQFmLbG5DBH7PU4Q_UW-0CuY-kzeVyGjKwXdQZWqS5KsdioOYQZ2k2dbK24FbyvsLvWvDX50UIAtcn0EbogwpyF-ALQJ_EGeJvkkUJdr9GFswARM19rzaHonDnQHxWS3jXPUBq90NT5rQy3fRVFXPsyxs-1fOUKEPpcF_Qg89q9fUN2tLz9lg4SxIn9hbgEd__ZcpkJz"/>
+<img class="mb-4 rounded-lg w-full" data-alt="A champagne toast among friends at the wedding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfCZsQleabfAuHYbJSbD2eYWjk8hb9mQ0ncZ1Mu9LthDFiBoeCmm-Oi3yYJi0Ygqcu32z_xvAdK8mhgZcvklJ7w-y7TSL_x-iFJjkf2yVSSiSihcCxuOhSb6a6iJ9L-Ffb3g60LfUKBW-OuOxMjiBj0IUHG3UrjNB2k2jChj2srLTkHh8p_PtZlaM85pCi2jzWNeptQR1eq6pt7UGlCf3vxWbbROXARv5gDqhWVbzspjh6rIr5SPTtljvOeQu0FoTjhHh7_oomHIQY"/>
+<img class="mb-4 rounded-lg w-full" data-alt="The groom looking at the bride during the vows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk0tOc7_GY9i9Eac3iVQUbUWdrzAaA1bC92aGjIIgKZOfyUkh5ufWZ6LA2feOiKR5a6dOfesAcSTv91JZtLYsOS-1RQpq-Ss_ofTVxDa7AERXr0QyNE6-NttP2UkVYv6vXCqIve0XtD-Rmkl9BCbVOG5fDjgz9LaQoSwFzpkWUlm0cNMQs2QX_q-NeFemW4FF1DWgunl2LAo0YFcY8kZv6h6FEWUhopnrZOoclQo4JpqhjIk3YlEz4Ndrq26fKP0-jNKr3imvleWsl"/>
+</div>
+</main>
+</div>
+</div>
+</div>
+<!-- FAB -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-primary text-background-light dark:text-background-dark shadow-lg hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined !text-3xl">photo_camera</span>
+</button>
+</div>
+</div>
+</body></html>
