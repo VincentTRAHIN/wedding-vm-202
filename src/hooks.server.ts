@@ -3,8 +3,6 @@ import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Database } from '$lib/types/supabase';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-import { SERVICE_ROLE_KEY } from '$env/static/private';
-import { createClient } from '@supabase/supabase-js';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient<Database>(
@@ -56,14 +54,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 
 const passwordWall: Handle = async ({ event, resolve }) => {
 	// Exceptions : Pages accessibles sans mot de passe
-	const publicPaths = [
-		'/unlock',
-		'/health',
-		'/_app',
-		'/favicon',
-		'/robots.txt',
-		'/manifest.json'
-	];
+	const publicPaths = ['/unlock', '/health', '/_app', '/favicon', '/robots.txt', '/manifest.json'];
 
 	if (publicPaths.some((path) => event.url.pathname.startsWith(path))) {
 		return resolve(event);
@@ -97,13 +88,13 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 	// 3. Protection Admin
 	if (event.url.pathname.startsWith('/admin')) {
-		const { data: guest } = await (event.locals.supabase as any)
+		const { data: guest } = await event.locals.supabase
 			.from('guests')
 			.select('role')
 			.eq('auth_id', user.id)
-			.single();
+			.maybeSingle();
 
-		if (!guest || guest.role !== 'admin') {
+		if (!guest || (guest as { role: string }).role !== 'admin') {
 			throw redirect(303, '/');
 		}
 	}
