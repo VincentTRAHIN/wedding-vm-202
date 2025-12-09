@@ -55,7 +55,12 @@ const rsvpSchema = z.object({
 	dietary_restrictions: z.string().optional()
 });
 
-import { sendInvitationEmail } from '$lib/server/email';
+import {
+	sendRsvpConfirmation,
+	sendGuestInvitation,
+	sendAdminAlert,
+	sendInvitationEmail
+} from '$lib/server/email';
 
 export const actions: Actions = {
 	update: async ({ request, locals: { user } }) => {
@@ -78,13 +83,15 @@ export const actions: Actions = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { data: guests } = await (supabaseAdmin as any)
 			.from('guests')
-			.select('id, auth_id, managed_by_id')
+			.select('id, auth_id, managed_by_id, full_name, email, invitation_code')
 			.or(`id.eq.${currentUserGuest.id},managed_by_id.eq.${currentUserGuest.id}`);
 
 		if (!guests) return fail(500, { message: 'Error fetching guests' });
 
 		const errors: Record<string, unknown> = {};
 		let hasError = false;
+		const updatedGuestsList: { full_name: string; rsvp_status: string }[] = [];
+		let mainGuestStatus = 'pending';
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		for (const guest of guests as any[]) {
@@ -97,7 +104,7 @@ export const actions: Actions = {
 
 			const rawData = {
 				rsvp_status: status,
-				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`)
+				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || undefined
 			};
 
 			const result = rsvpSchema.safeParse(rawData);
@@ -123,12 +130,48 @@ export const actions: Actions = {
 				console.error(`Error updating guest ${guest.id}:`, error);
 				errors[guest.id] = { server: 'Update failed' };
 				hasError = true;
+			} else {
+				// Track for emails
+				updatedGuestsList.push({ full_name: guest.full_name, rsvp_status });
+
+				if (guest.id === currentUserGuest.id) {
+					mainGuestStatus = rsvp_status;
+				}
+
+				// Send Invitation to secondary guests if they are present and have email
+				if (
+					rsvp_status === 'present' &&
+					guest.email &&
+					guest.id !== currentUserGuest.id &&
+					guest.email !== user.email
+				) {
+					// Fire and forget
+					sendGuestInvitation(
+						guest.email,
+						guest.full_name,
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						(guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name || 'Un proche',
+						guest.invitation_code
+					);
+				}
 			}
 		}
 
 		if (hasError) {
 			return fail(400, { errors, message: 'Some updates failed' });
 		}
+
+		// Send Confirmation to Main Guest
+		if (user.email) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
+			await sendRsvpConfirmation(user.email, mainGuestName || 'Invité', updatedGuestsList);
+		}
+
+		// Send Admin Alert
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
+		await sendAdminAlert(mainGuestName || 'Inconnu', mainGuestStatus, updatedGuestsList);
 
 		return { success: true };
 	},

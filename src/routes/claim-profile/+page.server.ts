@@ -58,14 +58,20 @@ export const actions: Actions = {
 		if (guest.auth_id) return fail(400, { message: 'Cet invité a déjà été réclamé.' });
 
 		// Link
+		console.log('Claiming guest:', guestId);
+		console.log('User email:', user.email);
+
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { error } = await (supabaseAdmin as any)
 			.from('guests')
-			.update({ auth_id: user.id })
+			.update({
+				auth_id: user.id,
+				email: user.email?.toLowerCase()
+			})
 			.eq('id', guestId);
 
 		if (error) {
-			console.error(error);
+			console.error('Error linking guest:', error);
 			return fail(500, { message: 'Erreur lors de la liaison.' });
 		}
 

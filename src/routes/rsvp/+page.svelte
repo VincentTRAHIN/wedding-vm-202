@@ -118,6 +118,7 @@
 						isSubmitting = true;
 						return async ({ result, update }) => {
 							isSubmitting = false;
+							console.log('RSVP Update Result:', result);
 							if (result.type === 'success') {
 								if (isRemove) {
 									toast.success('Invité retiré de votre liste.');

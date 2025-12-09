@@ -51,22 +51,24 @@
 	<Popover.Content class="w-[300px] p-0">
 		<Command.Root>
 			<Command.Input placeholder="Rechercher un invité..." />
-			<Command.Empty>{emptyText}</Command.Empty>
-			<Command.Group class="max-h-64 overflow-y-auto">
-				{#each guests as guest}
-					<Command.Item
-						value={guest.full_name}
-						onSelect={() => {
-							value = guest.id;
-							if (onSelect) onSelect(guest);
-							closeAndFocusTrigger();
-						}}
-					>
-						<Check class={cn('mr-2 h-4 w-4', value !== guest.id && 'text-transparent')} />
-						{guest.full_name}
-					</Command.Item>
-				{/each}
-			</Command.Group>
+			<Command.List>
+				<Command.Empty>{emptyText}</Command.Empty>
+				<Command.Group class="max-h-64 overflow-y-auto">
+					{#each guests as guest}
+						<Command.Item
+							value={guest.full_name}
+							onSelect={() => {
+								value = guest.id;
+								if (onSelect) onSelect(guest);
+								closeAndFocusTrigger();
+							}}
+						>
+							<Check class={cn('mr-2 h-4 w-4', value !== guest.id && 'text-transparent')} />
+							{guest.full_name}
+						</Command.Item>
+					{/each}
+				</Command.Group>
+			</Command.List>
 		</Command.Root>
 	</Popover.Content>
 </Popover.Root>
