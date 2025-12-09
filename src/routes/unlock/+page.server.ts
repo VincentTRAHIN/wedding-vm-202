@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { WEDDING_ACCESS_CODE } from '$env/static/private';
+import { dev } from '$app/environment';
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
@@ -19,7 +20,7 @@ export const actions: Actions = {
 		cookies.set('wedding_access', 'true', {
 			path: '/',
 			httpOnly: true,
-			secure: true,
+			secure: !dev,
 			maxAge: 60 * 60 * 24 * 30 // 30 days
 		});
 

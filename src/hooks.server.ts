@@ -61,8 +61,10 @@ const passwordWall: Handle = async ({ event, resolve }) => {
 	}
 
 	const hasPass = event.cookies.get('wedding_access');
+	console.log(`[PasswordWall] Path: ${event.url.pathname}, HasPass: ${hasPass}`);
 
 	if (!hasPass) {
+		console.log('[PasswordWall] Access denied. Redirecting to /unlock');
 		throw redirect(303, '/unlock');
 	}
 
