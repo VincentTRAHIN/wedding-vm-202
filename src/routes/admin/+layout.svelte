@@ -5,17 +5,14 @@
 
 	let { children } = $props();
 
-	const tabs = [
-		{ href: '/admin/guests', label: 'Invités', icon: Users },
-		{ href: '/admin/photos', label: 'Photos', icon: Image }
-	];
+	const tabs = [{ href: '/admin/guests', label: 'Invités', icon: Users }];
 </script>
 
 <div class="container py-8">
 	<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 		<div>
 			<h1 class="font-serif text-3xl font-bold text-primary">Administration</h1>
-			<p class="text-muted-foreground">Gérez les invités et modérez les photos.</p>
+			<p class="text-muted-foreground">Gérez la liste des invités.</p>
 		</div>
 		<div class="flex gap-2">
 			{#each tabs as tab}
