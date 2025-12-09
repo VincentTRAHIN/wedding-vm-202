@@ -17,10 +17,11 @@ export const actions: Actions = {
 			return fail(400, { error: 'Code incorrect' });
 		}
 
-		cookies.set('wedding_access', 'true', {
+		cookies.set('wedding_pass', 'true', {
 			path: '/',
 			httpOnly: true,
-			secure: !dev,
+			sameSite: 'lax',
+			secure: !dev, // Secure in production only
 			maxAge: 60 * 60 * 24 * 30 // 30 days
 		});
 
