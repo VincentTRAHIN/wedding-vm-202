@@ -4,9 +4,10 @@ import type { Actions } from './$types';
 export const actions: Actions = {
 	login_google: async ({ locals: { supabase }, url }) => {
 		// Force production URL if we are in production (to avoid localhost issues behind proxy)
-		const origin = process.env.NODE_ENV === 'production' 
-			? 'https://july18.melanie.vincent-trahin.dev' 
-			: url.origin;
+		const origin =
+			process.env.NODE_ENV === 'production'
+				? 'https://july18.melanie.vincent-trahin.dev'
+				: url.origin;
 
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',

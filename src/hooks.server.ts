@@ -54,6 +54,30 @@ const supabase: Handle = async ({ event, resolve }) => {
 	});
 };
 
+const passwordWall: Handle = async ({ event, resolve }) => {
+	// Exceptions : Pages accessibles sans mot de passe
+	const publicPaths = [
+		'/unlock',
+		'/health',
+		'/_app',
+		'/favicon',
+		'/robots.txt',
+		'/manifest.json'
+	];
+
+	if (publicPaths.some((path) => event.url.pathname.startsWith(path))) {
+		return resolve(event);
+	}
+
+	const hasPass = event.cookies.get('wedding_pass');
+
+	if (!hasPass) {
+		throw redirect(303, '/unlock');
+	}
+
+	return resolve(event);
+};
+
 const authGuard: Handle = async ({ event, resolve }) => {
 	const { session, user } = await event.locals.safeGetSession();
 	event.locals.session = session;
@@ -87,4 +111,4 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(supabase, authGuard);
+export const handle = sequence(supabase, passwordWall, authGuard);
