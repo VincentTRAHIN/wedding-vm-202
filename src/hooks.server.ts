@@ -76,7 +76,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 	// 1. Routes Publiques (Login, Auth callbacks, Logout, Register)
 	// Register doit être public pour permettre l'inscription des nouveaux utilisateurs
-	const publicRoutes = ['/login', '/auth/callback', '/logout', '/register'];
+	const publicRoutes = ['/login', '/auth/callback', '/logout', '/register', '/unlock'];
 	if (publicRoutes.some((route) => event.url.pathname.startsWith(route))) {
 		return resolve(event);
 	}
