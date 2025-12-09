@@ -36,13 +36,13 @@
 
 	let sortedGuests = $derived(
 		guests
-			.filter((g) => {
+			.filter((g: typeof guests[0]) => {
 				const q = searchQuery.toLowerCase();
 				return (
 					(g.full_name || '').toLowerCase().includes(q) || (g.email || '').toLowerCase().includes(q)
 				);
 			})
-			.sort((a, b) => {
+			.sort((a: typeof guests[0], b: typeof guests[0]) => {
 				const modifier = sortDirection === 'asc' ? 1 : -1;
 				if (sortColumn === 'full_name') {
 					return (a.full_name || '').localeCompare(b.full_name || '') * modifier;

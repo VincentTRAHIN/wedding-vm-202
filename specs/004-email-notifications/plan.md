@@ -31,8 +31,8 @@ Implémenter le système d'envoi d'emails transactionnels (Invitations, Confirma
 
 ## Flux de Données
 
-1.  User submits RSVP.
-2.  Server updates DB.
-3.  Server triggers Email Service.
-4.  Email Service renders templates.
-5.  Email Service sends via Resend API.
+1. User submits RSVP.
+2. Server updates DB.
+3. Server triggers Email Service.
+4. Email Service renders templates.
+5. Email Service sends via Resend API.
