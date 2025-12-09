@@ -5,7 +5,7 @@
 
 	let { data } = $props();
 
-	const userName = data.session?.user?.user_metadata?.full_name?.split(' ')[0] ?? null;
+	let userName = $derived(data.guest?.full_name ?? 'Invité');
 
 	let timeLeft = $state({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 	let timer: ReturnType<typeof setInterval>;

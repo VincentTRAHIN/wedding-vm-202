@@ -19,33 +19,24 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 			const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
 			// Check if guest exists
-			const { data: existingGuest } = await supabaseAdmin
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const { data: existingGuest } = await (supabaseAdmin as any)
 				.from('guests')
 				.select('id, auth_id')
-				.eq('email', user.email!)
+				.eq('email', user.email!.toLowerCase())
 				.single();
 
 			if (existingGuest) {
 				// Link if not linked
 				if (!existingGuest.auth_id) {
-					await supabaseAdmin
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					await (supabaseAdmin as any)
 						.from('guests')
 						.update({ auth_id: user.id })
 						.eq('id', existingGuest.id);
 				}
-			} else {
-				// Create new guest
-				await supabaseAdmin.from('guests').insert({
-					email: user.email!,
-					auth_id: user.id,
-					full_name: user.user_metadata.full_name || user.email,
-					role: 'guest',
-					rsvp_status: 'pending',
-					adults_count: 1,
-					children_count: 0,
-					expected_count: 1
-				});
 			}
+			// Do NOT auto-create guests. Unlinked users will be redirected to /claim-profile by layout.server.ts
 
 			throw redirect(303, next);
 		}

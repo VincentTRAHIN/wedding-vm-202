@@ -1,0 +1,105 @@
+<script lang="ts">
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { Check, X } from 'lucide-svelte';
+	import { cn } from '$lib/utils';
+
+	let {
+		guest,
+		prefix = '',
+		isRemovable = false
+	} = $props<{
+		guest: {
+			id: string;
+			full_name: string;
+			rsvp_status: string;
+			dietary_restrictions?: string;
+		};
+		prefix?: string;
+		isRemovable?: boolean;
+	}>();
+
+	let rsvpStatus = $state(guest.rsvp_status || 'present');
+</script>
+
+<div class="mb-8 border-b border-stone-100 pb-8 last:mb-0 last:border-0 last:pb-0">
+	<div class="mb-4 flex items-center justify-between">
+		<h3 class="font-serif text-xl font-bold text-sage-900">{guest.full_name}</h3>
+		{#if isRemovable}
+			<button
+				type="submit"
+				formaction="?/removeManagedGuest"
+				name="guestId"
+				value={guest.id}
+				class="rounded-full p-1 text-stone-400 transition-colors hover:bg-red-50 hover:text-red-500"
+				aria-label="Retirer cet invité"
+				title="Retirer de ma liste"
+			>
+				<X class="h-5 w-5" />
+			</button>
+		{/if}
+	</div>
+
+	<input type="hidden" name="{prefix}rsvp_status" value={rsvpStatus} />
+
+	<!-- Presence Toggle -->
+	<div class="mb-6 space-y-3">
+		<Label class="text-base font-medium text-stone-700">Sera présent(e) ?</Label>
+		<div class="grid grid-cols-2 gap-4">
+			<button
+				type="button"
+				class={cn(
+					'relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
+					rsvpStatus === 'present'
+						? 'border-sage-600 bg-sage-50 text-sage-900'
+						: 'border-stone-100 bg-white text-stone-500'
+				)}
+				onclick={() => (rsvpStatus = 'present')}
+			>
+				<div
+					class={cn(
+						'rounded-full p-2',
+						rsvpStatus === 'present' ? 'bg-sage-100 text-sage-700' : 'bg-stone-100 text-stone-400'
+					)}
+				>
+					<Check class="h-5 w-5" />
+				</div>
+				<span class="font-semibold">Oui</span>
+			</button>
+
+			<button
+				type="button"
+				class={cn(
+					'relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
+					rsvpStatus === 'absent'
+						? 'border-red-200 bg-red-50 text-red-900'
+						: 'border-stone-100 bg-white text-stone-500'
+				)}
+				onclick={() => (rsvpStatus = 'absent')}
+			>
+				<div
+					class={cn(
+						'rounded-full p-2',
+						rsvpStatus === 'absent' ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-400'
+					)}
+				>
+					<X class="h-5 w-5" />
+				</div>
+				<span class="font-semibold">Non</span>
+			</button>
+		</div>
+	</div>
+
+	{#if rsvpStatus === 'present'}
+		<div class="space-y-3">
+			<Label for="{prefix}dietary_restrictions">Restrictions alimentaires</Label>
+			<Textarea
+				name="{prefix}dietary_restrictions"
+				id="{prefix}dietary_restrictions"
+				placeholder="Allergies, régime végétarien..."
+				value={guest.dietary_restrictions}
+				class="resize-none"
+			/>
+		</div>
+	{/if}
+</div>

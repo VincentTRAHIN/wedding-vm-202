@@ -22,17 +22,42 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 	const userRole = guest?.role;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const { data: photos, error } = await (supabaseAdmin as any)
+	const { data: photosData, error } = await (supabaseAdmin as any)
 		.from('photos')
-		.select('*, guests(full_name)')
+		.select(
+			`
+			*,
+			guests(full_name),
+			photo_likes(count),
+			photo_comments(count)
+		`
+		)
 		.order('created_at', { ascending: false });
 
 	if (error) {
 		console.error('Error fetching photos:', error);
 	}
 
+	// Fetch user's likes to determine is_liked_by_user
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const { data: userLikes } = await (supabaseAdmin as any)
+		.from('photo_likes')
+		.select('photo_id')
+		.eq('user_id', user.id);
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const userLikedPhotoIds = new Set(userLikes?.map((l: any) => l.photo_id));
+
+	const photos =
+		photosData?.map((photo: any) => ({
+			...photo,
+			likes_count: photo.photo_likes[0]?.count ?? 0,
+			comments_count: photo.photo_comments[0]?.count ?? 0,
+			is_liked_by_user: userLikedPhotoIds.has(photo.id)
+		})) ?? [];
+
 	return {
-		photos: photos ?? [],
+		photos,
 		userRole
 	};
 };
@@ -77,7 +102,7 @@ export const actions: Actions = {
 			storage_path: fileName,
 			guest_id: guest.id,
 			owner_id: user.id,
-			status: 'pending',
+			status: 'approved',
 			caption
 		});
 
@@ -142,6 +167,87 @@ export const actions: Actions = {
 			console.error('DB Delete Error:', dbError);
 			return fail(500, { message: 'Failed to delete photo' });
 		}
+
+		return { success: true };
+	},
+
+	toggleLike: async ({ request, locals: { supabase, user } }) => {
+		if (!user) return fail(401, { message: 'Unauthorized' });
+		const formData = await request.formData();
+		const photoId = formData.get('photoId') as string;
+
+		if (!photoId) return fail(400, { message: 'Missing photo ID' });
+
+		// Check if liked
+		const { data: existing } = await supabase
+			.from('photo_likes')
+			.select('user_id')
+			.eq('user_id', user.id)
+			.eq('photo_id', photoId)
+			.single();
+
+		if (existing) {
+			const { error } = await supabase
+				.from('photo_likes')
+				.delete()
+				.eq('user_id', user.id)
+				.eq('photo_id', photoId);
+			if (error) return fail(500, { message: 'Failed to unlike' });
+		} else {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const { error } = await (supabase as any)
+				.from('photo_likes')
+				.insert({ user_id: user.id, photo_id: photoId });
+			if (error) return fail(500, { message: 'Failed to like' });
+		}
+
+		return { success: true };
+	},
+
+	addComment: async ({ request, locals: { supabase, user } }) => {
+		if (!user) return fail(401, { message: 'Unauthorized' });
+		const formData = await request.formData();
+		const photoId = formData.get('photoId') as string;
+		const content = formData.get('content') as string;
+
+		if (!photoId || !content) return fail(400, { message: 'Missing data' });
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { error } = await (supabase as any)
+			.from('photo_comments')
+			.insert({ user_id: user.id, photo_id: photoId, content });
+
+		if (error) return fail(500, { message: 'Failed to comment' });
+
+		return { success: true };
+	},
+
+	deleteComment: async ({ request, locals: { supabase, user } }) => {
+		if (!user) return fail(401, { message: 'Unauthorized' });
+		const formData = await request.formData();
+		const commentId = formData.get('commentId') as string;
+
+		if (!commentId) return fail(400, { message: 'Missing comment ID' });
+
+		// Check if user is owner or admin
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { data: comment, error: fetchError } = await (supabase as any)
+			.from('photo_comments')
+			.select('user_id')
+			.eq('id', commentId)
+			.single();
+
+		if (fetchError || !comment) return fail(404, { message: 'Comment not found' });
+
+		// Allow deletion if user owns the comment OR is admin (email check)
+		const isAdmin = user.email === 'admin@example.com'; // Replace with real admin check if needed
+		if (comment.user_id !== user.id && !isAdmin) {
+			return fail(403, { message: 'Forbidden' });
+		}
+
+		const { error } = await supabase.from('photo_comments').delete().eq('id', commentId);
+
+		if (error) return fail(500, { message: 'Failed to delete comment' });
 
 		return { success: true };
 	}

@@ -113,23 +113,54 @@
 			class="grid gap-4 py-4"
 		>
 			<div class="grid gap-2">
-				<Label for="photo">Photo</Label>
-				<Input
-					id="photo"
-					name="photo"
-					type="file"
-					accept="image/*"
-					required
-					onchange={handleFileSelect}
-					disabled={isUploading || isCompressing}
-				/>
-			</div>
-
-			{#if previewUrl}
-				<div class="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
-					<img src={previewUrl} alt="Preview" class="h-full w-full object-cover" />
+				<Label for="photo" class={previewUrl ? 'sr-only' : ''}>Photo</Label>
+				<div class="flex w-full items-center justify-center">
+					<label
+						for="photo"
+						class={cn(
+							'flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors hover:bg-muted/50',
+							isUploading || isCompressing ? 'cursor-not-allowed opacity-50' : '',
+							previewUrl ? 'border-primary/50 bg-muted/20' : 'border-muted-foreground/25'
+						)}
+					>
+						{#if previewUrl}
+							<div class="relative h-full w-full p-2">
+								<img
+									src={previewUrl}
+									alt="Preview"
+									class="h-full w-full rounded-md object-contain"
+								/>
+								<div
+									class="absolute inset-0 m-2 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity hover:opacity-100"
+								>
+									<span class="flex items-center gap-2 font-medium text-white">
+										<ImagePlus class="h-5 w-5" />
+										Changer
+									</span>
+								</div>
+							</div>
+						{:else}
+							<div
+								class="flex flex-col items-center justify-center pb-6 pt-5 text-muted-foreground"
+							>
+								<Upload class="mb-3 h-10 w-10" />
+								<p class="mb-2 text-sm font-semibold">Cliquez pour choisir une photo</p>
+								<p class="text-xs">JPG, PNG, WEBP</p>
+							</div>
+						{/if}
+						<input
+							id="photo"
+							name="photo"
+							type="file"
+							accept="image/*"
+							class="hidden"
+							required={!selectedFile}
+							onchange={handleFileSelect}
+							disabled={isUploading || isCompressing}
+						/>
+					</label>
 				</div>
-			{/if}
+			</div>
 
 			<div class="grid gap-2">
 				<Label for="caption">Légende (optionnel)</Label>

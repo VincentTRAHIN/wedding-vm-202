@@ -3,7 +3,7 @@ import type { Database } from '$lib/types/supabase';
 import type { LayoutLoad } from './$types';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 
-export const load: LayoutLoad = async ({ depends, fetch }) => {
+export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	/**
 	 * Declare a dependency so the layout can be invalidated, for example, on
 	 * session refresh.
@@ -25,5 +25,11 @@ export const load: LayoutLoad = async ({ depends, fetch }) => {
 		data: { session }
 	} = await supabase.auth.getSession();
 
-	return { supabase, session, user: session?.user };
+	return {
+		supabase,
+		session,
+		user: session?.user,
+		guest: data.guest,
+		userRole: data.guest?.role
+	};
 };
