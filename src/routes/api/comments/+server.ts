@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SERVICE_ROLE_KEY } from '$env/static/private';
+import type { Database } from '$lib/types/supabase';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, locals: { user } }) => {
@@ -10,7 +11,7 @@ export const GET: RequestHandler = async ({ url, locals: { user } }) => {
 	const photoId = url.searchParams.get('photoId');
 	if (!photoId) return json({ error: 'Missing photoId' }, { status: 400 });
 
-	const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
+	const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
 	// 1. Fetch comments
 	const { data: comments, error: commentsError } = await supabaseAdmin

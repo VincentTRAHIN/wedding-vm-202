@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 	if (error) {
 		console.error('Error fetching guests:', error);
-		return { guests: [] };
+		return { guests: [], rooms: [] };
 	}
 
 	// Manually resolve managed_by relationship to avoid PostgREST recursion issues
@@ -33,8 +33,18 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 		return { ...guest, managed_by: null };
 	});
 
+	const { data: rooms, error: roomsError } = await supabase
+		.from('rooms')
+		.select('id, name, capacity')
+		.order('name');
+
+	if (roomsError) {
+		console.error('Error fetching rooms:', roomsError);
+	}
+
 	return {
-		guests
+		guests,
+		rooms: rooms || []
 	};
 };
 
@@ -45,11 +55,12 @@ const addGuestSchema = z.object({
 });
 
 const editGuestSchema = addGuestSchema.extend({
-	id: z.string().uuid()
+	id: z.string().uuid(),
+	room_id: z.string().uuid().optional().or(z.literal(''))
 });
 
 export const actions: Actions = {
-	add: async ({ request, locals: { supabase } }) => {
+	add: async ({ request }) => {
 		const formData = await request.formData();
 		const rawData = Object.fromEntries(formData);
 
@@ -90,7 +101,7 @@ export const actions: Actions = {
 		return { success: true };
 	},
 
-	edit: async ({ request, locals: { supabase } }) => {
+	edit: async ({ request }) => {
 		const formData = await request.formData();
 		const rawData = Object.fromEntries(formData);
 
@@ -102,13 +113,14 @@ export const actions: Actions = {
 			});
 		}
 
-		const { id, email, full_name, is_child } = result.data;
+		const { id, email, full_name, is_child, room_id } = result.data;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const updateData: any = {
 			full_name,
 			email: email ? email.toLowerCase() : null,
-			is_child: is_child === 'on'
+			is_child: is_child === 'on',
+			room_id: room_id || null
 		};
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,7 +137,7 @@ export const actions: Actions = {
 		return { success: true };
 	},
 
-	delete: async ({ request, locals: { supabase } }) => {
+	delete: async ({ request }) => {
 		const formData = await request.formData();
 		const id = formData.get('id');
 

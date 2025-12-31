@@ -3,6 +3,14 @@
 	import PhotoGrid from './photo-grid.svelte';
 	import Lightbox from './lightbox.svelte';
 	import { Heart, Image as ImageIcon } from 'lucide-svelte';
+	import type { Database } from '$lib/types/supabase';
+
+	type Photo = Database['public']['Tables']['photos']['Row'] & {
+		is_liked_by_user: boolean;
+		likes_count: number;
+		comments_count: number;
+		guests: { full_name: string | null } | null;
+	};
 
 	let { data } = $props();
 	let { photos, supabase, session, userRole } = $derived(data);
@@ -11,7 +19,7 @@
 	let selectedPhotoIndex = $state(-1);
 
 	let filteredPhotos = $derived(
-		filter === 'likes' ? photos.filter((p: any) => p.is_liked_by_user) : photos
+		filter === 'likes' ? photos.filter((p: Photo) => p.is_liked_by_user) : photos
 	);
 
 	function handlePhotoClick(index: number) {

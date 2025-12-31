@@ -8,12 +8,12 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Badge } from '$lib/components/ui/badge';
 	import { toast } from 'svelte-sonner';
-	import { Plus, Loader2, Users, ArrowUpDown, Link } from 'lucide-svelte';
+	import { Plus, Loader2, ArrowUpDown, Link } from 'lucide-svelte';
 	import EditGuestDialog from './EditGuestDialog.svelte';
 	import DeleteGuestDialog from './DeleteGuestDialog.svelte';
 
 	let { data } = $props();
-	let { guests } = $derived(data);
+	let { guests, rooms } = $derived(data);
 
 	let isAdding = $state(false);
 	let isChild = $state(false);
@@ -36,13 +36,13 @@
 
 	let sortedGuests = $derived(
 		guests
-			.filter((g: typeof guests[0]) => {
+			.filter((g: (typeof guests)[0]) => {
 				const q = searchQuery.toLowerCase();
 				return (
 					(g.full_name || '').toLowerCase().includes(q) || (g.email || '').toLowerCase().includes(q)
 				);
 			})
-			.sort((a: typeof guests[0], b: typeof guests[0]) => {
+			.sort((a: (typeof guests)[0], b: (typeof guests)[0]) => {
 				const modifier = sortDirection === 'asc' ? 1 : -1;
 				if (sortColumn === 'full_name') {
 					return (a.full_name || '').localeCompare(b.full_name || '') * modifier;
@@ -149,7 +149,7 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each sortedGuests as guest}
+					{#each sortedGuests as guest (guest.id)}
 						<Table.Row>
 							<Table.Cell>
 								<div class="flex items-center gap-2">
@@ -187,7 +187,7 @@
 							</Table.Cell>
 							<Table.Cell>
 								<div class="flex items-center gap-2">
-									<EditGuestDialog {guest} allGuests={guests} />
+									<EditGuestDialog {guest} {rooms} />
 									<DeleteGuestDialog {guest} />
 								</div>
 							</Table.Cell>

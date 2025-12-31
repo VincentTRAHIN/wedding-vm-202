@@ -39,16 +39,15 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 	}
 
 	// Fetch user's likes to determine is_liked_by_user
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const { data: userLikes } = await (supabaseAdmin as any)
+	const { data: userLikes } = await supabaseAdmin
 		.from('photo_likes')
 		.select('photo_id')
 		.eq('user_id', user.id);
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const userLikedPhotoIds = new Set(userLikes?.map((l: any) => l.photo_id));
+	const userLikedPhotoIds = new Set(userLikes?.map((l) => l.photo_id));
 
 	const photos =
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		photosData?.map((photo: any) => ({
 			...photo,
 			likes_count: photo.photo_likes[0]?.count ?? 0,

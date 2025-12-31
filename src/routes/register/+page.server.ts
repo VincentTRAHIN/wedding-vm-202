@@ -29,7 +29,10 @@ export const actions: Actions = {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${url.origin}/auth/callback`
+				redirectTo: `${url.origin}/auth/callback`,
+				queryParams: {
+					prompt: 'select_account consent'
+				}
 			}
 		});
 
@@ -41,7 +44,7 @@ export const actions: Actions = {
 		throw redirect(303, data.url);
 	},
 
-	register: async ({ request, locals: { supabase } }) => {
+	register: async ({ request }) => {
 		const formData = await request.formData();
 		const code = formData.get('code') as string;
 		const fullName = formData.get('fullName') as string;
@@ -80,7 +83,7 @@ export const actions: Actions = {
 		}
 
 		// 2. Check if email exists in guests table (Admin pre-seed)
-		const { data: existingGuest } = await (supabaseAdmin as any)
+		const { data: existingGuest } = await supabaseAdmin
 			.from('guests')
 			.select('id')
 			.eq('email', email)
@@ -88,7 +91,7 @@ export const actions: Actions = {
 
 		if (existingGuest) {
 			// Link existing guest (Admin) to new Auth ID
-			const { error: updateError } = await (supabaseAdmin as any)
+			const { error: updateError } = await supabaseAdmin
 				.from('guests')
 				.update({
 					auth_id: authData.user.id,
@@ -114,7 +117,7 @@ export const actions: Actions = {
 				expected_count: 1
 			};
 
-			const { error: insertError } = await (supabaseAdmin as any).from('guests').insert(newGuest);
+			const { error: insertError } = await supabaseAdmin.from('guests').insert(newGuest);
 
 			if (insertError) {
 				console.error('Guest Insert Error:', insertError);
