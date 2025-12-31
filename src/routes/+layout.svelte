@@ -22,7 +22,7 @@
 	import { cn } from '$lib/utils';
 
 	let { children, data } = $props();
-	let { supabase, session, userRole } = $derived(data);
+	let { supabase, session, userRole, theme } = $derived(data);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -51,7 +51,12 @@
 	<title>Mariage V&M 2026</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col bg-background font-sans text-foreground">
+<div
+	class={cn(
+		'flex min-h-screen flex-col bg-background font-sans text-foreground',
+		theme === 'bordeaux' ? 'theme-bordeaux' : null
+	)}
+>
 	<header
 		class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>

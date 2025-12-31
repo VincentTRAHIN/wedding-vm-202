@@ -18,7 +18,19 @@
 			<h1 class="font-serif text-3xl font-bold text-primary">Administration</h1>
 			<p class="text-muted-foreground">Gérez les données du site.</p>
 		</div>
-		<div class="flex flex-wrap gap-2">
+		<div class="flex flex-wrap items-center gap-2">
+			<form method="POST" action="/admin/theme" class="contents">
+				<input
+					type="hidden"
+					name="next"
+					value={$page.data.theme === 'bordeaux' ? 'default' : 'bordeaux'}
+				/>
+				<input type="hidden" name="redirectTo" value={$page.url.pathname} />
+				<Button type="submit" variant="secondary" size="sm">
+					Thème : {$page.data.theme === 'bordeaux' ? 'Bordeaux' : 'Sage'}
+				</Button>
+			</form>
+
 			{#each tabs as tab (tab.href)}
 				<Button
 					href={tab.href}

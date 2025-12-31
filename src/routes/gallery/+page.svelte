@@ -41,8 +41,8 @@
 		<button
 			class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors {filter ===
 			'all'
-				? 'bg-sage-600 text-white'
-				: 'bg-stone-100 text-stone-600 hover:bg-stone-200'}"
+				? 'bg-primary text-primary-foreground'
+				: 'bg-muted text-muted-foreground hover:bg-muted/80'}"
 			onclick={() => (filter = 'all')}
 		>
 			<ImageIcon class="h-4 w-4" />
@@ -51,8 +51,8 @@
 		<button
 			class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors {filter ===
 			'likes'
-				? 'bg-sage-600 text-white'
-				: 'bg-stone-100 text-stone-600 hover:bg-stone-200'}"
+				? 'bg-primary text-primary-foreground'
+				: 'bg-muted text-muted-foreground hover:bg-muted/80'}"
 			onclick={() => (filter = 'likes')}
 		>
 			<Heart class="h-4 w-4 {filter === 'likes' ? 'fill-current' : ''}" />

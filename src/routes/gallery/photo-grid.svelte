@@ -104,7 +104,7 @@
 							<Heart
 								class="h-6 w-6 transition-colors {photo.is_liked_by_user
 									? 'fill-red-500 text-red-500'
-									: 'text-stone-600 hover:text-stone-900'}"
+									: 'text-muted-foreground hover:text-foreground'}"
 							/>
 						</button>
 					</form>
@@ -112,7 +112,7 @@
 					<!-- Comment Button -->
 					<button
 						type="button"
-						class="flex items-center gap-1 text-stone-600 transition-colors hover:text-sage-600"
+						class="flex items-center gap-1 text-muted-foreground transition-colors hover:text-primary"
 						onclick={() => onPhotoClick(index)}
 						aria-label="Commenter"
 					>
@@ -121,7 +121,7 @@
 				</div>
 
 				<!-- Likes Count -->
-				<div class="mb-1 text-sm font-semibold text-stone-900">
+				<div class="mb-1 text-sm font-semibold text-foreground">
 					{photo.likes_count} J'aime
 				</div>
 
@@ -129,14 +129,14 @@
 				{#if photo.caption}
 					<div class="mb-1 text-sm line-clamp-2">
 						<span class="font-bold mr-1">{photo.guests?.full_name || 'Invité'}</span>
-						<span class="text-stone-700">{photo.caption}</span>
+						<span class="text-muted-foreground">{photo.caption}</span>
 					</div>
 				{/if}
 
 				<!-- View Comments Link -->
 				{#if photo.comments_count > 0}
 					<button
-						class="mb-2 text-sm text-stone-500 hover:text-stone-700"
+						class="mb-2 text-sm text-muted-foreground hover:text-foreground"
 						onclick={() => onPhotoClick(index)}
 					>
 						Voir les {photo.comments_count} commentaires
@@ -145,7 +145,7 @@
 
 				<!-- Fake Input -->
 				<button
-					class="w-full text-left text-sm text-stone-400 hover:text-stone-600"
+					class="w-full text-left text-sm text-muted-foreground hover:text-foreground"
 					onclick={() => onPhotoClick(index)}
 				>
 					Ajouter un commentaire...

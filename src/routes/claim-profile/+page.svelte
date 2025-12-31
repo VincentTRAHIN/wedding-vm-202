@@ -28,13 +28,7 @@
 					<input type="hidden" name="guestId" value={selectedGuestId} />
 				</div>
 
-				<Button
-					type="submit"
-					class="w-full bg-sage-600 hover:bg-sage-700"
-					disabled={!selectedGuestId}
-				>
-					C'est moi !
-				</Button>
+				<Button type="submit" class="w-full" disabled={!selectedGuestId}>C'est moi !</Button>
 			</form>
 		</Card.Content>
 	</Card.Root>

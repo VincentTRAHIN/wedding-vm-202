@@ -42,14 +42,14 @@
 		{#if !isEditing}
 			<!-- Summary View -->
 			<div class="flex flex-col items-center p-8 text-center">
-				<div class="mb-6 rounded-full bg-sage-100 p-4 text-sage-600">
+				<div class="mb-6 rounded-full bg-muted p-4 text-primary">
 					<Check class="h-8 w-8" />
 				</div>
 
-				<h1 class="mb-2 font-serif text-3xl font-bold text-sage-900">
+				<h1 class="mb-2 font-serif text-3xl font-bold text-foreground">
 					Merci, votre réponse est enregistrée !
 				</h1>
-				<p class="mb-8 text-stone-500">Nous avons bien pris en compte votre réponse.</p>
+				<p class="mb-8 text-muted-foreground">Nous avons bien pris en compte votre réponse.</p>
 
 				<div
 					class="mb-8 w-full max-w-md space-y-4 rounded-lg border border-stone-100 bg-stone-50 p-6"
@@ -57,27 +57,24 @@
 					<div
 						class="flex items-center justify-between border-b border-stone-200 pb-4 last:border-0 last:pb-0"
 					>
-						<span class="font-medium text-stone-900">Votre statut</span>
-						<Badge
-							variant={data.guest.rsvp_status === 'present' ? 'default' : 'destructive'}
-							class={data.guest.rsvp_status === 'present' ? 'bg-sage-600 hover:bg-sage-700' : ''}
-						>
+						<span class="font-medium text-foreground">Votre statut</span>
+						<Badge variant={data.guest.rsvp_status === 'present' ? 'default' : 'destructive'}>
 							{data.guest.rsvp_status === 'present' ? 'Présent' : 'Absent'}
 						</Badge>
 					</div>
 
 					{#if data.managedGuests.length > 0}
 						<div class="pt-2 text-left">
-							<span class="mb-2 block text-sm font-medium text-stone-500"
+							<span class="mb-2 block text-sm font-medium text-muted-foreground"
 								>Vous venez accompagné de :</span
 							>
 							<ul class="space-y-2">
 								{#each data.managedGuests as guest (guest.id)}
 									<li class="flex items-center justify-between text-sm">
-										<span class="text-stone-900">
+										<span class="text-foreground">
 											{guest.full_name}
 											{#if guest.is_child}
-												<span class="text-stone-400">(Enfant)</span>
+												<span class="text-muted-foreground">(Enfant)</span>
 											{/if}
 										</span>
 										<Badge variant="outline" class="text-xs">
@@ -93,7 +90,7 @@
 				{#if !isDeadlinePassed}
 					<Button variant="outline" onclick={() => (isEditing = true)}>Modifier ma réponse</Button>
 				{:else}
-					<p class="text-sm text-stone-500">
+					<p class="text-sm text-muted-foreground">
 						La date limite de réponse est passée. Contactez les mariés pour tout changement.
 					</p>
 				{/if}
@@ -101,10 +98,10 @@
 		{:else}
 			<!-- Edit View -->
 			<div class="bg-white px-6 pb-6 pt-8 text-center">
-				<h1 class="font-serif text-3xl font-bold text-sage-900 md:text-4xl">
+				<h1 class="font-serif text-3xl font-bold text-foreground md:text-4xl">
 					Répondez à l'invitation
 				</h1>
-				<p class="mt-2 text-sm text-stone-500">
+				<p class="mt-2 text-sm text-muted-foreground">
 					Veuillez confirmer votre présence avant le 1er Mai 2026
 				</p>
 			</div>
@@ -155,11 +152,7 @@
 								Annuler
 							</Button>
 						{/if}
-						<Button
-							type="submit"
-							class="flex-1 bg-sage-600 hover:bg-sage-700"
-							disabled={isSubmitting}
-						>
+						<Button type="submit" class="flex-1" disabled={isSubmitting}>
 							{#if isSubmitting}
 								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 							{/if}
@@ -170,8 +163,8 @@
 
 				<!-- Manage other guests -->
 				<div class="mt-12 border-t border-stone-200 pt-8">
-					<h3 class="mb-4 font-serif text-xl font-bold text-sage-900">Gérer d'autres invités</h3>
-					<p class="mb-4 text-sm text-stone-500">
+					<h3 class="mb-4 font-serif text-xl font-bold text-foreground">Gérer d'autres invités</h3>
+					<p class="mb-4 text-sm text-muted-foreground">
 						Vous pouvez ajouter votre conjoint(e) ou vos enfants s'ils sont dans la liste des
 						invités.
 					</p>
@@ -218,7 +211,7 @@
 						</div>
 
 						<div class="space-y-2">
-							<Label for="email" class={isChild ? 'text-stone-400' : ''}>Email</Label>
+							<Label for="email" class={isChild ? 'text-muted-foreground' : ''}>Email</Label>
 							<Input
 								type="email"
 								id="email"

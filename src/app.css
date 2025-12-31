@@ -35,6 +35,28 @@
 		--radius: 0.5rem;
 	}
 
+	/* Experimental skin: Bordeaux + Doré */
+	.theme-bordeaux {
+		--primary: 351 56% 28%; /* Bordeaux */
+		--primary-foreground: 43 85% 88%; /* Doré clair */
+
+		--secondary: 43 67% 45%; /* Doré */
+		--secondary-foreground: 43 85% 88%;
+
+		--accent: 43 67% 45%;
+		--accent-foreground: 43 85% 88%;
+
+		/* Texte doré (plus présent) */
+		--foreground: 43 74% 28%;
+		--card-foreground: 43 74% 28%;
+		--popover-foreground: 43 74% 28%;
+		--muted-foreground: 43 40% 34%;
+
+		--border: 351 20% 78%;
+		--input: 351 20% 78%;
+		--ring: 351 56% 28%;
+	}
+
 	.dark {
 		--background: 144 14% 14%; /* #1F2923 */
 		--foreground: 45 15% 90%; /* #EAE8E1 */
