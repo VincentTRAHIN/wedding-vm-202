@@ -13,11 +13,71 @@ type WeatherStatus =
 	  }
 	| { status: 'error'; message: string };
 
-const VENUE_COORDS = { lat: 43.7459, lng: 4.2341 };
-async function getWeatherNow(): Promise<WeatherStatus> {
+type VenueCoords = { lat: number; lng: number };
+
+const VENUE = {
+	name: 'Château des Landes',
+	address: 'Château des Landes, 49560 Cléré-sur-Layon, Maine-et-Loire',
+	geocodeQuery: 'Château des Landes, 49560 Cléré-sur-Layon, Maine-et-Loire'
+} as const;
+
+let venueCoordsMemo: VenueCoords | null | undefined = undefined;
+
+async function getVenueCoords(): Promise<VenueCoords | null> {
+	if (venueCoordsMemo !== undefined) return venueCoordsMemo;
+
+	try {
+		const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
+		url.searchParams.set('name', VENUE.geocodeQuery);
+		url.searchParams.set('count', '1');
+		url.searchParams.set('language', 'fr');
+		url.searchParams.set('format', 'json');
+
+		const res = await fetch(url.toString(), {
+			headers: {
+				accept: 'application/json'
+			}
+		});
+
+		if (!res.ok) {
+			venueCoordsMemo = null;
+			return null;
+		}
+
+		const json: unknown = await res.json();
+		const schema = z.object({
+			results: z
+				.array(
+					z.object({
+						latitude: z.number(),
+						longitude: z.number()
+					})
+				)
+				.optional()
+		});
+
+		const parsed = schema.safeParse(json);
+		if (!parsed.success || !parsed.data.results?.[0]) {
+			venueCoordsMemo = null;
+			return null;
+		}
+
+		venueCoordsMemo = {
+			lat: parsed.data.results[0].latitude,
+			lng: parsed.data.results[0].longitude
+		};
+
+		return venueCoordsMemo;
+	} catch {
+		venueCoordsMemo = null;
+		return null;
+	}
+}
+
+async function getWeatherNow(coords: VenueCoords): Promise<WeatherStatus> {
 	const url = new URL('https://api.open-meteo.com/v1/forecast');
-	url.searchParams.set('latitude', String(VENUE_COORDS.lat));
-	url.searchParams.set('longitude', String(VENUE_COORDS.lng));
+	url.searchParams.set('latitude', String(coords.lat));
+	url.searchParams.set('longitude', String(coords.lng));
 	url.searchParams.set('daily', 'weather_code,temperature_2m_min,temperature_2m_max');
 	url.searchParams.set('timezone', 'Europe/Paris');
 
@@ -126,7 +186,10 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 	}
 
 	// 4. Weather
-	const weather = await getWeatherNow();
+	const venueCoords = await getVenueCoords();
+	const weather = venueCoords
+		? await getWeatherNow(venueCoords)
+		: ({ status: 'error', message: 'Localisation du lieu introuvable pour la météo.' } satisfies WeatherStatus);
 
 	return {
 		guest: { ...guest, room },
@@ -134,9 +197,9 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 		songRequests: songRequests ?? [],
 		weather,
 		venue: {
-			coords: VENUE_COORDS,
-			name: 'Domaine de la Grosse Tour',
-			address: 'Vergèze, Gard'
+			coords: venueCoords,
+			name: VENUE.name,
+			address: VENUE.address
 		}
 	};
 };

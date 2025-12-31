@@ -10,7 +10,8 @@
 
 	let { guest } = $props<{ guest: Guest }>();
 
-	const VENUE_NAME = 'Domaine de la Grosse Tour';
+	const VENUE_NAME = 'Château des Landes';
+	const VENUE_ADDRESS = 'Cléré-sur-Layon, Maine-et-Loire';
 </script>
 
 <Card.Root>
@@ -36,7 +37,7 @@
 			<MapPin class="mt-0.5 h-5 w-5 text-sage-600" />
 			<div>
 				<p class="font-medium">{VENUE_NAME}</p>
-				<p class="text-sm text-muted-foreground">Vergèze, Gard</p>
+				<p class="text-sm text-muted-foreground">{VENUE_ADDRESS}</p>
 			</div>
 		</div>
 

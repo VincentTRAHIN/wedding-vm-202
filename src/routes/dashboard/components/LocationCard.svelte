@@ -7,18 +7,17 @@
 		venue: {
 			name: string;
 			address: string;
-			coords: { lat: number; lng: number };
+			coords: { lat: number; lng: number } | null;
 		};
 	}>();
 
-	const wazeLink = $derived(
-		`https://waze.com/ul?ll=${venue.coords.lat},${venue.coords.lng}&navigate=yes`
-	);
+	const destinationQuery = $derived(encodeURIComponent(`${venue.name}, ${venue.address}`));
+	const wazeLink = $derived(`https://waze.com/ul?q=${destinationQuery}&navigate=yes`);
 	const mapsLink = $derived(
-		`https://www.google.com/maps/dir/?api=1&destination=${venue.coords.lat},${venue.coords.lng}`
+		`https://www.google.com/maps/dir/?api=1&destination=${destinationQuery}`
 	);
 	const embedLink = $derived(
-		`https://www.google.com/maps?q=${venue.coords.lat},${venue.coords.lng}&z=15&output=embed`
+		`https://www.google.com/maps?q=${destinationQuery}&z=15&output=embed`
 	);
 </script>
 

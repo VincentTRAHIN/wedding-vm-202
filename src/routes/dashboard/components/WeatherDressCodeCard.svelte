@@ -20,6 +20,18 @@
 		if (code >= 51 && code <= 99) return CloudRain;
 		return Cloud;
 	}
+
+	function formatFrenchDate(dateStr: string) {
+		const dt = new Date(dateStr);
+		if (Number.isNaN(dt.getTime())) return dateStr;
+		const formatter = new Intl.DateTimeFormat('fr-FR', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'long',
+			day: '2-digit'
+		});
+		return `le ${formatter.format(dt)}`;
+	}
 </script>
 
 <Card.Root>
@@ -37,7 +49,9 @@
 				<div class="flex items-center gap-3">
 					<Icon class="h-5 w-5 text-sage-600" />
 					<div>
-						<p class="text-sm text-muted-foreground">Prévision du {weather.date}</p>
+						<p class="text-sm text-muted-foreground">
+							Prévision {formatFrenchDate(weather.date)}
+						</p>
 						<p class="font-medium">
 							{Math.round(weather.temp_min_c)}° / {Math.round(weather.temp_max_c)}°
 						</p>
