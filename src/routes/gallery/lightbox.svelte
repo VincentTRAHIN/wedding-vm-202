@@ -1,17 +1,14 @@
 <script lang="ts">
-	import {
-		X,
-		ChevronLeft,
-		ChevronRight,
-		MessageCircle,
-		Send,
-		Heart,
-		Trash2,
-		Smile
-	} from 'lucide-svelte';
+	import { X, ChevronLeft, ChevronRight, MessageCircle, Heart, Trash2, Smile } from 'lucide-svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { browser } from '$app/environment';
+	import type { Database } from '$lib/types/supabase';
+
+	type Comment = Database['public']['Tables']['photo_comments']['Row'] & {
+		guest: Pick<Database['public']['Tables']['guests']['Row'], 'full_name' | 'avatar_url'> | null;
+	};
 
 	let { photos, initialIndex, supabase, user, onClose } = $props();
 
@@ -20,13 +17,12 @@
 	let hasNext = $derived(currentIndex < photos.length - 1);
 	let hasPrev = $derived(currentIndex > 0);
 
-	let comments = $state<any[]>([]);
+	let comments = $state<Comment[]>([]);
 	let loadingComments = $state(false);
-	let localCommentsCount = $state(0);
 	let commentInput = $state<HTMLInputElement | null>(null);
 
 	$effect(() => {
-		localCommentsCount = photo.comments_count;
+		if (!browser) return;
 		loadComments();
 	});
 
@@ -61,7 +57,6 @@
 
 		if (result.type === 'success') {
 			comments = comments.filter((c) => c.id !== commentId);
-			localCommentsCount--;
 			toast.success('Commentaire supprimé');
 		} else {
 			toast.error('Erreur lors de la suppression');
@@ -183,6 +178,11 @@
 <div
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-0 md:p-8 backdrop-blur-sm"
 	transition:fade={{ duration: 200 }}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) onClose();
+	}}
+	onkeydown={handleKeydown}
+	tabindex="-1"
 	role="dialog"
 	aria-modal="true"
 >
@@ -220,7 +220,6 @@
 	<!-- Main Container (Instagram Style) -->
 	<div
 		class="flex h-full w-full max-w-6xl flex-col overflow-hidden bg-black md:h-[85vh] md:flex-row md:rounded-xl"
-		onclick={(e) => e.stopPropagation()}
 	>
 		<!-- Left Column: Image -->
 		<div class="relative flex flex-1 items-center justify-center bg-black">
@@ -280,7 +279,7 @@
 						<p class="text-sm">Soyez le premier à réagir !</p>
 					</div>
 				{:else}
-					{#each comments as comment}
+					{#each comments as comment (comment.id)}
 						<div class="group flex gap-3">
 							<div class="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-stone-200">
 								{#if comment.guest?.avatar_url}
@@ -376,7 +375,6 @@
 						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								loadComments();
-								localCommentsCount++;
 								commentInput!.value = ''; // Clear input manually
 							}
 							await update({ reset: true });
@@ -389,11 +387,11 @@
 							class="absolute bottom-full left-0 mb-2 w-64 max-h-60 overflow-y-auto bg-white rounded-lg shadow-xl border border-stone-100 z-10"
 							transition:scale={{ duration: 100, start: 0.9 }}
 						>
-							{#each emojiCategories as category}
+							{#each emojiCategories as category (category.name)}
 								<div class="p-2">
 									<div class="text-xs font-bold text-stone-500 mb-1 px-1">{category.name}</div>
 									<div class="grid grid-cols-6 gap-1">
-										{#each category.emojis as emoji}
+										{#each category.emojis as emoji (emoji)}
 											<button
 												type="button"
 												class="text-xl hover:bg-stone-100 p-1 rounded transition-colors flex items-center justify-center"

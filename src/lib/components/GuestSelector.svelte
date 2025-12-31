@@ -54,7 +54,7 @@
 			<Command.List>
 				<Command.Empty>{emptyText}</Command.Empty>
 				<Command.Group class="max-h-64 overflow-y-auto">
-					{#each guests as guest}
+					{#each guests as guest (guest.id)}
 						<Command.Item
 							value={guest.full_name}
 							onSelect={() => {

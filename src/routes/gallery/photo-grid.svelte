@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { Clock, Trash2, Heart, MessageCircle } from 'lucide-svelte';
+	import { Trash2, Heart, MessageCircle } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { photos: initialPhotos = [], supabase, currentUserId, userRole, onPhotoClick } = $props();
 
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let photos = $state(initialPhotos);
 
 	$effect(() => {

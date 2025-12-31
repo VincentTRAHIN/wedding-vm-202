@@ -72,7 +72,7 @@
 								>Vous venez accompagné de :</span
 							>
 							<ul class="space-y-2">
-								{#each data.managedGuests as guest}
+								{#each data.managedGuests as guest (guest.id)}
 									<li class="flex items-center justify-between text-sm">
 										<span class="text-stone-900">
 											{guest.full_name}

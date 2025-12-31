@@ -18,6 +18,10 @@ export interface Database {
 					dietary_restrictions: string | null;
 					expected_count: number;
 					managed_by_id: string | null;
+					room_id: string | null;
+					check_in_date: string | null;
+					check_out_date: string | null;
+					room_notes: string | null;
 				};
 				Insert: {
 					id?: string;
@@ -33,6 +37,10 @@ export interface Database {
 					dietary_restrictions?: string | null;
 					expected_count?: number;
 					managed_by_id?: string | null;
+					room_id?: string | null;
+					check_in_date?: string | null;
+					check_out_date?: string | null;
+					room_notes?: string | null;
 				};
 				Update: {
 					id?: string;
@@ -48,7 +56,12 @@ export interface Database {
 					dietary_restrictions?: string | null;
 					expected_count?: number;
 					managed_by_id?: string | null;
+					room_id?: string | null;
+					check_in_date?: string | null;
+					check_out_date?: string | null;
+					room_notes?: string | null;
 				};
+				Relationships: [];
 			};
 			photos: {
 				Row: {
@@ -78,6 +91,7 @@ export interface Database {
 					status?: 'pending' | 'approved' | 'rejected';
 					caption?: string | null;
 				};
+				Relationships: [];
 			};
 			photo_likes: {
 				Row: {
@@ -95,6 +109,7 @@ export interface Database {
 					photo_id?: string;
 					created_at?: string;
 				};
+				Relationships: [];
 			};
 			photo_comments: {
 				Row: {
@@ -118,7 +133,105 @@ export interface Database {
 					content?: string;
 					created_at?: string;
 				};
+				Relationships: [];
+			};
+			site_content: {
+				Row: {
+					id: string;
+					created_at: string;
+					updated_at: string;
+					key: string;
+					content: Json;
+					page: string | null;
+				};
+				Insert: {
+					id?: string;
+					created_at?: string;
+					updated_at?: string;
+					key: string;
+					content: Json;
+					page?: string | null;
+				};
+				Update: {
+					id?: string;
+					created_at?: string;
+					updated_at?: string;
+					key?: string;
+					content?: Json;
+					page?: string | null;
+				};
+				Relationships: [];
+			};
+			rooms: {
+				Row: {
+					id: string;
+					created_at: string;
+					name: string;
+					lol_region: string | null;
+					description: string | null;
+					capacity: number;
+					price_per_night: number | null;
+					building: string | null;
+					amenities: Json | null;
+					image_url: string | null;
+					access_code: string | null;
+				};
+				Insert: {
+					id?: string;
+					created_at?: string;
+					name: string;
+					lol_region?: string | null;
+					description?: string | null;
+					capacity?: number;
+					price_per_night?: number | null;
+					building?: string | null;
+					amenities?: Json | null;
+					image_url?: string | null;
+					access_code?: string | null;
+				};
+				Update: {
+					id?: string;
+					created_at?: string;
+					name?: string;
+					lol_region?: string | null;
+					description?: string | null;
+					capacity?: number;
+					price_per_night?: number | null;
+					building?: string | null;
+					amenities?: Json | null;
+					image_url?: string | null;
+					access_code?: string | null;
+				};
+				Relationships: [];
+			};
+			song_requests: {
+				Row: {
+					id: string;
+					created_at: string;
+					track_name: string;
+					artist: string | null;
+					requested_by: string;
+				};
+				Insert: {
+					id?: string;
+					created_at?: string;
+					track_name: string;
+					artist?: string | null;
+					requested_by: string;
+				};
+				Update: {
+					id?: string;
+					created_at?: string;
+					track_name?: string;
+					artist?: string | null;
+					requested_by?: string;
+				};
+				Relationships: [];
 			};
 		};
+		Views: { [_ in never]: never };
+		Functions: { [_ in never]: never };
+		Enums: { [_ in never]: never };
+		CompositeTypes: { [_ in never]: never };
 	};
 }
