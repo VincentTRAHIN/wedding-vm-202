@@ -50,7 +50,7 @@
 			{:else}
 				{@const Icon = iconFor(weather.weather_code)}
 				<div class="flex items-center gap-3">
-					<Icon class="h-5 w-5 text-sage-600" />
+					<Icon class="h-5 w-5 text-primary" />
 					<div>
 						<p class="text-sm text-muted-foreground">
 							Prévision {formatFrenchDate(weather.date)}

@@ -72,7 +72,7 @@
 					<div
 						class="flex flex-col items-center justify-center rounded-lg bg-stone-200/50 p-6 text-center shadow-sm"
 					>
-						<span class="font-sans text-4xl font-bold text-stone-800 md:text-5xl">
+						<span class="font-sans text-4xl font-bold text-foreground md:text-5xl">
 							{value.toString().padStart(2, '0')}
 						</span>
 						<span class="mt-2 font-serif text-sm uppercase tracking-wider text-primary">
@@ -93,10 +93,10 @@
 	<!-- 3. Welcome & Actions Section -->
 	<section class="bg-stone-50 pb-24 pt-8">
 		<div class="container mx-auto max-w-2xl px-4 text-center">
-			<h2 class="mb-6 font-serif text-4xl font-bold text-stone-900 md:text-5xl">
+			<h2 class="mb-6 font-serif text-4xl font-bold text-foreground md:text-5xl">
 				Bienvenue {firstName ? `, ${firstName}` : ''}
 			</h2>
-			<p class="mb-10 text-lg leading-relaxed text-stone-600">
+			<p class="mb-10 text-lg leading-relaxed text-muted-foreground">
 				Nous sommes ravis de partager ce moment unique avec vous. Explorez notre site pour trouver
 				toutes les informations nécessaires et n'oubliez pas de nous faire part de votre présence.
 			</p>
@@ -109,16 +109,10 @@
 				>
 					Mon Espace Invité
 				</Button>
-				<Button
-					href="/rsvp"
-					class="h-12 w-full bg-sage-600 px-8 text-base font-semibold text-white hover:bg-sage-700 sm:w-auto"
-				>
+				<Button href="/rsvp" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
 					Confirmer Votre Présence (RSVP)
 				</Button>
-				<Button
-					href="/gallery"
-					class="h-12 w-full bg-sage-600 px-8 text-base font-semibold text-white hover:bg-sage-700 sm:w-auto"
-				>
+				<Button href="/gallery" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
 					Partagez Vos Souvenirs (Galerie)
 				</Button>
 			</div>

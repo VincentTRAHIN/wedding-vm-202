@@ -8,6 +8,9 @@ import type { Database } from '$lib/types/supabase';
 export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies, url }) => {
 	const { session, user } = await safeGetSession();
 
+	const themeCookie = cookies.get('theme');
+	const theme = themeCookie === 'bordeaux' ? 'bordeaux' : 'default';
+
 	let guest = null;
 	if (user) {
 		// Use Admin Client to bypass RLS recursion issues
@@ -35,6 +38,7 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
 		session,
 		user,
 		guest,
+		theme,
 		cookies: cookies.getAll()
 	};
 };

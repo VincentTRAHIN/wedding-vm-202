@@ -238,11 +238,11 @@
 			<!-- Header -->
 			<div class="flex items-center gap-3 border-b border-stone-100 p-4">
 				<div
-					class="flex h-8 w-8 items-center justify-center rounded-full bg-sage-100 text-sage-700 font-bold text-xs"
+					class="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground font-bold text-xs"
 				>
 					{photo.guests?.full_name?.[0] || '?'}
 				</div>
-				<div class="font-bold text-sm text-stone-900">
+				<div class="font-bold text-sm text-foreground">
 					{photo.guests?.full_name || 'Invité'}
 				</div>
 			</div>
@@ -253,14 +253,14 @@
 				{#if photo.caption}
 					<div class="flex gap-3">
 						<div
-							class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-sage-100 text-sage-700 font-bold text-xs"
+							class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-foreground font-bold text-xs"
 						>
 							{photo.guests?.full_name?.[0] || '?'}
 						</div>
 						<div class="text-sm">
 							<span class="font-bold mr-1">{photo.guests?.full_name || 'Invité'}</span>
-							<span class="text-stone-800">{photo.caption}</span>
-							<div class="mt-1 text-xs text-stone-400">
+							<span class="text-foreground">{photo.caption}</span>
+							<div class="mt-1 text-xs text-muted-foreground">
 								{new Date(photo.created_at).toLocaleDateString()}
 							</div>
 						</div>
@@ -270,11 +270,13 @@
 				{#if loadingComments}
 					<div class="flex justify-center py-4">
 						<div
-							class="h-6 w-6 animate-spin rounded-full border-2 border-sage-600 border-t-transparent"
+							class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"
 						></div>
 					</div>
 				{:else if comments.length === 0 && !photo.caption}
-					<div class="flex h-full flex-col items-center justify-center text-center text-stone-500">
+					<div
+						class="flex h-full flex-col items-center justify-center text-center text-muted-foreground"
+					>
 						<p class="text-lg font-serif">Aucun commentaire</p>
 						<p class="text-sm">Soyez le premier à réagir !</p>
 					</div>
@@ -290,7 +292,7 @@
 									/>
 								{:else}
 									<div
-										class="flex h-full w-full items-center justify-center text-xs font-bold text-stone-500"
+										class="flex h-full w-full items-center justify-center text-xs font-bold text-muted-foreground"
 									>
 										{comment.guest?.full_name?.[0] || '?'}
 									</div>
@@ -298,14 +300,14 @@
 							</div>
 							<div class="flex-1 text-sm">
 								<span class="font-bold mr-1">{comment.guest?.full_name || 'Invité'}</span>
-								<span class="text-stone-800">{comment.content}</span>
-								<div class="mt-1 text-xs text-stone-400">
+								<span class="text-foreground">{comment.content}</span>
+								<div class="mt-1 text-xs text-muted-foreground">
 									{new Date(comment.created_at).toLocaleDateString()}
 								</div>
 							</div>
 							{#if user && (comment.user_id === user.id || user.email === 'admin@example.com')}
 								<button
-									class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-stone-400 hover:text-red-500"
+									class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-red-500"
 									onclick={() => deleteComment(comment.id)}
 									aria-label="Supprimer le commentaire"
 								>
@@ -343,23 +345,23 @@
 							<Heart
 								class="h-7 w-7 transition-colors {photo.is_liked_by_user
 									? 'fill-red-500 text-red-500'
-									: 'text-stone-800 hover:text-stone-500'}"
+									: 'text-foreground hover:text-muted-foreground'}"
 							/>
 						</button>
 					</form>
 
 					<button onclick={focusCommentInput} class="transition-transform active:scale-90">
-						<MessageCircle class="h-7 w-7 text-stone-800 hover:text-stone-500" />
+						<MessageCircle class="h-7 w-7 text-foreground hover:text-muted-foreground" />
 					</button>
 				</div>
 
 				<!-- Likes Count -->
-				<div class="font-bold text-sm mb-1 text-stone-900">
+				<div class="font-bold text-sm mb-1 text-foreground">
 					{photo.likes_count} J'aime
 				</div>
 
 				<!-- Date -->
-				<div class="text-[10px] uppercase tracking-wide text-stone-400 mb-4">
+				<div class="text-[10px] uppercase tracking-wide text-muted-foreground mb-4">
 					{new Date(photo.created_at).toLocaleDateString(undefined, {
 						year: 'numeric',
 						month: 'long',
@@ -389,7 +391,9 @@
 						>
 							{#each emojiCategories as category (category.name)}
 								<div class="p-2">
-									<div class="text-xs font-bold text-stone-500 mb-1 px-1">{category.name}</div>
+									<div class="text-xs font-bold text-muted-foreground mb-1 px-1">
+										{category.name}
+									</div>
 									<div class="grid grid-cols-6 gap-1">
 										{#each category.emojis as emoji (emoji)}
 											<button
@@ -408,7 +412,7 @@
 
 					<button
 						type="button"
-						class="text-stone-400 hover:text-stone-600"
+						class="text-muted-foreground hover:text-foreground"
 						onclick={toggleEmojiPicker}
 					>
 						<Smile class="h-6 w-6" />
@@ -420,13 +424,13 @@
 						type="text"
 						name="content"
 						placeholder="Ajouter un commentaire..."
-						class="flex-1 bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none"
+						class="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
 						required
 						autocomplete="off"
 					/>
 					<button
 						type="submit"
-						class="text-sm font-bold text-sage-600 hover:text-sage-800 disabled:opacity-50"
+						class="text-sm font-bold text-primary hover:text-foreground disabled:opacity-50"
 					>
 						Publier
 					</button>

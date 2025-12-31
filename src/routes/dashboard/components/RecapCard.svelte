@@ -22,7 +22,7 @@
 	<Card.Content class="space-y-6">
 		<!-- Date & Heure -->
 		<div class="flex items-start gap-3">
-			<Calendar class="mt-0.5 h-5 w-5 text-sage-600" />
+			<Calendar class="mt-0.5 h-5 w-5 text-primary" />
 			<div>
 				<p class="font-medium">Samedi 18 Juillet 2026</p>
 				<div class="flex items-center gap-1 text-sm text-muted-foreground">
@@ -34,7 +34,7 @@
 
 		<!-- Lieu -->
 		<div class="flex items-start gap-3">
-			<MapPin class="mt-0.5 h-5 w-5 text-sage-600" />
+			<MapPin class="mt-0.5 h-5 w-5 text-primary" />
 			<div>
 				<p class="font-medium">{VENUE_NAME}</p>
 				<p class="text-sm text-muted-foreground">{VENUE_ADDRESS}</p>
@@ -42,11 +42,11 @@
 		</div>
 
 		<!-- RSVP Status -->
-		<div class="rounded-lg bg-sage-50/70 p-4">
+		<div class="rounded-lg bg-muted p-4">
 			<div class="mb-2 flex items-center justify-between">
 				<span class="text-sm font-medium">Votre statut RSVP</span>
 				{#if guest.rsvp_status === 'present'}
-					<Badge class="bg-sage-600 hover:bg-sage-700">Présent</Badge>
+					<Badge variant="default">Présent</Badge>
 				{:else if guest.rsvp_status === 'absent'}
 					<Badge variant="destructive">Absent</Badge>
 				{:else}

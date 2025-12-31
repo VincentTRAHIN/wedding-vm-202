@@ -55,7 +55,9 @@
 									</Table.Cell>
 									<Table.Cell class="hidden sm:table-cell">{r.artist ?? '—'}</Table.Cell>
 									<Table.Cell>{r.requested_by_name}</Table.Cell>
-									<Table.Cell class="hidden sm:table-cell whitespace-nowrap">{formatDate(r.created_at)}</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell whitespace-nowrap"
+										>{formatDate(r.created_at)}</Table.Cell
+									>
 								</Table.Row>
 							{/each}
 						</Table.Body>

@@ -51,7 +51,7 @@
 						<div class="flex items-center gap-2">
 							{#if icons[category.icon]}
 								{@const Icon = icons[category.icon]}
-								<Icon class="h-5 w-5 text-sage-600" />
+								<Icon class="h-5 w-5 text-primary" />
 							{/if}
 							<Card.Title class="text-lg">{category.title}</Card.Title>
 						</div>
@@ -80,7 +80,7 @@
 											href={item.link}
 											target="_blank"
 											rel="noopener noreferrer"
-											class="mt-1 flex items-center gap-1 text-xs font-medium text-sage-600 hover:underline"
+											class="mt-1 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
 										>
 											Voir le site <ExternalLink class="h-3 w-3" />
 										</a>

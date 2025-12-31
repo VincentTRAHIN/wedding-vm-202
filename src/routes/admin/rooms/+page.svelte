@@ -114,11 +114,15 @@
 										<Table.Cell class="font-medium">
 											<div class="break-words">{room.name}</div>
 											<div class="text-xs text-muted-foreground sm:hidden">
-												Capacité: {room.capacity ?? '—'} • Invités: {guestCountByRoomId.get(room.id) ?? 0}
-										</div>
-									</Table.Cell>
-									<Table.Cell class="hidden sm:table-cell">{room.capacity ?? '—'}</Table.Cell>
-									<Table.Cell class="hidden sm:table-cell">{guestCountByRoomId.get(room.id) ?? 0}</Table.Cell>
+												Capacité: {room.capacity ?? '—'} • Invités: {guestCountByRoomId.get(
+													room.id
+												) ?? 0}
+											</div>
+										</Table.Cell>
+										<Table.Cell class="hidden sm:table-cell">{room.capacity ?? '—'}</Table.Cell>
+										<Table.Cell class="hidden sm:table-cell"
+											>{guestCountByRoomId.get(room.id) ?? 0}</Table.Cell
+										>
 										<Table.Cell class="text-right">
 											<div class="flex justify-end gap-2">
 												<Button

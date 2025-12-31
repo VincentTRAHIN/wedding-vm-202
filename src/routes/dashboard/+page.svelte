@@ -16,7 +16,7 @@
 			<h1 class="mb-4 font-serif text-4xl font-bold text-primary md:text-5xl">
 				Bonjour {guest.full_name?.split(' ')[0]}
 			</h1>
-			<p class="text-lg text-stone-500">
+			<p class="text-lg text-muted-foreground">
 				Bienvenue sur votre espace personnel. Retrouvez ici toutes les informations pour le mariage.
 			</p>
 		</div>

@@ -132,11 +132,23 @@
 			<!-- Mobile list -->
 			<div class="sm:hidden space-y-3">
 				<div class="flex gap-2">
-					<Button type="button" variant="outline" size="sm" class="w-full" onclick={() => toggleSort('full_name')}>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						class="w-full"
+						onclick={() => toggleSort('full_name')}
+					>
 						Nom
 						<ArrowUpDown class="ml-2 h-4 w-4" />
 					</Button>
-					<Button type="button" variant="outline" size="sm" class="w-full" onclick={() => toggleSort('rsvp_status')}>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						class="w-full"
+						onclick={() => toggleSort('rsvp_status')}
+					>
 						Statut
 						<ArrowUpDown class="ml-2 h-4 w-4" />
 					</Button>
@@ -242,7 +254,9 @@
 									</Table.Cell>
 									<Table.Cell>
 										{#if guest.rsvp_status === 'present'}
-											<Badge variant="default" class="bg-green-600 hover:bg-green-700">Présent</Badge>
+											<Badge variant="default" class="bg-green-600 hover:bg-green-700"
+												>Présent</Badge
+											>
 										{:else if guest.rsvp_status === 'absent'}
 											<Badge variant="destructive">Absent</Badge>
 										{:else}

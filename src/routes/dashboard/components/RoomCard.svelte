@@ -5,11 +5,11 @@
 
 	type Room = Database['public']['Tables']['rooms']['Row'];
 
-	let {
-		room,
-		checkInDate,
-		checkOutDate
-	} = $props<{ room: Room; checkInDate?: string | null; checkOutDate?: string | null }>();
+	let { room, checkInDate, checkOutDate } = $props<{
+		room: Room;
+		checkInDate?: string | null;
+		checkOutDate?: string | null;
+	}>();
 
 	let copied = $state(false);
 
@@ -35,7 +35,7 @@
 		<div class="flex items-center justify-between">
 			<Card.Title>{room.name}</Card.Title>
 			{#if room.lol_region}
-				<span class="rounded-full bg-sage-100 px-2 py-1 text-xs font-medium text-sage-800">
+				<span class="rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground">
 					{room.lol_region}
 				</span>
 			{/if}
@@ -55,7 +55,7 @@
 						Arrivée: {checkInDate}
 					{/if}
 					{#if checkInDate && checkOutDate}
-						 ·
+						·
 					{/if}
 					{#if checkOutDate}
 						Départ: {checkOutDate}
@@ -66,7 +66,7 @@
 		{#if room.access_code}
 			<div class="flex items-center justify-between gap-3 rounded-md bg-stone-50 p-3">
 				<div class="flex items-center gap-2 text-sm">
-					<KeyRound class="h-4 w-4 text-sage-600" />
+					<KeyRound class="h-4 w-4 text-primary" />
 					<span class="text-muted-foreground">Code d'accès:</span>
 					<code class="font-mono font-semibold text-foreground">{room.access_code}</code>
 				</div>
@@ -94,7 +94,7 @@
 		{#if room.amenities && Array.isArray(room.amenities) && room.amenities.length > 0}
 			<div class="flex flex-wrap gap-2 pt-2">
 				{#each room.amenities as amenity (amenity)}
-					<span class="rounded-md bg-stone-100 px-2 py-1 text-xs text-stone-600">
+					<span class="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
 						{amenity}
 					</span>
 				{/each}

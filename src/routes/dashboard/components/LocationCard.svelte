@@ -29,7 +29,7 @@
 	</Card.Header>
 	<Card.Content class="space-y-4">
 		<div class="flex items-start gap-3">
-			<MapPin class="mt-0.5 h-5 w-5 text-sage-600" />
+			<MapPin class="mt-0.5 h-5 w-5 text-primary" />
 			<div>
 				<p class="font-medium">{venue.name}</p>
 				<p class="text-sm text-muted-foreground">{venue.address}</p>
