@@ -13,11 +13,20 @@ type WeatherStatus =
 	  }
 	| { status: 'error'; message: string };
 
-const VENUE_COORDS = { lat: 43.7459, lng: 4.2341 };
-async function getWeatherNow(): Promise<WeatherStatus> {
+type VenueCoords = { lat: number; lng: number };
+
+const VENUE = {
+	name: 'Château des Landes',
+	address: 'Château des Landes, 49560 Cléré-sur-Layon, Maine-et-Loire'
+} as const;
+
+// Coordonnées fournies via Google Maps embed (centre sur le lieu)
+const VENUE_COORDS: VenueCoords = { lat: 47.4756719865999, lng: -0.9339330139280028 };
+
+async function getWeatherNow(coords: VenueCoords): Promise<WeatherStatus> {
 	const url = new URL('https://api.open-meteo.com/v1/forecast');
-	url.searchParams.set('latitude', String(VENUE_COORDS.lat));
-	url.searchParams.set('longitude', String(VENUE_COORDS.lng));
+	url.searchParams.set('latitude', String(coords.lat));
+	url.searchParams.set('longitude', String(coords.lng));
 	url.searchParams.set('daily', 'weather_code,temperature_2m_min,temperature_2m_max');
 	url.searchParams.set('timezone', 'Europe/Paris');
 
@@ -126,7 +135,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 	}
 
 	// 4. Weather
-	const weather = await getWeatherNow();
+	const weather = await getWeatherNow(VENUE_COORDS);
 
 	return {
 		guest: { ...guest, room },
@@ -135,8 +144,8 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 		weather,
 		venue: {
 			coords: VENUE_COORDS,
-			name: 'Domaine de la Grosse Tour',
-			address: 'Vergèze, Gard'
+			name: VENUE.name,
+			address: VENUE.address
 		}
 	};
 };

@@ -10,7 +10,8 @@
 
 	let { guest } = $props<{ guest: Guest }>();
 
-	const VENUE_NAME = 'Domaine de la Grosse Tour';
+	const VENUE_NAME = 'Château des Landes';
+	const VENUE_ADDRESS = 'Cléré-sur-Layon, Maine-et-Loire';
 </script>
 
 <Card.Root>
@@ -26,7 +27,7 @@
 				<p class="font-medium">Samedi 18 Juillet 2026</p>
 				<div class="flex items-center gap-1 text-sm text-muted-foreground">
 					<Clock class="h-3 w-3" />
-					<span>Début à 14h00</span>
+					<span>Ouverture des portes dès <strong>15h</strong>. Début de la cérémonie à <strong>15h30</strong></span>
 				</div>
 			</div>
 		</div>
@@ -36,7 +37,7 @@
 			<MapPin class="mt-0.5 h-5 w-5 text-sage-600" />
 			<div>
 				<p class="font-medium">{VENUE_NAME}</p>
-				<p class="text-sm text-muted-foreground">Vergèze, Gard</p>
+				<p class="text-sm text-muted-foreground">{VENUE_ADDRESS}</p>
 			</div>
 		</div>
 

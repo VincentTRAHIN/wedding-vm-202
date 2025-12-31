@@ -129,31 +129,25 @@
 			</div>
 		</Card.Header>
 		<Card.Content>
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>
-							<Button variant="ghost" onclick={() => toggleSort('full_name')} class="-ml-4">
-								Nom / Email
-								<ArrowUpDown class="ml-2 h-4 w-4" />
-							</Button>
-						</Table.Head>
-						<Table.Head>Validé par</Table.Head>
-						<Table.Head>
-							<Button variant="ghost" onclick={() => toggleSort('rsvp_status')} class="-ml-4">
-								Statut
-								<ArrowUpDown class="ml-2 h-4 w-4" />
-							</Button>
-						</Table.Head>
-						<Table.Head class="w-[50px]"></Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each sortedGuests as guest (guest.id)}
-						<Table.Row>
-							<Table.Cell>
-								<div class="flex items-center gap-2">
-									<div class="font-medium">{guest.full_name || 'Sans nom'}</div>
+			<!-- Mobile list -->
+			<div class="sm:hidden space-y-3">
+				<div class="flex gap-2">
+					<Button type="button" variant="outline" size="sm" class="w-full" onclick={() => toggleSort('full_name')}>
+						Nom
+						<ArrowUpDown class="ml-2 h-4 w-4" />
+					</Button>
+					<Button type="button" variant="outline" size="sm" class="w-full" onclick={() => toggleSort('rsvp_status')}>
+						Statut
+						<ArrowUpDown class="ml-2 h-4 w-4" />
+					</Button>
+				</div>
+
+				{#each sortedGuests as guest (guest.id)}
+					<div class="rounded-lg border bg-background p-3">
+						<div class="flex items-start justify-between gap-3">
+							<div class="min-w-0">
+								<div class="flex flex-wrap items-center gap-2">
+									<div class="font-medium break-words">{guest.full_name || 'Sans nom'}</div>
 									{#if guest.auth_id}
 										<span title="Compte lié">
 											<Link class="h-3 w-3 text-blue-500" />
@@ -164,19 +158,18 @@
 									{/if}
 								</div>
 								{#if guest.email}
-									<div class="text-xs text-muted-foreground">{guest.email}</div>
+									<div class="mt-1 text-xs text-muted-foreground break-words">{guest.email}</div>
 								{/if}
-							</Table.Cell>
-							<Table.Cell>
-								{#if guest.managed_by}
-									<Badge variant="secondary" class="font-normal text-xs">
-										via {guest.managed_by.full_name}
-									</Badge>
-								{:else}
-									<span class="text-muted-foreground">-</span>
-								{/if}
-							</Table.Cell>
-							<Table.Cell>
+							</div>
+
+							<div class="flex items-center gap-2">
+								<EditGuestDialog {guest} {rooms} />
+								<DeleteGuestDialog {guest} />
+							</div>
+						</div>
+
+						<div class="mt-3 flex items-center justify-between gap-2">
+							<div>
 								{#if guest.rsvp_status === 'present'}
 									<Badge variant="default" class="bg-green-600 hover:bg-green-700">Présent</Badge>
 								{:else if guest.rsvp_status === 'absent'}
@@ -184,17 +177,90 @@
 								{:else}
 									<Badge variant="secondary">En attente</Badge>
 								{/if}
-							</Table.Cell>
-							<Table.Cell>
-								<div class="flex items-center gap-2">
-									<EditGuestDialog {guest} {rooms} />
-									<DeleteGuestDialog {guest} />
-								</div>
-							</Table.Cell>
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
+							</div>
+							<div class="text-xs text-muted-foreground">
+								{#if guest.managed_by}
+									via {guest.managed_by.full_name}
+								{:else}
+									-
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/each}
+			</div>
+
+			<!-- Desktop table -->
+			<div class="hidden sm:block w-full overflow-x-auto">
+				<div class="min-w-0 sm:min-w-[820px]">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>
+									<Button variant="ghost" onclick={() => toggleSort('full_name')} class="-ml-4">
+										Nom / Email
+										<ArrowUpDown class="ml-2 h-4 w-4" />
+									</Button>
+								</Table.Head>
+								<Table.Head class="hidden sm:table-cell">Validé par</Table.Head>
+								<Table.Head>
+									<Button variant="ghost" onclick={() => toggleSort('rsvp_status')} class="-ml-4">
+										Statut
+										<ArrowUpDown class="ml-2 h-4 w-4" />
+									</Button>
+								</Table.Head>
+								<Table.Head class="w-[50px]"></Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each sortedGuests as guest (guest.id)}
+								<Table.Row>
+									<Table.Cell>
+										<div class="flex items-center gap-2">
+											<div class="font-medium break-words">{guest.full_name || 'Sans nom'}</div>
+											{#if guest.auth_id}
+												<span title="Compte lié">
+													<Link class="h-3 w-3 text-blue-500" />
+												</span>
+											{/if}
+											{#if guest.is_child}
+												<Badge variant="outline" class="text-[10px] h-5 px-1.5">Enfant</Badge>
+											{/if}
+										</div>
+										{#if guest.email}
+											<div class="text-xs text-muted-foreground break-words">{guest.email}</div>
+										{/if}
+									</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell">
+										{#if guest.managed_by}
+											<Badge variant="secondary" class="font-normal text-xs">
+												via {guest.managed_by.full_name}
+											</Badge>
+										{:else}
+											<span class="text-muted-foreground">-</span>
+										{/if}
+									</Table.Cell>
+									<Table.Cell>
+										{#if guest.rsvp_status === 'present'}
+											<Badge variant="default" class="bg-green-600 hover:bg-green-700">Présent</Badge>
+										{:else if guest.rsvp_status === 'absent'}
+											<Badge variant="destructive">Absent</Badge>
+										{:else}
+											<Badge variant="secondary">En attente</Badge>
+										{/if}
+									</Table.Cell>
+									<Table.Cell>
+										<div class="flex items-center gap-2">
+											<EditGuestDialog {guest} {rooms} />
+											<DeleteGuestDialog {guest} />
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</div>
+			</div>
 		</Card.Content>
 	</Card.Root>
 </div>

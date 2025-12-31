@@ -11,15 +11,15 @@
 		};
 	}>();
 
+	const destinationQuery = $derived(encodeURIComponent(`${venue.name}, ${venue.address}`));
 	const wazeLink = $derived(
 		`https://waze.com/ul?ll=${venue.coords.lat},${venue.coords.lng}&navigate=yes`
 	);
 	const mapsLink = $derived(
 		`https://www.google.com/maps/dir/?api=1&destination=${venue.coords.lat},${venue.coords.lng}`
 	);
-	const embedLink = $derived(
-		`https://www.google.com/maps?q=${venue.coords.lat},${venue.coords.lng}&z=15&output=embed`
-	);
+	const embedLink =
+		'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d690363.1258669095!2d-0.9339330139280028!3d47.4756719865999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4807b9ac3adb523d%3A0x85422e0eab6a0b4f!2sCh%C3%A2teau%20des%20Landes!5e0!3m2!1sfr!2sfr!4v1767168930190!5m2!1sfr!2sfr';
 </script>
 
 <Card.Root>

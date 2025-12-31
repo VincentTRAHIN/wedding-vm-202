@@ -20,6 +20,21 @@
 		if (code >= 51 && code <= 99) return CloudRain;
 		return Cloud;
 	}
+
+	function formatFrenchDate(dateStr: string) {
+		const [y, m, d] = dateStr.split('-').map((v) => Number(v));
+		if (!y || !m || !d) return dateStr;
+		// Midi UTC pour éviter les décalages de jour selon le fuseau.
+		const dt = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+		const formatter = new Intl.DateTimeFormat('fr-FR', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'long',
+			day: '2-digit',
+			timeZone: 'Europe/Paris'
+		});
+		return `le ${formatter.format(dt)}`;
+	}
 </script>
 
 <Card.Root>
@@ -37,7 +52,9 @@
 				<div class="flex items-center gap-3">
 					<Icon class="h-5 w-5 text-sage-600" />
 					<div>
-						<p class="text-sm text-muted-foreground">Prévision du {weather.date}</p>
+						<p class="text-sm text-muted-foreground">
+							Prévision {formatFrenchDate(weather.date)}
+						</p>
 						<p class="font-medium">
 							{Math.round(weather.temp_min_c)}° / {Math.round(weather.temp_max_c)}°
 						</p>
