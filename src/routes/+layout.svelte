@@ -15,7 +15,8 @@
 		Image,
 		Settings,
 		LogOut,
-		CalendarDays
+		CalendarDays,
+		LayoutDashboard
 	} from 'lucide-svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { cn } from '$lib/utils';
@@ -68,7 +69,7 @@
 							<Sheet.Title class="font-serif text-xl text-primary">V&M 2026</Sheet.Title>
 						</Sheet.Header>
 						<nav class="mt-6 flex flex-col gap-4">
-							{#each navItems as item}
+							{#each navItems as item (item.href)}
 								<a
 									href={item.href}
 									class="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary {$page
@@ -81,6 +82,19 @@
 									{item.label}
 								</a>
 							{/each}
+							{#if session}
+								<a
+									href="/dashboard"
+									class="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary {$page
+										.url.pathname === '/dashboard'
+										? 'text-primary'
+										: 'text-muted-foreground'}"
+									onclick={() => (isMobileMenuOpen = false)}
+								>
+									<LayoutDashboard class="h-5 w-5" />
+									Mon Espace
+								</a>
+							{/if}
 							{#if userRole === 'admin'}
 								<a
 									href={adminItem.href}
@@ -108,7 +122,7 @@
 			</div>
 
 			<nav class="hidden md:flex md:items-center md:gap-6">
-				{#each navItems as item}
+				{#each navItems as item (item.href)}
 					<a
 						href={item.href}
 						class="text-sm font-medium transition-colors hover:text-primary {$page.url.pathname ===
@@ -119,6 +133,17 @@
 						{item.label}
 					</a>
 				{/each}
+				{#if session}
+					<a
+						href="/dashboard"
+						class="text-sm font-medium transition-colors hover:text-primary {$page.url.pathname ===
+						'/dashboard'
+							? 'text-primary'
+							: 'text-muted-foreground'}"
+					>
+						Mon Espace
+					</a>
+				{/if}
 				{#if userRole === 'admin'}
 					<a
 						href={adminItem.href}
@@ -144,6 +169,13 @@
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content align="end">
 							<DropdownMenu.Label>Mon Compte</DropdownMenu.Label>
+							<DropdownMenu.Separator />
+							<a href="/dashboard" class="contents">
+								<DropdownMenu.Item>
+									<LayoutDashboard class="mr-2 h-4 w-4" />
+									<span>Mon Espace</span>
+								</DropdownMenu.Item>
+							</a>
 							<DropdownMenu.Separator />
 							<a href="/logout" class="contents">
 								<DropdownMenu.Item class="text-destructive focus:text-destructive">

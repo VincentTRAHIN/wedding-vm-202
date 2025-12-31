@@ -12,9 +12,16 @@ export const actions: Actions = {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${origin}/auth/callback`
+				redirectTo: `${origin}/auth/callback`,
+				queryParams: {
+					prompt: 'select_account consent'
+				}
 			}
 		});
+
+		if (process.env.NODE_ENV !== 'production') {
+			console.info('Google OAuth URL:', data?.url);
+		}
 
 		if (error) {
 			console.error('Google Auth Error:', error);

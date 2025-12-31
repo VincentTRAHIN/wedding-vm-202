@@ -7,10 +7,14 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { toast } from 'svelte-sonner';
 	import { Loader2, Pencil } from 'lucide-svelte';
+	import type { Database } from '$lib/types/supabase';
 
-	let { guest, allGuests } = $props<{
-		guest: any;
-		allGuests: any[];
+	type Guest = Database['public']['Tables']['guests']['Row'];
+	type Room = Pick<Database['public']['Tables']['rooms']['Row'], 'id' | 'name' | 'capacity'>;
+
+	let { guest, rooms } = $props<{
+		guest: Guest;
+		rooms: Room[];
 	}>();
 
 	let isOpen = $state(false);
@@ -83,6 +87,23 @@
 				>
 					Cet invité est un enfant (-18 ans)
 				</Label>
+			</div>
+
+			<div class="space-y-2">
+				<Label for="room_id">Chambre assignée</Label>
+				<select
+					id="room_id"
+					name="room_id"
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					value={guest.room_id || ''}
+				>
+					<option value="">Aucune chambre</option>
+					{#each rooms as room (room.id)}
+						<option value={room.id}>
+							{room.name} ({room.capacity} pers.)
+						</option>
+					{/each}
+				</select>
 			</div>
 
 			<Dialog.Footer>

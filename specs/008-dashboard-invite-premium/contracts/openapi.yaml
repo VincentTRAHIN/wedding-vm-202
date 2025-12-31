@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Wedding V&M - Dashboard Invite Premium API
+  version: 1.0.0
+  description: |
+    Contracts for data used by the Guest Dashboard (/dashboard).
+    Note: In-app mutations should prefer SvelteKit Form Actions, but these endpoints
+    are documented as stable contracts if we expose them via /api routes.
+
+servers:
+  - url: http://localhost:5173
+
+paths:
+  /api/weather:
+    get:
+      summary: Get wedding-area weather preview (Open-Meteo)
+      parameters:
+        - in: query
+          name: lat
+          required: true
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: lng
+          required: true
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: targetDate
+          required: true
+          description: ISO date (YYYY-MM-DD). Usually wedding date minus 3 days.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Weather payload or “not available yet” marker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherResponse'
+        '400':
+          description: Missing or invalid parameters.
+        '401':
+          description: Unauthorized.
+
+  /api/song-requests:
+    get:
+      summary: List recent song requests
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 3
+      responses:
+        '200':
+          description: Recent song requests.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SongRequest'
+        '401':
+          description: Unauthorized.
+
+    post:
+      summary: Create a song request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSongRequest'
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongRequest'
+        '400':
+          description: Validation error.
+        '401':
+          description: Unauthorized.
+
+components:
+  schemas:
+    WeatherResponse:
+      type: object
+      required: [available]
+      properties:
+        available:
+          type: boolean
+          description: Whether the forecast is available for the requested targetDate.
+        temperature_c:
+          type: number
+          format: double
+          nullable: true
+        weather_code:
+          type: integer
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+
+    SongRequest:
+      type: object
+      required: [id, created_at, track_name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        track_name:
+          type: string
+        artist:
+          type: string
+          nullable: true
+        requested_by:
+          type: string
+          description: Supabase auth uid
+
+    CreateSongRequest:
+      type: object
+      required: [track_name]
+      properties:
+        track_name:
+          type: string
+          minLength: 1
+        artist:
+          type: string
+          nullable: true

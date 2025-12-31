@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { CalendarCheck, Image } from 'lucide-svelte';
 
 	let { data } = $props();
 
 	let userName = $derived(data.guest?.full_name ?? 'Invité');
+	let firstName = $derived(userName.split(' ')[0]);
+	let isLoggedIn = $derived(!!data.session);
 
 	let timeLeft = $state({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 	let timer: ReturnType<typeof setInterval>;
@@ -67,7 +68,7 @@
 			</h2>
 
 			<div class="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
-				{#each Object.entries(timeLeft) as [unit, value]}
+				{#each Object.entries(timeLeft) as [unit, value] (unit)}
 					<div
 						class="flex flex-col items-center justify-center rounded-lg bg-stone-200/50 p-6 text-center shadow-sm"
 					>
@@ -93,7 +94,7 @@
 	<section class="bg-stone-50 pb-24 pt-8">
 		<div class="container mx-auto max-w-2xl px-4 text-center">
 			<h2 class="mb-6 font-serif text-4xl font-bold text-stone-900 md:text-5xl">
-				Bienvenue {userName ? `, ${userName}` : ''}
+				Bienvenue {firstName ? `, ${firstName}` : ''}
 			</h2>
 			<p class="mb-10 text-lg leading-relaxed text-stone-600">
 				Nous sommes ravis de partager ce moment unique avec vous. Explorez notre site pour trouver
@@ -102,6 +103,13 @@
 
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 				<Button
+					href={isLoggedIn ? '/dashboard' : '/login'}
+					variant={isLoggedIn ? 'default' : 'outline'}
+					class="h-12 w-full px-8 text-base font-semibold sm:w-auto"
+				>
+					Mon Espace Invité
+				</Button>
+				<Button
 					href="/rsvp"
 					class="h-12 w-full bg-sage-600 px-8 text-base font-semibold text-white hover:bg-sage-700 sm:w-auto"
 				>
@@ -109,8 +117,7 @@
 				</Button>
 				<Button
 					href="/gallery"
-					variant="outline"
-					class="h-12 w-full border-stone-300 px-8 text-base font-semibold text-stone-700 hover:bg-stone-100 sm:w-auto"
+					class="h-12 w-full bg-sage-600 px-8 text-base font-semibold text-white hover:bg-sage-700 sm:w-auto"
 				>
 					Partagez Vos Souvenirs (Galerie)
 				</Button>
