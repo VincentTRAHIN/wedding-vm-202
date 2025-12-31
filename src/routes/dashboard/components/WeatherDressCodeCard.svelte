@@ -22,13 +22,16 @@
 	}
 
 	function formatFrenchDate(dateStr: string) {
-		const dt = new Date(dateStr);
-		if (Number.isNaN(dt.getTime())) return dateStr;
+		const [y, m, d] = dateStr.split('-').map((v) => Number(v));
+		if (!y || !m || !d) return dateStr;
+		// Midi UTC pour éviter les décalages de jour selon le fuseau.
+		const dt = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
 		const formatter = new Intl.DateTimeFormat('fr-FR', {
 			weekday: 'long',
 			year: 'numeric',
 			month: 'long',
-			day: '2-digit'
+			day: '2-digit',
+			timeZone: 'Europe/Paris'
 		});
 		return `le ${formatter.format(dt)}`;
 	}

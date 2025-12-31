@@ -94,53 +94,70 @@
 			<Card.Title>Liste des Chambres ({rooms.length})</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>Nom</Table.Head>
-						<Table.Head>Capacité</Table.Head>
-						<Table.Head>Assignés</Table.Head>
-						<Table.Head class="text-right">Actions</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each rooms as room (room.id)}
-						<Table.Row>
-							<Table.Cell class="font-medium">{room.name}</Table.Cell>
-							<Table.Cell>{room.capacity}</Table.Cell>
-							<Table.Cell>
-								{guestCountByRoomId.get(room.id) ?? 0}
-							</Table.Cell>
-							<Table.Cell class="text-right">
-								<div class="flex justify-end gap-2">
-									<Button
-										variant="ghost"
-										size="icon"
-										onclick={() => {
-											assigningRoom = room;
-											selectedGuestId = '';
-										}}
-										aria-label="Assigner des invités"
-									>
-										<Users class="h-4 w-4" />
-									</Button>
-									<Button variant="ghost" size="icon" onclick={() => (editingRoom = room)}>
-										<Pencil class="h-4 w-4" />
-									</Button>
-									<Button
-										variant="ghost"
-										size="icon"
-										class="text-red-500 hover:text-red-600"
-										onclick={() => (deletingRoom = room)}
-									>
-										<Trash2 class="h-4 w-4" />
-									</Button>
-								</div>
-							</Table.Cell>
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
+			{#if rooms.length === 0}
+				<p class="text-sm text-muted-foreground">Aucune chambre pour le moment.</p>
+			{:else}
+				<div class="w-full overflow-x-auto">
+					<div class="min-w-0 sm:min-w-[820px]">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>Nom</Table.Head>
+									<Table.Head class="hidden sm:table-cell">Capacité</Table.Head>
+									<Table.Head class="hidden sm:table-cell">Invités</Table.Head>
+									<Table.Head class="text-right">Actions</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each rooms as room (room.id)}
+									<Table.Row>
+										<Table.Cell class="font-medium">
+											<div class="break-words">{room.name}</div>
+											<div class="text-xs text-muted-foreground sm:hidden">
+												Capacité: {room.capacity ?? '—'} • Invités: {guestCountByRoomId.get(room.id) ?? 0}
+										</div>
+									</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell">{room.capacity ?? '—'}</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell">{guestCountByRoomId.get(room.id) ?? 0}</Table.Cell>
+										<Table.Cell class="text-right">
+											<div class="flex justify-end gap-2">
+												<Button
+													variant="ghost"
+													size="icon"
+													onclick={() => {
+														assigningRoom = room;
+														selectedGuestId = '';
+													}}
+													aria-label="Assigner des invités"
+												>
+													<Users class="h-4 w-4" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													onclick={() => (editingRoom = room)}
+													aria-label="Modifier la chambre"
+												>
+													<Pencil class="h-4 w-4" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													class="text-red-500 hover:text-red-600"
+													onclick={() => (deletingRoom = room)}
+													aria-label="Supprimer la chambre"
+												>
+													<Trash2 class="h-4 w-4" />
+												</Button>
+											</div>
+										</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				</div>
+			{/if}
 		</Card.Content>
 	</Card.Root>
 </div>

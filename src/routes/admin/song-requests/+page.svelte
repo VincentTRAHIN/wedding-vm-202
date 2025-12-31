@@ -31,26 +31,37 @@
 		{#if requests.length === 0}
 			<p class="text-sm text-muted-foreground">Aucune proposition pour le moment.</p>
 		{:else}
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>Titre</Table.Head>
-						<Table.Head>Artiste</Table.Head>
-						<Table.Head>Proposé par</Table.Head>
-						<Table.Head>Date</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each requests as r (r.id)}
-						<Table.Row>
-							<Table.Cell class="font-medium">{r.track_name}</Table.Cell>
-							<Table.Cell>{r.artist ?? '—'}</Table.Cell>
-							<Table.Cell>{r.requested_by_name}</Table.Cell>
-							<Table.Cell class="whitespace-nowrap">{formatDate(r.created_at)}</Table.Cell>
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
+			<div class="w-full overflow-x-auto">
+				<div class="min-w-0 sm:min-w-[720px]">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>Titre</Table.Head>
+								<Table.Head class="hidden sm:table-cell">Artiste</Table.Head>
+								<Table.Head>Proposé par</Table.Head>
+								<Table.Head class="hidden sm:table-cell">Date</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each requests as r (r.id)}
+								<Table.Row>
+									<Table.Cell class="font-medium">
+										<div class="break-words">{r.track_name}</div>
+										<div class="text-xs text-muted-foreground sm:hidden">
+											Artiste: {r.artist ?? '—'}
+											<span class="mx-1">•</span>
+											{formatDate(r.created_at)}
+										</div>
+									</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell">{r.artist ?? '—'}</Table.Cell>
+									<Table.Cell>{r.requested_by_name}</Table.Cell>
+									<Table.Cell class="hidden sm:table-cell whitespace-nowrap">{formatDate(r.created_at)}</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</div>
+			</div>
 		{/if}
 	</Card.Content>
 </Card.Root>

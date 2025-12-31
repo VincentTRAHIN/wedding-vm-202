@@ -18,7 +18,7 @@
 			<h1 class="font-serif text-3xl font-bold text-primary">Administration</h1>
 			<p class="text-muted-foreground">Gérez les données du site.</p>
 		</div>
-		<div class="flex gap-2">
+		<div class="flex flex-wrap gap-2">
 			{#each tabs as tab (tab.href)}
 				<Button
 					href={tab.href}

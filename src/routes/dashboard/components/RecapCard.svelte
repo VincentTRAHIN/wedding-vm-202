@@ -27,7 +27,7 @@
 				<p class="font-medium">Samedi 18 Juillet 2026</p>
 				<div class="flex items-center gap-1 text-sm text-muted-foreground">
 					<Clock class="h-3 w-3" />
-					<span>Début à 14h00</span>
+					<span>Ouverture des portes dès <strong>15h</strong>. Début de la cérémonie à <strong>15h30</strong></span>
 				</div>
 			</div>
 		</div>

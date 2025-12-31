@@ -9,392 +9,10 @@
 
 ## Table des Matières
 
-1. [AXE 1: Nouvelle Feature "Tableau de Bord Invité"](#axe-1-nouvelle-feature-tableau-de-bord-invité)
-2. [AXE 2: Audit de Sécurité & Infrastructure](#axe-2-audit-de-sécurité--infrastructure-hardening)
-3. [AXE 3: Review UI/UX & Responsive](#axe-3-review-uiux--responsive)
-4. [AXE 4: To-Do de Finition](#axe-4-to-do-de-finition)
-5. [Annexes](#annexes)
-
----
-
-## AXE 1: Nouvelle Feature "Tableau de Bord Invité"
-
-> **Route:** `/dashboard`
-> **Priorité:** P1
-> **Hub central pour l'invité connecté**
-
-### 1.1 Hébergement & Chambres (Thème League of Legends) 🏰
-
-#### 1.1.1 Modèle de Données
-
-**Nouvelle table `rooms`:**
-
-```sql
-CREATE TABLE public.rooms (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  name TEXT NOT NULL UNIQUE,           -- Ex: "Demacia", "Noxus", "Ionia"
-  lol_region TEXT,                     -- Nom officiel LoL pour ref
-  description TEXT,                    -- Description thématique
-  capacity INT NOT NULL DEFAULT 2,     -- Nombre de personnes max
-  price_per_night DECIMAL(10,2),       -- Prix/nuit (optionnel)
-  building TEXT,                       -- Bâtiment/Lieu physique
-  amenities JSONB DEFAULT '[]',        -- Ex: ["wifi", "salle_de_bain_privée"]
-  image_url TEXT                       -- Image de la chambre ou illustration LoL
-);
-
--- Index pour recherche rapide
-CREATE INDEX idx_rooms_name ON public.rooms(name);
-```
-
-**Modification table `guests`:**
-
-```sql
-ALTER TABLE public.guests
-  ADD COLUMN room_id UUID REFERENCES public.rooms(id),
-  ADD COLUMN check_in_date DATE,
-  ADD COLUMN check_out_date DATE,
-  ADD COLUMN room_notes TEXT;          -- Notes spéciales (lit bébé, etc.)
-```
-
-**Policies RLS:**
-
-```sql
--- Rooms: Lecture pour tous les authentifiés
-CREATE POLICY "Authenticated can view rooms" ON public.rooms
-  FOR SELECT TO authenticated USING (true);
-
--- Rooms: CRUD Admin seulement
-CREATE POLICY "Admins can manage rooms" ON public.rooms
-  FOR ALL USING (auth.uid() IN (SELECT auth_id FROM public.guests WHERE role = 'admin'));
-```
-
-#### 1.1.2 Noms des Chambres (Régions LoL)
-
-| Nom Chambre      | Région LoL   | Thème/Ambiance         |
-| ---------------- | ------------ | ---------------------- |
-| **Demacia**      | Demacia      | Noble, lumineux, doré  |
-| **Noxus**        | Noxus        | Puissant, rouge/noir   |
-| **Ionia**        | Ionia        | Zen, nature, spirituel |
-| **Piltover**     | Piltover     | Steampunk, inventif    |
-| **Zaun**         | Zaun         | Industriel, néon       |
-| **Freljord**     | Freljord     | Glacial, bleu, viking  |
-| **Shurima**      | Shurima      | Désert, or, égyptien   |
-| **Bilgewater**   | Bilgewater   | Pirate, maritime       |
-| **Shadow Isles** | Shadow Isles | Mystérieux, gothique   |
-| **Targon**       | Targon       | Céleste, montagne      |
-
-#### 1.1.3 Tâches Techniques
-
-| ID    | Tâche                                                   | Effort | Dépendances |
-| ----- | ------------------------------------------------------- | ------ | ----------- |
-| A1-01 | Créer migration SQL `rooms`                             | 1h     | -           |
-| A1-02 | Créer migration SQL `guests.room_id`                    | 30min  | A1-01       |
-| A1-03 | Mettre à jour types Supabase (`npx supabase gen types`) | 15min  | A1-02       |
-| A1-04 | Créer page admin `/admin/rooms` (CRUD chambres)         | 3h     | A1-03       |
-| A1-05 | Ajouter sélecteur chambre dans `/admin/guests`          | 2h     | A1-04       |
-| A1-06 | Créer composant `RoomCard.svelte`                       | 1h     | A1-03       |
-| A1-07 | Créer section "Votre Hébergement" dans dashboard        | 2h     | A1-06       |
-
----
-
-### 1.2 Récapitulatif (Section Dashboard) 📋
-
-#### 1.2.1 Données Affichées
-
-| Information               | Source                        | Format                               |
-| ------------------------- | ----------------------------- | ------------------------------------ |
-| Date du mariage           | Constante                     | "Samedi 18 Juillet 2026"             |
-| Heure de début            | Constante                     | "14h00"                              |
-| Lieu                      | Config/DB                     | "Domaine de la Grosse Tour, Vergèze" |
-| Lien Maps                 | Généré                        | Google Maps / Waze deeplink          |
-| Statut RSVP               | `guests.rsvp_status`          | Badge Présent/Absent/En attente      |
-| Personnes accompagnantes  | `guests` managed_by           | Liste noms                           |
-| Restrictions alimentaires | `guests.dietary_restrictions` | Texte                                |
-
-#### 1.2.2 Liens Deeplink Navigation
-
-```typescript
-// Génération des liens navigation
-const VENUE_COORDS = { lat: 43.7459, lng: 4.2341 }; // À confirmer
-const VENUE_NAME = 'Domaine de la Grosse Tour';
-
-const wazeLink = `https://waze.com/ul?ll=${VENUE_COORDS.lat},${VENUE_COORDS.lng}&navigate=yes`;
-const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_COORDS.lat},${VENUE_COORDS.lng}&destination_place_id=PLACE_ID`;
-const appleMapsLink = `maps://maps.apple.com/?daddr=${VENUE_COORDS.lat},${VENUE_COORDS.lng}`;
-```
-
-#### 1.2.3 Tâches Techniques
-
-| ID    | Tâche                                                  | Effort | Dépendances |
-| ----- | ------------------------------------------------------ | ------ | ----------- |
-| A1-08 | Créer route `/dashboard/+page.svelte`                  | 30min  | -           |
-| A1-09 | Créer `+page.server.ts` avec chargement données invité | 1h     | -           |
-| A1-10 | Créer composant `RecapCard.svelte`                     | 2h     | A1-08       |
-| A1-11 | Intégrer boutons navigation (Waze/Maps)                | 1h     | A1-10       |
-| A1-12 | Ajouter lien Dashboard dans navigation principale      | 30min  | A1-08       |
-
----
-
-### 1.3 Guide Local (Infos Utiles) 🗺️
-
-#### 1.3.1 Structure de Données
-
-**Option A: Table `site_content` (Recommandé)**
-
-```sql
-CREATE TABLE public.site_content (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  key TEXT NOT NULL UNIQUE,            -- Ex: "local_guide"
-  content JSONB NOT NULL,              -- Contenu structuré
-  page TEXT                            -- Page associée (optionnel)
-);
-
--- Trigger update timestamp
-CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER site_content_updated
-  BEFORE UPDATE ON public.site_content
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
-```
-
-**Structure JSONB pour `local_guide`:**
-
-```json
-{
-  "categories": [
-    {
-      "id": "visits",
-      "title": "Lieux à Visiter",
-      "icon": "MapPin",
-      "items": [
-        {
-          "name": "Pont du Gard",
-          "description": "Monument romain à 30min",
-          "distance": "25km",
-          "link": "https://...",
-          "image": "/images/local/pont-du-gard.jpg"
-        }
-      ]
-    },
-    {
-      "id": "services",
-      "title": "Services",
-      "icon": "Scissors",
-      "items": [
-        {
-          "name": "Salon Élégance",
-          "type": "Coiffeur",
-          "phone": "04 66 XX XX XX",
-          "address": "12 rue de la Paix, Nîmes"
-        }
-      ]
-    },
-    {
-      "id": "transport",
-      "title": "Taxis & Transport",
-      "icon": "Car",
-      "items": [
-        {
-          "name": "Taxi Vergèze",
-          "phone": "06 XX XX XX XX",
-          "available_24h": true
-        }
-      ]
-    }
-  ]
-}
-```
-
-#### Option B: Fichier Config JSON (Alternative simple)
-
-Créer `/src/lib/config/local-guide.json` - Plus simple mais nécessite redéploiement pour modifier.
-
-#### 1.3.2 Tâches Techniques
-
-| ID    | Tâche                                             | Effort | Dépendances |
-| ----- | ------------------------------------------------- | ------ | ----------- |
-| A1-13 | Créer migration `site_content`                    | 30min  | -           |
-| A1-14 | Seed données initiales guide local                | 1h     | A1-13       |
-| A1-15 | Créer composant `LocalGuideSection.svelte`        | 2h     | A1-13       |
-| A1-16 | Créer page admin `/admin/content` (éditeur JSONB) | 4h     | A1-13       |
-| A1-17 | Intégrer dans `/dashboard`                        | 1h     | A1-15       |
-
----
-
-### 1.4 Architecture Page Dashboard
-
-```text
-/dashboard
-├── +page.server.ts          # Load guest, room, site_content
-├── +page.svelte             # Layout principal
-├── components/
-│   ├── RecapCard.svelte     # Résumé mariage + RSVP
-│   ├── LocationCard.svelte  # Logistique & GPS (Waze/Maps)
-│   ├── RoomCard.svelte      # Hébergement assigné
-│   ├── SongRequestsCard.svelte
-│   ├── WeatherDressCodeCard.svelte
-│   ├── ContactsSosSection.svelte
-│   ├── BrunchCard.svelte
-│   ├── LocalGuideSection.svelte
-│   └── NavigationButtons.svelte
-```
-
----
-
-## 1.5 Logistique & GPS (Action Cards) 🧭
-
-**Objectif:** faciliter l'arrivée des invités.
-
-**UI:** créer un composant `LocationCard` (Shadcn `Card`).
-
-**Fonctionnalités:**
-
-- Afficher l'adresse du lieu principal.
-- Afficher 2 gros boutons d'action (Outline ou Secondary) + icônes:
-  - "Ouvrir Waze" (deep link `https://waze.com/ul?ll=...&navigate=yes`)
-  - "Ouvrir Google Maps" (`https://www.google.com/maps/dir/?api=1&destination=...`)
-
-**Tâches techniques:**
-
-| ID    | Tâche                                   | Effort | Dépendances |
-| ----- | --------------------------------------- | ------ | ----------- |
-| A1-18 | Créer composant `LocationCard.svelte`   | 1h     | -           |
-| A1-19 | Intégrer `LocationCard` dans dashboard  | 30min  | A1-18       |
-
----
-
-## 1.6 Hébergement (Gestion des Chambres) 🛏️
-
-**Affichage conditionnel:** la section n'apparaît que si `guests.room_id` est présent.
-
-**Base de données (delta):** la table `rooms` existe déjà.
-
-**Ajout requis:** `rooms.access_code` (code porte) + affichage côté UI.
-
-```sql
-ALTER TABLE public.rooms
-  ADD COLUMN access_code TEXT;
-```
-
-**Dashboard UI:** carte "Votre Chambre" (Shadcn `Card`).
-
-- Nom de la chambre (clin d'œil LoL)
-- Code d'accès (copiable au clic)
-- Horaires (check-in / check-out)
-
-**Admin:** conserver l'assignation chambre → invité dans `/admin/guests`.
-
-**Tâches techniques:**
-
-| ID    | Tâche                                              | Effort | Dépendances |
-| ----- | -------------------------------------------------- | ------ | ----------- |
-| A1-20 | Migration: ajouter `rooms.access_code`             | 30min  | -           |
-| A1-21 | UI: afficher + copier `access_code` dans dashboard | 1h     | A1-20       |
-
----
-
-## 1.7 Ambiance & Participation 🎶⛅️
-
-### 1.7.1 DJ Collaboratif
-
-**DB:** créer table `song_requests`.
-
-```sql
-CREATE TABLE public.song_requests (
-
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  track_name TEXT NOT NULL,
-  artist TEXT,
-  requested_by UUID NOT NULL
-);
-
-ALTER TABLE public.song_requests ENABLE ROW LEVEL SECURITY;
-
--- Lecture pour tous les authentifiés
-CREATE POLICY "Authenticated can view song requests" ON public.song_requests
-  FOR SELECT TO authenticated USING (true);
-
--- Insertion uniquement si requested_by == auth.uid()
-CREATE POLICY "Authenticated can create own song request" ON public.song_requests
-  FOR INSERT TO authenticated WITH CHECK (requested_by = auth.uid());
-```
-
-**UI:**
-
-- Form simple "Proposer une musique" (track + artist)
-- Afficher les 3 dernières propositions
-
-### 1.7.2 Météo & Dress Code
-
-**API:** utiliser Open-Meteo (sans clé). Récupérer la prévision à J-3 quand la date est dans l'horizon de forecast, sinon afficher un état "Disponible à J-3".
-
-**UI:** widget météo minimaliste (icône + température) + rappel dress code: "Chic & Vert".
-
-**Tâches techniques:**
-
-- A1-22 (1h): Migration: créer table `song_requests` + policies RLS
-- A1-23 (2h): UI: formulaire + liste des 3 dernières (SSR + Form Actions)
-- A1-24 (2h): API/SSR: fetch Open-Meteo + mapping icône/code
-- A1-25 (1h): UI: widget météo + dress code
-
----
-
-## 1.8 Contacts & SOS 📞
-
-**Données:** via `site_content` (admin éditable), ex:
-
-```json
-{
-  "contacts": [
-    { "name": "Témoin 1", "role": "Témoin", "phone": "+336..." }
-  ],
-  "taxis": [
-    { "name": "Taxi Vergèze", "phone": "+336..." }
-  ]
-}
-```
-
-**UI:** cartes Contacts d'urgence avec bouton "Appeler" (`tel:`) + section Taxis.
-
-**Tâches techniques:**
-
-- A1-26 (30min): Seed `site_content` keys: `contacts_sos`, `taxis`
-- A1-27 (2h): UI: section Contacts & SOS (cards + tel links)
-
----
-
-## 1.9 Lendemain & Brunch 🥐
-
-**Données:** via `site_content` (admin éditable), ex:
-
-```text
-{
-  "start_time": "11:00",
-  "location": "Domaine de la Grosse Tour",
-  "menu": "Café, jus, viennoiseries, brunch"
-}
-```
-
-**UI:** bloc informatif (heure, menu sommaire, lieu si différent).
-
-**Tâches techniques:**
-
-| ID    | Tâche                                                | Effort | Dépendances |
-| ----- | ---------------------------------------------------- | ------ | ----------- |
-| A1-28 | Seed `site_content` key `brunch_info`                | 30min  | -           |
-| A1-29 | UI: bloc Brunch dans dashboard                       | 1h     | A1-28       |
-
-**Estimation totale AXE 1:** ~28-35h
+1. [AXE 2: Audit de Sécurité & Infrastructure](#axe-2-audit-de-sécurité--infrastructure-hardening)
+2. [AXE 3: Review UI/UX & Responsive](#axe-3-review-uiux--responsive)
+3. [AXE 4: To-Do de Finition](#axe-4-to-do-de-finition)
+4. [Annexes](#annexes)
 
 ---
 
@@ -413,43 +31,43 @@ CREATE POLICY "Authenticated can create own song request" ON public.song_request
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  message: string;
-  context?: Record<string, unknown>;
-  requestId?: string;
+	timestamp: string;
+	level: LogLevel;
+	message: string;
+	context?: Record<string, unknown>;
+	requestId?: string;
 }
 
 // Données sensibles à ne JAMAIS logger
 const REDACTED_FIELDS = ['password', 'token', 'email', 'access_token', 'refresh_token'];
 
 function sanitize(obj: Record<string, unknown>): Record<string, unknown> {
-  const sanitized = { ...obj };
-  for (const field of REDACTED_FIELDS) {
-    if (field in sanitized) {
-      sanitized[field] = '[REDACTED]';
-    }
-  }
-  return sanitized;
+	const sanitized = { ...obj };
+	for (const field of REDACTED_FIELDS) {
+		if (field in sanitized) {
+			sanitized[field] = '[REDACTED]';
+		}
+	}
+	return sanitized;
 }
 
 export function log(level: LogLevel, message: string, context?: Record<string, unknown>) {
-  const entry: LogEntry = {
-    timestamp: new Date().toISOString(),
-    level,
-    message,
-    context: context ? sanitize(context) : undefined
-  };
+	const entry: LogEntry = {
+		timestamp: new Date().toISOString(),
+		level,
+		message,
+		context: context ? sanitize(context) : undefined
+	};
 
-  // JSON pour Coolify
-  console.log(JSON.stringify(entry));
+	// JSON pour Coolify
+	console.log(JSON.stringify(entry));
 }
 
 export const logger = {
-  debug: (msg: string, ctx?: Record<string, unknown>) => log('debug', msg, ctx),
-  info: (msg: string, ctx?: Record<string, unknown>) => log('info', msg, ctx),
-  warn: (msg: string, ctx?: Record<string, unknown>) => log('warn', msg, ctx),
-  error: (msg: string, ctx?: Record<string, unknown>) => log('error', msg, ctx)
+	debug: (msg: string, ctx?: Record<string, unknown>) => log('debug', msg, ctx),
+	info: (msg: string, ctx?: Record<string, unknown>) => log('info', msg, ctx),
+	warn: (msg: string, ctx?: Record<string, unknown>) => log('warn', msg, ctx),
+	error: (msg: string, ctx?: Record<string, unknown>) => log('error', msg, ctx)
 };
 ```
 
@@ -488,37 +106,37 @@ Fichiers identifiés avec `console.log/error` à migrer vers logger:
 
 ```typescript
 const securityHeaders: Handle = async ({ event, resolve }) => {
-  const response = await resolve(event);
+	const response = await resolve(event);
 
-  // Content Security Policy
-  response.headers.set(
-    'Content-Security-Policy',
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://apis.google.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://*.googleapis.com",
-      "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'"
-    ].join('; ')
-  );
+	// Content Security Policy
+	response.headers.set(
+		'Content-Security-Policy',
+		[
+			"default-src 'self'",
+			"script-src 'self' 'unsafe-inline' https://apis.google.com",
+			"style-src 'self' 'unsafe-inline'",
+			"img-src 'self' data: blob: https://*.supabase.co https://*.googleapis.com",
+			"font-src 'self'",
+			"connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+			"frame-ancestors 'none'",
+			"base-uri 'self'",
+			"form-action 'self'"
+		].join('; ')
+	);
 
-  // Autres headers de sécurité
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
+	// Autres headers de sécurité
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+	response.headers.set('X-XSS-Protection', '1; mode=block');
 
-  // HSTS (activer seulement en production avec HTTPS)
-  if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  }
+	// HSTS (activer seulement en production avec HTTPS)
+	if (process.env.NODE_ENV === 'production') {
+		response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+	}
 
-  return response;
+	return response;
 };
 
 // Mettre à jour sequence
@@ -533,40 +151,40 @@ export const handle = sequence(securityHeaders, supabase, passwordWall, authGuar
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 interface RateLimitConfig {
-  windowMs: number; // Fenêtre en ms
-  maxAttempts: number; // Max tentatives
+	windowMs: number; // Fenêtre en ms
+	maxAttempts: number; // Max tentatives
 }
 
 const CONFIGS: Record<string, RateLimitConfig> = {
-  login: { windowMs: 15 * 60 * 1000, maxAttempts: 5 }, // 5 tentatives / 15min
-  unlock: { windowMs: 5 * 60 * 1000, maxAttempts: 10 }, // 10 tentatives / 5min
-  upload: { windowMs: 60 * 1000, maxAttempts: 20 } // 20 uploads / min
+	login: { windowMs: 15 * 60 * 1000, maxAttempts: 5 }, // 5 tentatives / 15min
+	unlock: { windowMs: 5 * 60 * 1000, maxAttempts: 10 }, // 10 tentatives / 5min
+	upload: { windowMs: 60 * 1000, maxAttempts: 20 } // 20 uploads / min
 };
 
 export function checkRateLimit(
-  identifier: string,
-  action: keyof typeof CONFIGS
+	identifier: string,
+	action: keyof typeof CONFIGS
 ): { allowed: boolean; retryAfter?: number } {
-  const config = CONFIGS[action];
-  const key = `${action}:${identifier}`;
-  const now = Date.now();
+	const config = CONFIGS[action];
+	const key = `${action}:${identifier}`;
+	const now = Date.now();
 
-  const entry = rateLimitMap.get(key);
+	const entry = rateLimitMap.get(key);
 
-  if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + config.windowMs });
-    return { allowed: true };
-  }
+	if (!entry || now > entry.resetTime) {
+		rateLimitMap.set(key, { count: 1, resetTime: now + config.windowMs });
+		return { allowed: true };
+	}
 
-  if (entry.count >= config.maxAttempts) {
-    return {
-      allowed: false,
-      retryAfter: Math.ceil((entry.resetTime - now) / 1000)
-    };
-  }
+	if (entry.count >= config.maxAttempts) {
+		return {
+			allowed: false,
+			retryAfter: Math.ceil((entry.resetTime - now) / 1000)
+		};
+	}
 
-  entry.count++;
-  return { allowed: true };
+	entry.count++;
+	return { allowed: true };
 }
 ```
 
@@ -576,18 +194,18 @@ export function checkRateLimit(
 import { checkRateLimit } from '$lib/server/rate-limit';
 
 export const actions = {
-  default: async ({ request, cookies, getClientAddress }) => {
-    const ip = getClientAddress();
-    const { allowed, retryAfter } = checkRateLimit(ip, 'unlock');
+	default: async ({ request, cookies, getClientAddress }) => {
+		const ip = getClientAddress();
+		const { allowed, retryAfter } = checkRateLimit(ip, 'unlock');
 
-    if (!allowed) {
-      return fail(429, {
-        error: `Trop de tentatives. Réessayez dans ${retryAfter}s.`
-      });
-    }
+		if (!allowed) {
+			return fail(429, {
+				error: `Trop de tentatives. Réessayez dans ${retryAfter}s.`
+			});
+		}
 
-    // ... reste du code
-  }
+		// ... reste du code
+	}
 };
 ```
 
@@ -740,25 +358,25 @@ WEDDING_ACCESS_CODE=votre_code_secret
 import { BUNKER_MODE } from '$env/static/private';
 
 const passwordWall: Handle = async ({ event, resolve }) => {
-  // Skip si Bunker Mode désactivé
-  if (BUNKER_MODE !== 'true') {
-    return resolve(event);
-  }
+	// Skip si Bunker Mode désactivé
+	if (BUNKER_MODE !== 'true') {
+		return resolve(event);
+	}
 
-  // Exceptions : Pages accessibles sans mot de passe
-  const publicPaths = ['/unlock', '/health', '/_app', '/favicon', '/robots.txt', '/manifest.json'];
+	// Exceptions : Pages accessibles sans mot de passe
+	const publicPaths = ['/unlock', '/health', '/_app', '/favicon', '/robots.txt', '/manifest.json'];
 
-  if (publicPaths.some((path) => event.url.pathname.startsWith(path))) {
-    return resolve(event);
-  }
+	if (publicPaths.some((path) => event.url.pathname.startsWith(path))) {
+		return resolve(event);
+	}
 
-  const hasPass = event.cookies.get('wedding_pass');
+	const hasPass = event.cookies.get('wedding_pass');
 
-  if (!hasPass) {
-    throw redirect(303, '/unlock');
-  }
+	if (!hasPass) {
+		throw redirect(303, '/unlock');
+	}
 
-  return resolve(event);
+	return resolve(event);
 };
 ```
 
@@ -801,6 +419,7 @@ const passwordWall: Handle = async ({ event, resolve }) => {
 - [ ] **Clavier virtuel:** Vérifier que les inputs ne sont pas masqués
 - [ ] **Touch targets:** Boutons min 44x44px (WCAG)
 - [ ] **Scroll:** Pas de scroll horizontal non voulu
+- [x] **Admin tables:** wrapper `overflow-x-auto` + `min-w-*` (guests/rooms/song-requests)
 - [ ] **Images:** Lazy loading, tailles adaptatives
 - [ ] **Navigation:** Menu hamburger fonctionnel
 
@@ -851,16 +470,16 @@ Palette actuelle (depuis `tailwind.config.js`):
 
 ```svelte
 <script>
-  let isSubmitting = $state(false);
+	let isSubmitting = $state(false);
 </script>
 
 <button disabled={isSubmitting} class="relative">
-  {#if isSubmitting}
-    <Loader2 class="h-4 w-4 animate-spin" />
-    <span class="ml-2">Chargement...</span>
-  {:else}
-    <span>Valider</span>
-  {/if}
+	{#if isSubmitting}
+		<Loader2 class="h-4 w-4 animate-spin" />
+		<span class="ml-2">Chargement...</span>
+	{:else}
+		<span>Valider</span>
+	{/if}
 </button>
 ```
 
@@ -924,16 +543,16 @@ Voir section 2.1.2 pour liste complète. Tous doivent être:
 ```svelte
 <!-- Pattern image optimisée -->
 <picture>
-  <source srcset="/images/hero.webp" type="image/webp" />
-  <source srcset="/images/hero.jpg" type="image/jpeg" />
-  <img
-    src="/images/hero.jpg"
-    alt="Vincent & Mélanie"
-    loading="lazy"
-    decoding="async"
-    width="1920"
-    height="1080"
-  />
+	<source srcset="/images/hero.webp" type="image/webp" />
+	<source srcset="/images/hero.jpg" type="image/jpeg" />
+	<img
+		src="/images/hero.jpg"
+		alt="Vincent & Mélanie"
+		loading="lazy"
+		decoding="async"
+		width="1920"
+		height="1080"
+	/>
 </picture>
 ```
 
@@ -952,17 +571,17 @@ Voir section 2.1.2 pour liste complète. Tous doivent être:
 ```svelte
 <!-- /src/app.html ou +layout.svelte -->
 <svelte:head>
-  <title>Mariage Vincent & Mélanie - 18 Juillet 2026</title>
-  <meta
-    name="description"
-    content="Le site officiel du mariage de Vincent et Mélanie. Confirmez votre présence et partagez vos photos."
-  />
-  <meta property="og:title" content="Mariage V&M 2026" />
-  <meta property="og:description" content="Rejoignez-nous pour célébrer notre union !" />
-  <meta property="og:image" content="/og-image.jpg" />
-  <meta property="og:type" content="website" />
-  <meta name="robots" content="noindex, nofollow" />
-  <!-- Site privé -->
+	<title>Mariage Vincent & Mélanie - 18 Juillet 2026</title>
+	<meta
+		name="description"
+		content="Le site officiel du mariage de Vincent et Mélanie. Confirmez votre présence et partagez vos photos."
+	/>
+	<meta property="og:title" content="Mariage V&M 2026" />
+	<meta property="og:description" content="Rejoignez-nous pour célébrer notre union !" />
+	<meta property="og:image" content="/og-image.jpg" />
+	<meta property="og:type" content="website" />
+	<meta name="robots" content="noindex, nofollow" />
+	<!-- Site privé -->
 </svelte:head>
 ```
 
@@ -992,18 +611,16 @@ Voir section 2.1.2 pour liste complète. Tous doivent être:
 
 | Axe       | Description      | Estimation |
 | --------- | ---------------- | ---------- |
-| AXE 1     | Dashboard Invité | 20-25h     |
 | AXE 2     | Sécurité & Infra | 15-18h     |
 | AXE 3     | UI/UX Responsive | 15-18h     |
 | AXE 4     | Finition         | 10-12h     |
-| **TOTAL** |                  | **60-73h** |
+| **TOTAL** |                  | **40-48h** |
 
 ### B. Ordre de Priorité Suggéré
 
 1. **Sprint 1 (Semaine 1-2):** AXE 2 (Sécurité) - Bloquant production
 2. **Sprint 2 (Semaine 2-3):** AXE 4 (Finition) - Quick wins
-3. **Sprint 3 (Semaine 3-5):** AXE 1 (Dashboard) - Feature principale
-4. **Sprint 4 (Semaine 5-6):** AXE 3 (UI/UX) - Polish final
+3. **Sprint 3 (Semaine 3-4):** AXE 3 (UI/UX) - Polish final
 
 ### C. Migrations SQL Requises
 
