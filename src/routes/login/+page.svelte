@@ -16,7 +16,7 @@
 	<Card.Root class="w-full max-w-md">
 		<Card.Header class="text-center">
 			<Card.Title class="font-serif text-3xl text-primary">V&M 2026</Card.Title>
-			<Card.Description>Connectez-vous pour accéder à l'espace invités</Card.Description>
+			<Card.Description>Connecte-toi pour accéder à l'espace invités</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<form
@@ -87,7 +87,7 @@
 						id="email"
 						name="email"
 						type="email"
-						placeholder="vous@exemple.com"
+						placeholder="toi@exemple.com"
 						required
 						disabled={isLoadingMagic}
 					/>
@@ -123,17 +123,22 @@
 					{#if isLoadingMagic}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
-					Se connecter
+					Te connecter
 				</Button>
 			</form>
-			<div class="text-center text-sm">
-				<a href="/register" class="text-primary hover:underline">
-					Pas encore de compte ? S'inscrire
+			<div class="text-center text-sm space-y-2">
+				<a href="/forgot-password" class="text-muted-foreground hover:text-primary hover:underline">
+					Mot de passe oublié ?
 				</a>
+				<div>
+					<a href="/register" class="text-primary hover:underline">
+						Pas encore de compte ? T'inscrire
+					</a>
+				</div>
 			</div>
 		</Card.Content>
 		<Card.Footer class="justify-center text-sm text-muted-foreground">
-			Problème de connexion ? Contactez les mariés.
+			Problème de connexion ? Contacte les mariés.
 		</Card.Footer>
 	</Card.Root>
 </div>

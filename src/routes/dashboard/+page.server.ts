@@ -82,7 +82,8 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 		.from('guests')
 		.select('*')
 		.eq('auth_id', user.id)
-		.single();
+		.limit(1)
+		.maybeSingle();
 
 	if (guestError || !guest) {
 		console.error('Error fetching guest:', guestError);

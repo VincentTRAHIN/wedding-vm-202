@@ -1,25 +1,33 @@
 <script lang="ts">
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { Check, X } from 'lucide-svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import { Check, X, Calendar } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 
 	let {
 		guest,
 		prefix = '',
-		isRemovable = false
+		isRemovable = false,
+		showMessage = false
 	} = $props<{
 		guest: {
 			id: string;
 			full_name: string;
 			rsvp_status: string;
+			present_saturday?: boolean;
+			present_sunday?: boolean;
 			dietary_restrictions?: string;
+			message_for_couple?: string;
 		};
 		prefix?: string;
 		isRemovable?: boolean;
+		showMessage?: boolean;
 	}>();
 
 	let rsvpStatus = $state(guest.rsvp_status || 'present');
+	let presentSaturday = $state(guest.present_saturday ?? true);
+	let presentSunday = $state(guest.present_sunday ?? true);
 </script>
 
 <div class="mb-8 border-b border-stone-100 pb-8 last:mb-0 last:border-0 last:pb-0">
@@ -91,6 +99,38 @@
 	</div>
 
 	{#if rsvpStatus === 'present'}
+		<!-- Day presence checkboxes -->
+		<div class="mb-6 space-y-3">
+			<div class="flex items-center gap-2 text-base font-medium text-foreground">
+				<Calendar class="h-4 w-4" />
+				<span>Jours de présence</span>
+			</div>
+			<div class="space-y-3 rounded-lg border border-stone-200 bg-stone-50 p-4">
+				<label class="flex cursor-pointer items-center gap-3">
+					<Checkbox
+						name="{prefix}present_saturday"
+						checked={presentSaturday}
+						onCheckedChange={(checked: boolean) => (presentSaturday = checked === true)}
+					/>
+					<span class="text-sm">
+						<span class="font-medium">Samedi 18 juillet 2026</span>
+						<span class="text-muted-foreground"> — Cérémonie & Soirée</span>
+					</span>
+				</label>
+				<label class="flex cursor-pointer items-center gap-3">
+					<Checkbox
+						name="{prefix}present_sunday"
+						checked={presentSunday}
+						onCheckedChange={(checked: boolean) => (presentSunday = checked === true)}
+					/>
+					<span class="text-sm">
+						<span class="font-medium">Dimanche 19 juillet 2026</span>
+						<span class="text-muted-foreground"> — Brunch</span>
+					</span>
+				</label>
+			</div>
+		</div>
+
 		<div class="space-y-3">
 			<Label for="{prefix}dietary_restrictions">Restrictions alimentaires</Label>
 			<Textarea
@@ -101,5 +141,19 @@
 				class="resize-none"
 			/>
 		</div>
+
+		{#if showMessage}
+			<div class="mt-4 space-y-3">
+				<Label for="{prefix}message_for_couple">Un petit mot pour les mariés ? 💕</Label>
+				<Textarea
+					name="{prefix}message_for_couple"
+					id="{prefix}message_for_couple"
+					placeholder="Ton message ici..."
+					value={guest.message_for_couple}
+					class="resize-none"
+					rows={3}
+				/>
+			</div>
+		{/if}
 	{/if}
 </div>

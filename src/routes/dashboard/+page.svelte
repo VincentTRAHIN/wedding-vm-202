@@ -17,7 +17,7 @@
 				Bonjour {guest.full_name?.split(' ')[0]}
 			</h1>
 			<p class="text-lg text-muted-foreground">
-				Bienvenue sur votre espace personnel. Retrouvez ici toutes les informations pour le mariage.
+				Bienvenue sur ton espace personnel. Retrouve ici toutes les informations pour le mariage.
 			</p>
 		</div>
 
@@ -27,7 +27,7 @@
 				<RecapCard {guest} />
 				{#if guest.room}
 					<div class="space-y-4">
-						<h2 class="font-serif text-2xl font-bold text-primary">Votre Hébergement</h2>
+						<h2 class="font-serif text-2xl font-bold text-primary">Ton Hébergement</h2>
 						<RoomCard
 							room={guest.room}
 							checkInDate={guest.check_in_date}

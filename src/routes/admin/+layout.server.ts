@@ -9,7 +9,8 @@ export const load: LayoutServerLoad = async ({ locals: { supabase, user } }) => 
 		.from('guests')
 		.select('role')
 		.eq('auth_id', user.id)
-		.single();
+		.limit(1)
+		.maybeSingle();
 
 	if (guest?.role !== 'admin') {
 		throw redirect(303, '/');

@@ -9,28 +9,29 @@
 		class="max-w-xl mx-auto bg-white rounded-lg shadow-sm border border-[#e5e5e5] overflow-hidden"
 	>
 		<div class="bg-[#5E7E66] px-8 py-5 text-white">
-			<div class="text-sm opacity-90">Mariage de</div>
-			<div class="text-2xl font-bold">Vincent & Mélanie</div>
+			<div class="text-sm opacity-90">💍 Mariage de</div>
+			<div class="text-2xl font-bold">Mélanie & Vincent</div>
+			<div class="text-sm opacity-90 mt-1">🔔 Notification Admin</div>
 		</div>
 
 		<div class="p-8">
-			<h2 class="text-lg font-semibold mb-4">Nouveau RSVP</h2>
+			<h2 class="text-lg font-semibold mb-4">📬 Nouveau RSVP reçu</h2>
 
-			<div class="rounded-md border border-[#e5e5e5] bg-[#f3f4f6] p-4 mb-6">
-				<div class="text-sm text-gray-600">Réponse de</div>
-				<div class="mt-1 flex items-center justify-between gap-3">
+			<div class="rounded-lg border border-[#e5e5e5] bg-[#f3f4f6] p-5 mb-6">
+				<div class="text-sm text-gray-600 mb-2">👤 Réponse de</div>
+				<div class="flex items-center justify-between gap-3 bg-white p-3 rounded-md">
 					<div class="text-base font-semibold">{mainGuestName}</div>
 					{#if status === 'present'}
 						<span
-							class="inline-block rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#5E7E66]"
+							class="inline-block rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-[#5E7E66]"
 						>
-							PRÉSENT
+							✅ PRÉSENT
 						</span>
 					{:else}
 						<span
-							class="inline-block rounded-full bg-white px-3 py-1 text-sm font-semibold text-red-600"
+							class="inline-block rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-600"
 						>
-							ABSENT
+							❌ ABSENT
 						</span>
 					{/if}
 				</div>
@@ -38,19 +39,21 @@
 
 			{#if guests.length > 0}
 				<div class="mb-6">
-					<h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">
-						Accompagnants
+					<h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-3">
+						👥 Accompagnants ({guests.length})
 					</h3>
-					<ul class="rounded-md border border-[#e5e5e5] bg-white p-4 space-y-2">
+					<ul class="rounded-lg border border-[#e5e5e5] bg-white p-4 space-y-2">
 						{#each guests as guest, i (i)}
-							<li class="flex justify-between items-center text-sm">
+							<li
+								class="flex justify-between items-center text-sm py-2 border-b border-gray-100 last:border-0"
+							>
 								<span class="font-medium">{guest.full_name}</span>
 								<span
 									class="font-semibold {guest.rsvp_status === 'present'
 										? 'text-[#5E7E66]'
 										: 'text-red-600'}"
 								>
-									{guest.rsvp_status === 'present' ? 'Présent' : 'Absent'}
+									{guest.rsvp_status === 'present' ? '✅ Présent' : '❌ Absent'}
 								</span>
 							</li>
 						{/each}
@@ -60,12 +63,13 @@
 
 			<div class="text-center mt-8">
 				<a
-					href="https://wedding-vm-202.vercel.app/admin/guests"
-					class="inline-block bg-[#5E7E66] text-white px-6 py-3 rounded-md font-semibold no-underline"
+					href="https://july18.melanie.vincent-trahin.dev/admin/guests"
+					class="inline-block bg-[#5E7E66] text-white px-8 py-4 rounded-lg font-semibold no-underline shadow-sm hover:bg-[#4d6855] transition-colors"
+					style="text-decoration: none;"
 				>
-					Ouvrir le dashboard
+					📊 Ouvrir le Dashboard Admin
 				</a>
-				<p class="text-xs text-gray-500 mt-3">Lien réservé à l'administration.</p>
+				<p class="text-xs text-gray-500 mt-4">🔒 Lien réservé à l'administration</p>
 			</div>
 		</div>
 	</div>

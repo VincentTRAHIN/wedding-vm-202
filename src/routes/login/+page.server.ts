@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import { emailSchema } from '$lib/server/validation';
 
 export const actions: Actions = {
 	login_google: async ({ locals: { supabase }, url }) => {
@@ -40,8 +41,14 @@ export const actions: Actions = {
 			return fail(400, { email, missing: true });
 		}
 
+		// Validate email format
+		const emailValidation = emailSchema.safeParse(email);
+		if (!emailValidation.success) {
+			return fail(400, { message: 'Email invalide.' });
+		}
+
 		const { error } = await supabase.auth.signInWithPassword({
-			email,
+			email: emailValidation.data,
 			password
 		});
 

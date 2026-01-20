@@ -13,17 +13,17 @@
 		<Card.Header>
 			<Card.Title class="text-center font-serif text-2xl">Bienvenue !</Card.Title>
 			<Card.Description class="text-center">
-				Pour accéder au site, veuillez vous identifier en sélectionnant votre nom dans la liste.
+				Pour accéder au site, identifie-toi en sélectionnant ton nom dans la liste.
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<form method="POST" action="?/claim" use:enhance class="space-y-6">
 				<div class="space-y-2">
-					<label for="guest-selector" class="text-sm font-medium">Votre nom</label>
+					<label for="guest-selector" class="text-sm font-medium">Ton nom</label>
 					<GuestSelector
 						guests={data.unclaimedGuests}
 						bind:value={selectedGuestId}
-						placeholder="Rechercher votre nom..."
+						placeholder="Recherche ton nom..."
 					/>
 					<input type="hidden" name="guestId" value={selectedGuestId} />
 				</div>

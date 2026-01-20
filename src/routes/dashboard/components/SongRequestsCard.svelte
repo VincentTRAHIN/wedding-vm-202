@@ -30,7 +30,7 @@
 				return async ({ result, update }) => {
 					isSubmitting = false;
 					if (result.type === 'success') {
-						toast.success('Merci ! Votre proposition a été envoyée.');
+						toast.success('Merci ! Ta proposition a été envoyée.');
 					}
 					if (result.type === 'failure') {
 						toast.error("Impossible d'enregistrer la proposition.");

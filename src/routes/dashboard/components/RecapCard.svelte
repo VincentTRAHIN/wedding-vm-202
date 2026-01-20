@@ -27,7 +27,10 @@
 				<p class="font-medium">Samedi 18 Juillet 2026</p>
 				<div class="flex items-center gap-1 text-sm text-muted-foreground">
 					<Clock class="h-3 w-3" />
-					<span>Ouverture des portes dès <strong>15h</strong>. Début de la cérémonie à <strong>15h30</strong></span>
+					<span
+						>Ouverture des portes dès <strong>15h</strong>. Début de la cérémonie à
+						<strong>15h30</strong></span
+					>
 				</div>
 			</div>
 		</div>
@@ -44,7 +47,7 @@
 		<!-- RSVP Status -->
 		<div class="rounded-lg bg-muted p-4">
 			<div class="mb-2 flex items-center justify-between">
-				<span class="text-sm font-medium">Votre statut RSVP</span>
+				<span class="text-sm font-medium">Ton statut RSVP</span>
 				{#if guest.rsvp_status === 'present'}
 					<Badge variant="default">Présent</Badge>
 				{:else if guest.rsvp_status === 'absent'}
@@ -62,7 +65,7 @@
 			{#if guest.room}
 				<div class="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
 					<Bed class="mt-0.5 h-3 w-3" />
-					<span>Votre chambre: {guest.room.name}</span>
+					<span>Ta chambre: {guest.room.name}</span>
 				</div>
 			{/if}
 		</div>

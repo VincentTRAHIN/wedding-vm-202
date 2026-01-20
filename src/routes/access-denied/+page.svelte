@@ -7,13 +7,11 @@
 	<Card.Root class="w-full max-w-md text-center">
 		<Card.Header>
 			<Card.Title class="text-2xl font-serif text-primary">Accès Refusé</Card.Title>
-			<Card.Description>
-				Désolé, votre email ne figure pas sur la liste des invités.
-			</Card.Description>
+			<Card.Description>Désolé, ton email ne figure pas sur la liste des invités.</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<p class="text-muted-foreground mb-4">
-				Si vous pensez qu'il s'agit d'une erreur, veuillez contacter les mariés.
+				Si tu penses qu'il s'agit d'une erreur, contacte les mariés.
 			</p>
 		</Card.Content>
 		<Card.Footer class="flex justify-center">

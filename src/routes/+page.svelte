@@ -97,8 +97,8 @@
 				Bienvenue {firstName ? `, ${firstName}` : ''}
 			</h2>
 			<p class="mb-10 text-lg leading-relaxed text-muted-foreground">
-				Nous sommes ravis de partager ce moment unique avec vous. Explorez notre site pour trouver
-				toutes les informations nécessaires et n'oubliez pas de nous faire part de votre présence.
+				Nous sommes ravis de partager ce moment unique avec toi. Explore notre site pour trouver
+				toutes les informations nécessaires et n'oublie pas de nous faire part de ta présence.
 			</p>
 
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -110,10 +110,10 @@
 					Mon Espace Invité
 				</Button>
 				<Button href="/rsvp" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
-					Confirmer Votre Présence (RSVP)
+					Confirmer Ta Présence (RSVP)
 				</Button>
 				<Button href="/gallery" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
-					Partagez Vos Souvenirs (Galerie)
+					Partage Tes Souvenirs (Galerie)
 				</Button>
 			</div>
 		</div>

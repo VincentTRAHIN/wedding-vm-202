@@ -16,7 +16,7 @@
 			<Card.Title class="text-2xl font-bold">Oups ! Une erreur est survenue</Card.Title>
 			<Card.Description>
 				{#if $page.status === 404}
-					La page que vous recherchez n'existe pas.
+					La page que tu recherches n'existe pas.
 				{:else}
 					Une erreur inattendue s'est produite.
 				{/if}

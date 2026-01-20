@@ -18,6 +18,7 @@
 	let selectedManagedGuestId = $state('');
 	let isAddingGuest = $state(false);
 	let isChild = $state(false);
+	let noEmail = $state(false);
 	let email = $state('');
 
 	// Initialize editing state based on RSVP status
@@ -27,7 +28,7 @@
 	let isDeadlinePassed = $derived(new Date() > new Date(data.RSVP_DEADLINE));
 
 	$effect(() => {
-		if (isChild) {
+		if (isChild || noEmail) {
 			email = '';
 		}
 	});
@@ -47,9 +48,9 @@
 				</div>
 
 				<h1 class="mb-2 font-serif text-3xl font-bold text-foreground">
-					Merci, votre réponse est enregistrée !
+					Merci, ta réponse est enregistrée !
 				</h1>
-				<p class="mb-8 text-muted-foreground">Nous avons bien pris en compte votre réponse.</p>
+				<p class="mb-8 text-muted-foreground">Nous avons bien pris en compte ta réponse.</p>
 
 				<div
 					class="mb-8 w-full max-w-md space-y-4 rounded-lg border border-stone-100 bg-stone-50 p-6"
@@ -57,16 +58,30 @@
 					<div
 						class="flex items-center justify-between border-b border-stone-200 pb-4 last:border-0 last:pb-0"
 					>
-						<span class="font-medium text-foreground">Votre statut</span>
+						<span class="font-medium text-foreground">Ton statut</span>
 						<Badge variant={data.guest.rsvp_status === 'present' ? 'default' : 'destructive'}>
 							{data.guest.rsvp_status === 'present' ? 'Présent' : 'Absent'}
 						</Badge>
 					</div>
 
+					{#if data.guest.rsvp_status === 'present'}
+						<div class="space-y-2 border-b border-stone-200 pb-4 text-left">
+							<span class="text-sm font-medium text-muted-foreground">Jours de présence :</span>
+							<div class="flex flex-wrap gap-2">
+								{#if data.guest.present_saturday}
+									<Badge variant="outline">Sam. 18 juillet</Badge>
+								{/if}
+								{#if data.guest.present_sunday}
+									<Badge variant="outline">Dim. 19 juillet</Badge>
+								{/if}
+							</div>
+						</div>
+					{/if}
+
 					{#if data.managedGuests.length > 0}
 						<div class="pt-2 text-left">
 							<span class="mb-2 block text-sm font-medium text-muted-foreground"
-								>Vous venez accompagné de :</span
+								>Tu viens accompagné(e) de :</span
 							>
 							<ul class="space-y-2">
 								{#each data.managedGuests as guest (guest.id)}
@@ -91,7 +106,7 @@
 					<Button variant="outline" onclick={() => (isEditing = true)}>Modifier ma réponse</Button>
 				{:else}
 					<p class="text-sm text-muted-foreground">
-						La date limite de réponse est passée. Contactez les mariés pour tout changement.
+						La date limite de réponse est passée. Contacte les mariés pour tout changement.
 					</p>
 				{/if}
 			</div>
@@ -99,11 +114,9 @@
 			<!-- Edit View -->
 			<div class="bg-white px-6 pb-6 pt-8 text-center">
 				<h1 class="font-serif text-3xl font-bold text-foreground md:text-4xl">
-					Répondez à l'invitation
+					Réponds à l'invitation
 				</h1>
-				<p class="mt-2 text-sm text-muted-foreground">
-					Veuillez confirmer votre présence avant le 1er Mai 2026
-				</p>
+				<p class="mt-2 text-sm text-muted-foreground">Confirme ta présence avant le 1er Mai 2026</p>
 			</div>
 
 			<Card.Content class="p-6 pt-0">
@@ -118,9 +131,9 @@
 							console.log('RSVP Update Result:', result);
 							if (result.type === 'success') {
 								if (isRemove) {
-									toast.success('Invité retiré de votre liste.');
+									toast.success('Invité retiré de ta liste.');
 								} else {
-									toast.success('Votre réponse a été enregistrée !');
+									toast.success('Ta réponse a été enregistrée !');
 									isEditing = false;
 									await invalidateAll();
 								}
@@ -132,11 +145,12 @@
 					}}
 					class="space-y-8"
 				>
-					{#each allGuests as guest (guest.id)}
+					{#each allGuests as guest, i (guest.id)}
 						<RsvpFormItem
 							{guest}
 							prefix="guest_{guest.id}_"
 							isRemovable={guest.id !== data.guest.id}
+							showMessage={i === 0}
 						/>
 					{/each}
 
@@ -165,8 +179,7 @@
 				<div class="mt-12 border-t border-stone-200 pt-8">
 					<h3 class="mb-4 font-serif text-xl font-bold text-foreground">Gérer d'autres invités</h3>
 					<p class="mb-4 text-sm text-muted-foreground">
-						Vous pouvez ajouter votre conjoint(e) ou vos enfants s'ils sont dans la liste des
-						invités.
+						Tu peux ajouter ton/ta conjoint(e) ou tes enfants s'ils sont dans la liste des invités.
 					</p>
 
 					<form
@@ -180,6 +193,7 @@
 									toast.success('Invité ajouté !');
 									selectedManagedGuestId = '';
 									isChild = false;
+									noEmail = false;
 									email = '';
 									await invalidateAll();
 								} else {
@@ -210,18 +224,37 @@
 							</Label>
 						</div>
 
+						{#if !isChild}
+							<div class="flex items-center space-x-2">
+								<Checkbox id="no_email" bind:checked={noEmail} name="no_email" />
+								<Label
+									for="no_email"
+									class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>
+									Cette personne n'a pas d'email
+								</Label>
+							</div>
+						{/if}
+
 						<div class="space-y-2">
-							<Label for="email" class={isChild ? 'text-muted-foreground' : ''}>Email</Label>
+							<Label for="email" class={isChild || noEmail ? 'text-muted-foreground' : ''}
+								>Email</Label
+							>
 							<Input
 								type="email"
 								id="email"
 								name="email"
 								placeholder="email@exemple.com"
 								bind:value={email}
-								disabled={isChild}
-								required={!isChild}
-								class={isChild ? 'opacity-50' : ''}
+								disabled={isChild || noEmail}
+								required={!isChild && !noEmail}
+								class={isChild || noEmail ? 'opacity-50' : ''}
 							/>
+							{#if noEmail && !isChild}
+								<p class="text-xs text-muted-foreground">
+									Cette personne sera gérée via ton compte.
+								</p>
+							{/if}
 						</div>
 
 						<Button

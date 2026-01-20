@@ -7,7 +7,7 @@ export interface Database {
 				Row: {
 					id: string;
 					created_at: string;
-					email: string;
+					email: string | null;
 					full_name: string | null;
 					avatar_url: string | null;
 					role: 'admin' | 'guest';
@@ -22,11 +22,17 @@ export interface Database {
 					check_in_date: string | null;
 					check_out_date: string | null;
 					room_notes: string | null;
+					invitation_code: string | null;
+					is_child: boolean;
+					present_saturday: boolean | null;
+					present_sunday: boolean | null;
+					message_for_couple: string | null;
+					invitation_sent: boolean;
 				};
 				Insert: {
 					id?: string;
 					created_at?: string;
-					email: string;
+					email?: string | null;
 					full_name?: string | null;
 					avatar_url?: string | null;
 					role?: 'admin' | 'guest';
@@ -41,11 +47,17 @@ export interface Database {
 					check_in_date?: string | null;
 					check_out_date?: string | null;
 					room_notes?: string | null;
+					invitation_code?: string | null;
+					is_child?: boolean;
+					present_saturday?: boolean | null;
+					present_sunday?: boolean | null;
+					message_for_couple?: string | null;
+					invitation_sent?: boolean;
 				};
 				Update: {
 					id?: string;
 					created_at?: string;
-					email?: string;
+					email?: string | null;
 					full_name?: string | null;
 					avatar_url?: string | null;
 					role?: 'admin' | 'guest';
@@ -60,6 +72,12 @@ export interface Database {
 					check_in_date?: string | null;
 					check_out_date?: string | null;
 					room_notes?: string | null;
+					invitation_code?: string | null;
+					is_child?: boolean;
+					present_saturday?: boolean | null;
+					present_sunday?: boolean | null;
+					message_for_couple?: string | null;
+					invitation_sent?: boolean;
 				};
 				Relationships: [];
 			};

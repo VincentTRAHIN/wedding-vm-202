@@ -16,7 +16,8 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 		.from('guests')
 		.select('id')
 		.eq('auth_id', user.id)
-		.single();
+		.limit(1)
+		.maybeSingle();
 
 	if (existingGuest) {
 		throw redirect(303, '/');

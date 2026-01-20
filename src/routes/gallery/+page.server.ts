@@ -4,6 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SERVICE_ROLE_KEY } from '$env/static/private';
 import type { Database } from '$lib/types/supabase';
+import {
+	validateImageFile,
+	photoCaptionSchema,
+	commentContentSchema
+} from '$lib/server/validation';
 
 export const load: PageServerLoad = async ({ locals: { user } }) => {
 	if (!user) throw redirect(303, '/login');
@@ -35,7 +40,9 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 		.order('created_at', { ascending: false });
 
 	if (error) {
-		console.error('Error fetching photos:', error);
+		if (process.env.NODE_ENV === 'development') {
+			console.error('❌ Error fetching photos:', error);
+		}
 	}
 
 	// Fetch user's likes to determine is_liked_by_user
@@ -69,8 +76,18 @@ export const actions: Actions = {
 		const file = formData.get('photo') as File;
 		const caption = formData.get('caption') as string;
 
-		if (!file || file.size === 0) {
-			return fail(400, { message: 'No file uploaded' });
+		// Validate file
+		const fileValidation = validateImageFile(file);
+		if (!fileValidation.valid) {
+			return fail(400, { message: fileValidation.error });
+		}
+
+		// Validate caption if provided
+		if (caption) {
+			const captionValidation = photoCaptionSchema.safeParse(caption);
+			if (!captionValidation.success) {
+				return fail(400, { message: 'Légende invalide' });
+			}
 		}
 
 		// 1. Upload to Storage (Standard Client - Storage Policies are fine)
@@ -106,7 +123,9 @@ export const actions: Actions = {
 		});
 
 		if (dbError) {
-			console.error('DB Insert Error:', dbError);
+			if (process.env.NODE_ENV === 'development') {
+				console.error('❌ DB Insert Error:', dbError);
+			}
 			return fail(500, { message: 'Failed to save photo metadata.' });
 		}
 
@@ -155,7 +174,9 @@ export const actions: Actions = {
 			.remove([photo.storage_path]);
 
 		if (storageError) {
-			console.error('Storage Delete Error:', storageError);
+			if (process.env.NODE_ENV === 'development') {
+				console.error('❌ Storage Delete Error:', storageError);
+			}
 			// Continue to delete DB record even if storage fails (orphan file is better than broken UI)
 		}
 
@@ -163,7 +184,9 @@ export const actions: Actions = {
 		const { error: dbError } = await supabaseAdmin.from('photos').delete().eq('id', photoId);
 
 		if (dbError) {
-			console.error('DB Delete Error:', dbError);
+			if (process.env.NODE_ENV === 'development') {
+				console.error('❌ DB Delete Error:', dbError);
+			}
 			return fail(500, { message: 'Failed to delete photo' });
 		}
 
@@ -209,12 +232,18 @@ export const actions: Actions = {
 		const photoId = formData.get('photoId') as string;
 		const content = formData.get('content') as string;
 
-		if (!photoId || !content) return fail(400, { message: 'Missing data' });
+		if (!photoId) return fail(400, { message: 'Missing photo ID' });
+
+		// Validate content
+		const validation = commentContentSchema.safeParse(content);
+		if (!validation.success) {
+			return fail(400, { message: 'Commentaire invalide' });
+		}
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { error } = await (supabase as any)
 			.from('photo_comments')
-			.insert({ user_id: user.id, photo_id: photoId, content });
+			.insert({ user_id: user.id, photo_id: photoId, content: validation.data });
 
 		if (error) return fail(500, { message: 'Failed to comment' });
 
@@ -238,8 +267,15 @@ export const actions: Actions = {
 
 		if (fetchError || !comment) return fail(404, { message: 'Comment not found' });
 
-		// Allow deletion if user owns the comment OR is admin (email check)
-		const isAdmin = user.email === 'admin@example.com'; // Replace with real admin check if needed
+		// Check if user is admin via database
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { data: guest } = await (supabase as any)
+			.from('guests')
+			.select('role')
+			.eq('auth_id', user.id)
+			.single();
+
+		const isAdmin = guest?.role === 'admin';
 		if (comment.user_id !== user.id && !isAdmin) {
 			return fail(403, { message: 'Forbidden' });
 		}

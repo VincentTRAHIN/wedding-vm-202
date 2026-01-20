@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 		.from('guests')
 		.select('*')
 		.eq('auth_id', user.id)
-		.single();
+		.limit(1)
+		.maybeSingle();
 
 	if (!guest) {
 		// If user is logged in but has no guest profile, redirect to claim
@@ -52,15 +53,13 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 
 const rsvpSchema = z.object({
 	rsvp_status: z.enum(['present', 'absent']),
-	dietary_restrictions: z.string().optional()
+	present_saturday: z.boolean().optional(),
+	present_sunday: z.boolean().optional(),
+	dietary_restrictions: z.string().optional(),
+	message_for_couple: z.string().max(1000, 'Message trop long (1000 caractères max)').optional()
 });
 
-import {
-	sendRsvpConfirmation,
-	sendGuestInvitation,
-	sendAdminAlert,
-	sendInvitationEmail
-} from '$lib/server/email';
+import { sendRsvpConfirmation, sendGuestInvitation, sendAdminAlert } from '$lib/server/email';
 
 export const actions: Actions = {
 	update: async ({ request, locals: { user } }) => {
@@ -83,7 +82,7 @@ export const actions: Actions = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { data: guests } = await (supabaseAdmin as any)
 			.from('guests')
-			.select('id, auth_id, managed_by_id, full_name, email, invitation_code')
+			.select('id, auth_id, managed_by_id, full_name, email, invitation_code, invitation_sent')
 			.or(`id.eq.${currentUserGuest.id},managed_by_id.eq.${currentUserGuest.id}`);
 
 		if (!guests) return fail(500, { message: 'Error fetching guests' });
@@ -104,7 +103,10 @@ export const actions: Actions = {
 
 			const rawData = {
 				rsvp_status: status,
-				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || undefined
+				present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
+				present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
+				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || undefined,
+				message_for_couple: formData.get(`${prefix}message_for_couple`) || undefined
 			};
 
 			const result = rsvpSchema.safeParse(rawData);
@@ -115,14 +117,23 @@ export const actions: Actions = {
 				continue;
 			}
 
-			const { rsvp_status, dietary_restrictions } = result.data;
+			const {
+				rsvp_status,
+				present_saturday,
+				present_sunday,
+				dietary_restrictions,
+				message_for_couple
+			} = result.data;
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const { error } = await (supabaseAdmin as any)
 				.from('guests')
 				.update({
 					rsvp_status,
-					dietary_restrictions
+					present_saturday: rsvp_status === 'present' ? present_saturday : null,
+					present_sunday: rsvp_status === 'present' ? present_sunday : null,
+					dietary_restrictions,
+					message_for_couple
 				})
 				.eq('id', guest.id);
 
@@ -138,21 +149,38 @@ export const actions: Actions = {
 					mainGuestStatus = rsvp_status;
 				}
 
-				// Send Invitation to secondary guests if they are present and have email
+				// Send Invitation to secondary guests if they are present, have email, and haven't received one yet
 				if (
 					rsvp_status === 'present' &&
 					guest.email &&
 					guest.id !== currentUserGuest.id &&
-					guest.email !== user.email
+					guest.email !== user.email &&
+					!guest.invitation_sent
 				) {
+					console.log(
+						`📧 Sending invitation to secondary guest: ${guest.email} (${guest.full_name})`
+					);
+
+					// Mark as sent first to prevent duplicates
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					await (supabaseAdmin as any)
+						.from('guests')
+						.update({ invitation_sent: true })
+						.eq('id', guest.id);
+
 					// Fire and forget
-					sendGuestInvitation(
+					const emailResult = await sendGuestInvitation(
 						guest.email,
 						guest.full_name,
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						(guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name || 'Un proche',
-						guest.invitation_code
+						(guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name || 'Un proche'
 					);
+
+					if (emailResult.success) {
+						console.log(`✅ Invitation sent to ${guest.email}`);
+					} else {
+						console.error(`❌ Failed to send invitation to ${guest.email}:`, emailResult.error);
+					}
 				}
 			}
 		}
@@ -182,11 +210,17 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const rawData = Object.fromEntries(formData);
 		const isChild = rawData.is_child === 'on';
+		const noEmail = rawData.no_email === 'on';
 
+		// Email is optional for children or when explicitly marked as no-email
 		const schema = z.object({
 			guestId: z.string().uuid(),
-			email: isChild ? z.string().optional().or(z.literal('')) : z.string().email(),
-			is_child: z.literal('on').optional()
+			email:
+				isChild || noEmail
+					? z.string().email().optional().or(z.literal(''))
+					: z.string().email('Email invalide'),
+			is_child: z.literal('on').optional(),
+			no_email: z.literal('on').optional()
 		});
 
 		const result = schema.safeParse(rawData);
@@ -208,7 +242,8 @@ export const actions: Actions = {
 			.from('guests')
 			.select('id, full_name')
 			.eq('auth_id', user.id)
-			.single();
+			.limit(1)
+			.maybeSingle();
 
 		if (!currentUserGuest) return fail(400, { message: 'Guest profile not found' });
 
@@ -221,6 +256,7 @@ export const actions: Actions = {
 			is_child: isChild,
 			rsvp_status: 'present', // Always present when added via this flow
 			invitation_code: invitationCode
+			// NOTE: invitation_sent will be set to true AFTER successful email send
 		};
 
 		if (email) {
@@ -245,13 +281,42 @@ export const actions: Actions = {
 			return fail(500, { message: 'Failed to add guest' });
 		}
 
+		// Send invitation email only for adults with email
 		if (!isChild && email && updatedGuest) {
-			await sendInvitationEmail(
-				email,
-				updatedGuest.full_name,
-				currentUserGuest.full_name,
-				invitationCode
+			console.log(
+				`📧 Sending invitation email to ${email} (${updatedGuest.full_name}) from ${currentUserGuest.full_name}`
 			);
+
+			try {
+				const emailResult = await sendGuestInvitation(
+					email,
+					updatedGuest.full_name,
+					currentUserGuest.full_name
+				);
+
+				if (emailResult.success) {
+					console.log(`✅ Invitation email sent successfully to ${email}`);
+
+					// Mark as sent only AFTER successful send
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					await (supabaseAdmin as any)
+						.from('guests')
+						.update({ invitation_sent: true })
+						.eq('id', guestId);
+				} else {
+					console.error(`❌ Failed to send invitation email to ${email}:`, emailResult.error);
+					// Don't fail the whole operation, just log the error
+				}
+			} catch (err) {
+				console.error(`❌ Exception while sending email to ${email}:`, err);
+				// Don't fail the whole operation
+			}
+		} else {
+			if (isChild) {
+				console.log(`ℹ️ Skipping email for child: ${updatedGuest?.full_name}`);
+			} else if (!email) {
+				console.log(`ℹ️ Skipping email - no email provided for: ${updatedGuest?.full_name}`);
+			}
 		}
 
 		return { success: true };
@@ -273,7 +338,8 @@ export const actions: Actions = {
 			.from('guests')
 			.select('id')
 			.eq('auth_id', user.id)
-			.single();
+			.limit(1)
+			.maybeSingle();
 
 		if (!currentUserGuest) return fail(400, { message: 'Guest profile not found' });
 

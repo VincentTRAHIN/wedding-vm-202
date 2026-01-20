@@ -52,31 +52,20 @@ const supabase: Handle = async ({ event, resolve }) => {
 	});
 };
 
-const passwordWall: Handle = async ({ event, resolve }) => {
-	// Exceptions : Pages accessibles sans mot de passe
-	const publicPaths = ['/unlock', '/health', '/_app', '/favicon', '/robots.txt', '/manifest.json'];
-
-	if (publicPaths.some((path) => event.url.pathname.startsWith(path))) {
-		return resolve(event);
-	}
-
-	const hasPass = event.cookies.get('wedding_pass');
-
-	if (!hasPass) {
-		throw redirect(303, '/unlock');
-	}
-
-	return resolve(event);
-};
-
 const authGuard: Handle = async ({ event, resolve }) => {
 	const { session, user } = await event.locals.safeGetSession();
 	event.locals.session = session;
 	event.locals.user = user;
 
-	// 1. Routes Publiques (Login, Auth callbacks, Logout, Register)
-	// Register doit être public pour permettre l'inscription des nouveaux utilisateurs
-	const publicRoutes = ['/login', '/auth/callback', '/logout', '/register', '/unlock'];
+	// 1. Routes Publiques (Login, Auth callbacks, Logout, Register, Forgot Password)
+	const publicRoutes = [
+		'/login',
+		'/auth/callback',
+		'/logout',
+		'/register',
+		'/forgot-password',
+		'/health'
+	];
 	if (publicRoutes.some((route) => event.url.pathname.startsWith(route))) {
 		return resolve(event);
 	}
@@ -102,4 +91,49 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(supabase, passwordWall, authGuard);
+/**
+ * Security Headers
+ * Add security-related HTTP headers to all responses
+ */
+const securityHeaders: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+
+	// Only add security headers in production
+	if (process.env.NODE_ENV === 'production') {
+		// Prevent clickjacking
+		response.headers.set('X-Frame-Options', 'DENY');
+
+		// Prevent MIME type sniffing
+		response.headers.set('X-Content-Type-Options', 'nosniff');
+
+		// Enable XSS protection (legacy browsers)
+		response.headers.set('X-XSS-Protection', '1; mode=block');
+
+		// Referrer policy
+		response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+		// Permissions policy (limit browser features)
+		response.headers.set(
+			'Permissions-Policy',
+			'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+		);
+
+		// Content Security Policy
+		const cspDirectives = [
+			"default-src 'self'",
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-inline needed for SvelteKit
+			"style-src 'self' 'unsafe-inline'", // unsafe-inline needed for Tailwind
+			"img-src 'self' data: https: blob:",
+			"font-src 'self' data:",
+			"connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+			"frame-ancestors 'none'",
+			"base-uri 'self'",
+			"form-action 'self'"
+		];
+		response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+	}
+
+	return response;
+};
+
+export const handle = sequence(supabase, authGuard, securityHeaders);

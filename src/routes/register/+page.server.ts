@@ -1,9 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { WEDDING_ACCESS_CODE, SERVICE_ROLE_KEY } from '$env/static/private';
+import { SERVICE_ROLE_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { Database } from '$lib/types/supabase';
 import { createClient } from '@supabase/supabase-js';
+import { emailSchema, passwordSchema } from '$lib/server/validation';
 
 export const load: PageServerLoad = async ({ locals: { session } }) => {
 	// Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
@@ -14,22 +15,17 @@ export const load: PageServerLoad = async ({ locals: { session } }) => {
 };
 
 export const actions: Actions = {
-	verify_code: async ({ request }) => {
-		const formData = await request.formData();
-		const code = formData.get('code') as string;
-
-		if (code !== WEDDING_ACCESS_CODE) {
-			return fail(403, { error: 'Code invité incorrect.', codeValid: false });
-		}
-
-		return { codeValid: true };
-	},
-
 	login_google: async ({ locals: { supabase }, url }) => {
+		// Force production URL if we are in production
+		const origin =
+			process.env.NODE_ENV === 'production'
+				? 'https://july18.melanie.vincent-trahin.dev'
+				: url.origin;
+
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${url.origin}/auth/callback`,
+				redirectTo: `${origin}/auth/callback`,
 				queryParams: {
 					prompt: 'select_account consent'
 				}
@@ -37,8 +33,10 @@ export const actions: Actions = {
 		});
 
 		if (error) {
-			console.error('Google Auth Error:', error);
-			return fail(500, { message: 'Something went wrong.' });
+			if (process.env.NODE_ENV === 'development') {
+				console.error('Google Auth Error:', error);
+			}
+			return fail(500, { message: 'Une erreur est survenue.' });
 		}
 
 		throw redirect(303, data.url);
@@ -46,35 +44,56 @@ export const actions: Actions = {
 
 	register: async ({ request }) => {
 		const formData = await request.formData();
-		const code = formData.get('code') as string;
-		const fullName = formData.get('fullName') as string;
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
+		const confirmPassword = formData.get('confirmPassword') as string;
 
-		// Double check code server-side
-		if (code !== WEDDING_ACCESS_CODE) {
-			return fail(403, { error: 'Code invité incorrect.' });
+		// Validation des champs
+		if (!email || !password || !confirmPassword) {
+			return fail(400, { error: 'Tous les champs sont requis.' });
 		}
 
-		if (!email || !password || !fullName) {
-			return fail(400, { error: 'Tous les champs sont requis.' });
+		// Vérification que les mots de passe correspondent
+		if (password !== confirmPassword) {
+			return fail(400, { error: 'Les mots de passe ne correspondent pas.' });
+		}
+
+		// Validation email
+		const emailValidation = emailSchema.safeParse(email);
+		if (!emailValidation.success) {
+			return fail(400, { error: 'Email invalide.' });
+		}
+
+		// Validation mot de passe
+		const passwordValidation = passwordSchema.safeParse(password);
+		if (!passwordValidation.success) {
+			return fail(400, {
+				error: 'Mot de passe invalide. Il doit contenir au moins 8 caractères avec 1 chiffre.'
+			});
 		}
 
 		// Initialize Admin Client
 		const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
-		// 1. Create Auth User (Auto-confirmed)
+		// 1. Créer l'utilisateur Auth (Auto-confirmé)
 		const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-			email,
+			email: emailValidation.data,
 			password,
-			email_confirm: true,
-			user_metadata: { full_name: fullName }
+			email_confirm: true
 		});
 
 		if (authError) {
-			console.error('Auth Error:', authError);
+			if (process.env.NODE_ENV === 'development') {
+				console.error('Auth Error:', authError);
+			}
+
+			// Message d'erreur plus explicite
+			if (authError.message?.includes('already')) {
+				return fail(400, { error: 'Cet email est déjà utilisé. Essaie de te connecter.' });
+			}
+
 			return fail(500, {
-				error: 'Erreur lors de la création du compte. (Email invalide ou déjà utilisé)'
+				error: 'Erreur lors de la création du compte.'
 			});
 		}
 
@@ -82,49 +101,25 @@ export const actions: Actions = {
 			return fail(500, { error: "Erreur inattendue lors de l'inscription." });
 		}
 
-		// 2. Check if email exists in guests table (Admin pre-seed)
+		// 2. Vérifier si l'email existe dans la table guests (pre-seed admin)
 		const { data: existingGuest } = await supabaseAdmin
 			.from('guests')
 			.select('id')
-			.eq('email', email)
-			.single();
+			.eq('email', emailValidation.data)
+			.maybeSingle();
 
 		if (existingGuest) {
-			// Link existing guest (Admin) to new Auth ID
-			const { error: updateError } = await supabaseAdmin
+			// Lier le guest existant au nouvel Auth ID
+			await supabaseAdmin
 				.from('guests')
-				.update({
-					auth_id: authData.user.id,
-					full_name: fullName
-				})
+				.update({ auth_id: authData.user.id })
 				.eq('id', existingGuest.id);
 
-			if (updateError) {
-				console.error('Link Error:', updateError);
-				// Note: Auth user is created but guest link failed.
-				// User can still login but might need manual fix or retry logic.
-			}
-		} else {
-			// Create new guest entry
-			const newGuest: Database['public']['Tables']['guests']['Insert'] = {
-				email: email,
-				auth_id: authData.user.id,
-				full_name: fullName,
-				role: 'guest',
-				rsvp_status: 'pending',
-				adults_count: 1,
-				children_count: 0,
-				expected_count: 1
-			};
-
-			const { error: insertError } = await supabaseAdmin.from('guests').insert(newGuest);
-
-			if (insertError) {
-				console.error('Guest Insert Error:', insertError);
-				return fail(500, { error: 'Erreur lors de la création du profil invité.' });
-			}
+			// Redirige vers le dashboard car déjà lié
+			throw redirect(303, '/');
 		}
 
-		throw redirect(303, '/');
+		// 3. Pas de guest existant -> rediriger vers claim-profile pour se lier
+		throw redirect(303, '/claim-profile');
 	}
 };

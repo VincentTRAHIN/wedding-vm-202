@@ -191,7 +191,7 @@
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button href="/login" variant="default" size="sm">Se connecter</Button>
+					<Button href="/login" variant="default" size="sm">Te connecter</Button>
 				{/if}
 			</div>
 		</div>

@@ -40,7 +40,7 @@
 				</span>
 			{/if}
 		</div>
-		<Card.Description>{room.description || 'Votre hébergement pour le mariage.'}</Card.Description>
+		<Card.Description>{room.description || 'Ton hébergement pour le mariage.'}</Card.Description>
 	</Card.Header>
 	<Card.Content class="space-y-4">
 		<div class="flex items-center gap-2 text-sm text-muted-foreground">

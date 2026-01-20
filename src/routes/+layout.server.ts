@@ -8,6 +8,17 @@ import type { Database } from '$lib/types/supabase';
 export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies, url }) => {
 	const { session, user } = await safeGetSession();
 
+	if (process.env.NODE_ENV === 'development') {
+		console.log(
+			'📍 Route:',
+			url.pathname,
+			'| User:',
+			user?.id?.substring(0, 8),
+			'| Email:',
+			user?.email
+		);
+	}
+
 	const themeCookie = cookies.get('theme');
 	const theme = themeCookie === 'bordeaux' ? 'bordeaux' : 'default';
 
@@ -21,7 +32,8 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
 			.from('guests')
 			.select('*')
 			.eq('auth_id', user.id)
-			.single();
+			.limit(1)
+			.maybeSingle();
 
 		guest = data;
 
