@@ -71,6 +71,7 @@ export async function sendGuestInvitation(to: string, guestName: string, inviter
 	console.log(`   To: ${to}`);
 	console.log(`   Guest: ${guestName}`);
 	console.log(`   From: ${inviterName}`);
+	console.log(`   📧 Using sender: ${senderEmail}`);
 
 	try {
 		const { body: html } = render(GuestInvitation, {

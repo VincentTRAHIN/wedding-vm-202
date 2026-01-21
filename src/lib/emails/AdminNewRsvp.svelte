@@ -4,32 +4,36 @@
 	export let guests: { full_name: string; rsvp_status: string }[] = [];
 </script>
 
-<div class="bg-[#FAF9F6] font-serif p-8 text-[#1a1a1a]">
+<div style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #FAF9F6;">
 	<div
-		class="max-w-xl mx-auto bg-white rounded-lg shadow-sm border border-[#e5e5e5] overflow-hidden"
+		style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid #e5e5e5; overflow: hidden;"
 	>
-		<div class="bg-[#5E7E66] px-8 py-5 text-white">
-			<div class="text-sm opacity-90">💍 Mariage de</div>
-			<div class="text-2xl font-bold">Mélanie & Vincent</div>
-			<div class="text-sm opacity-90 mt-1">🔔 Notification Admin</div>
+		<div style="background-color: #5E7E66; padding: 32px; text-align: center; color: #ffffff;">
+			<div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">💍 Mariage de</div>
+			<div style="font-size: 28px; font-weight: bold; margin: 0;">Mélanie & Vincent</div>
+			<div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">🔔 Notification Admin</div>
 		</div>
 
-		<div class="p-8">
-			<h2 class="text-lg font-semibold mb-4">📬 Nouveau RSVP reçu</h2>
+		<div style="padding: 40px 32px; color: #1a1a1a; line-height: 1.6;">
+			<h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">📬 Nouveau RSVP reçu</h2>
 
-			<div class="rounded-lg border border-[#e5e5e5] bg-[#f3f4f6] p-5 mb-6">
-				<div class="text-sm text-gray-600 mb-2">👤 Réponse de</div>
-				<div class="flex items-center justify-between gap-3 bg-white p-3 rounded-md">
-					<div class="text-base font-semibold">{mainGuestName}</div>
+			<div
+				style="background-color: #f3f4f6; border: 1px solid #e5e5e5; border-radius: 8px; padding: 20px; margin-bottom: 24px;"
+			>
+				<div style="font-size: 14px; color: #4b5563; margin-bottom: 8px;">👤 Réponse de</div>
+				<div
+					style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 12px; border-radius: 6px;"
+				>
+					<div style="font-size: 16px; font-weight: 600;">{mainGuestName}</div>
 					{#if status === 'present'}
 						<span
-							class="inline-block rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-[#5E7E66]"
+							style="display: inline-block; border-radius: 9999px; background-color: #d1fae5; padding: 4px 16px; font-size: 14px; font-weight: 600; color: #5E7E66;"
 						>
 							✅ PRÉSENT
 						</span>
 					{:else}
 						<span
-							class="inline-block rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-600"
+							style="display: inline-block; border-radius: 9999px; background-color: #fee2e2; padding: 4px 16px; font-size: 14px; font-weight: 600; color: #dc2626;"
 						>
 							❌ ABSENT
 						</span>
@@ -38,39 +42,51 @@
 			</div>
 
 			{#if guests.length > 0}
-				<div class="mb-6">
-					<h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-3">
+				<div style="margin-bottom: 24px;">
+					<h3
+						style="font-size: 14px; font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;"
+					>
 						👥 Accompagnants ({guests.length})
 					</h3>
-					<ul class="rounded-lg border border-[#e5e5e5] bg-white p-4 space-y-2">
+					<div
+						style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px;"
+					>
 						{#each guests as guest, i (i)}
-							<li
-								class="flex justify-between items-center text-sm py-2 border-b border-gray-100 last:border-0"
+							<div
+								style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; {i ===
+								guests.length - 1
+									? 'border-bottom: none;'
+									: ''}"
 							>
-								<span class="font-medium">{guest.full_name}</span>
+								<span style="font-weight: 500;">{guest.full_name}</span>
 								<span
-									class="font-semibold {guest.rsvp_status === 'present'
-										? 'text-[#5E7E66]'
-										: 'text-red-600'}"
+									style="font-weight: 600; color: {guest.rsvp_status === 'present'
+										? '#5E7E66'
+										: '#dc2626'};"
 								>
 									{guest.rsvp_status === 'present' ? '✅ Présent' : '❌ Absent'}
 								</span>
-							</li>
+							</div>
 						{/each}
-					</ul>
+					</div>
 				</div>
 			{/if}
 
-			<div class="text-center mt-8">
+			<div style="text-align: center; margin-top: 32px;">
 				<a
 					href="https://july18.melanie.vincent-trahin.dev/admin/guests"
-					class="inline-block bg-[#5E7E66] text-white px-8 py-4 rounded-lg font-semibold no-underline shadow-sm hover:bg-[#4d6855] transition-colors"
-					style="text-decoration: none;"
+					style="display: inline-block; background-color: #5E7E66; color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;"
 				>
 					📊 Ouvrir le Dashboard Admin
 				</a>
-				<p class="text-xs text-gray-500 mt-4">🔒 Lien réservé à l'administration</p>
+				<p style="font-size: 13px; color: #6b7280; margin-top: 12px;">🔒 Lien réservé à l'administration</p>
 			</div>
+		</div>
+
+		<div
+			style="text-align: center; padding: 24px; font-size: 13px; color: #6b7280; border-top: 1px solid #e5e5e5;"
+		>
+			💍 Mariage Mélanie & Vincent • 18 juillet 2026
 		</div>
 	</div>
 </div>

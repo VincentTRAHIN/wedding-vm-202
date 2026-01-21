@@ -5,53 +5,67 @@
 	const hasPresent = guests.some((g) => g.rsvp_status === 'present');
 </script>
 
-<div class="bg-[#FAF9F6] font-serif p-8 text-[#1a1a1a]">
+<div style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #FAF9F6;">
 	<div
-		class="max-w-xl mx-auto bg-white rounded-lg shadow-sm border border-[#e5e5e5] overflow-hidden"
+		style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid #e5e5e5; overflow: hidden;"
 	>
-		<div class="bg-[#5E7E66] px-8 py-5 text-white">
-			<div class="text-sm opacity-90">💍 Mariage de</div>
-			<div class="text-2xl font-bold">Mélanie & Vincent</div>
-			<div class="text-sm opacity-90 mt-1">✅ Confirmation de réponse</div>
+		<div style="background-color: #5E7E66; padding: 32px; text-align: center; color: #ffffff;">
+			<div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">💍 Mariage de</div>
+			<div style="font-size: 28px; font-weight: bold; margin: 0;">Mélanie & Vincent</div>
+			<div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">✅ Confirmation de réponse</div>
 		</div>
 
-		<div class="p-8">
-			<p class="mb-4 text-lg">✨ C'est noté, {guestName} !</p>
+		<div style="padding: 40px 32px; color: #1a1a1a; line-height: 1.6;">
+			<p style="font-size: 18px; margin-bottom: 24px; color: #1a1a1a;">✨ C'est noté, {guestName} !</p>
 
-			<p class="mb-6 text-gray-700">
+			<p style="margin-bottom: 24px; color: #4b5563;">
 				Ta réponse est bien enregistrée. Merci pour ta confirmation ! 💌
 			</p>
 
-			<div class="rounded-lg border border-[#e5e5e5] bg-[#f3f4f6] p-6 mb-6">
-				<h2 class="text-lg font-semibold mb-4 border-b border-[#e5e5e5] pb-2">
+			<div
+				style="background-color: #f3f4f6; border: 1px solid #e5e5e5; border-radius: 8px; padding: 24px; margin: 24px 0;"
+			>
+				<h2
+					style="font-size: 18px; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px;"
+				>
 					📋 Récapitulatif de ta réponse
 				</h2>
-				<ul class="space-y-3">
+				<div style="margin: 0; padding: 0;">
 					{#each guests as guest, i (i)}
-						<li class="flex justify-between items-center bg-white px-4 py-3 rounded-md">
-							<span class="font-medium">{guest.full_name}</span>
+						<div
+							style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 12px 16px; border-radius: 6px; margin: 12px 0;"
+						>
+							<span style="font-weight: 500;">{guest.full_name}</span>
 							{#if guest.rsvp_status === 'present'}
-								<span class="text-[#5E7E66] font-bold">✅ Présent</span>
+								<span style="color: #5E7E66; font-weight: bold;">✅ Présent</span>
 							{:else}
-								<span class="text-red-600 font-semibold">❌ Absent</span>
+								<span style="color: #dc2626; font-weight: 600;">❌ Absent</span>
 							{/if}
-						</li>
+						</div>
 					{/each}
-				</ul>
+				</div>
 			</div>
 
 			{#if hasPresent}
-				<div class="text-center bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
-					<p class="text-gray-700 font-medium">🎉 Quel bonheur !</p>
-					<p class="text-gray-600 text-sm mt-2">
+				<div
+					style="text-align: center; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-top: 24px;"
+				>
+					<p style="color: #374151; font-weight: 500; margin: 0 0 8px 0;">🎉 Quel bonheur !</p>
+					<p style="color: #4b5563; font-size: 14px; margin: 0;">
 						On a hâte de fêter ça avec toi le <strong>18 juillet 2026</strong> ! 💕
 					</p>
 				</div>
 			{:else}
-				<p class="text-center text-gray-600 mt-8">
+				<p style="text-align: center; color: #4b5563; font-size: 14px; margin-top: 32px;">
 					💌 Merci encore pour ta réponse. On t'embrasse !
 				</p>
 			{/if}
+		</div>
+
+		<div
+			style="text-align: center; padding: 24px; font-size: 13px; color: #6b7280; border-top: 1px solid #e5e5e5;"
+		>
+			💍 Mariage Mélanie & Vincent • 18 juillet 2026
 		</div>
 	</div>
 </div>

@@ -11,7 +11,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 	const type = url.searchParams.get('type');
 	const next = url.searchParams.get('next') ?? '/';
 
-	console.log('🔄 Auth callback triggered:', { code: !!code, token_hash: !!token_hash, type, next });
+	console.log('🔄 Auth callback triggered:', {
+		code: !!code,
+		token_hash: !!token_hash,
+		type,
+		next
+	});
 
 	// Handle password recovery (reset password)
 	if (type === 'recovery' && token_hash) {

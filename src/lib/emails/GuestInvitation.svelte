@@ -8,9 +8,7 @@
 	<div
 		style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid #e5e5e5; overflow: hidden;"
 	>
-		<div
-			style="background-color: #5E7E66; padding: 32px; text-align: center; color: #ffffff;"
-		>
+		<div style="background-color: #5E7E66; padding: 32px; text-align: center; color: #ffffff;">
 			<div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">💍 Mariage de</div>
 			<div style="font-size: 28px; font-weight: bold; margin: 0;">Mélanie & Vincent</div>
 			<div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">
