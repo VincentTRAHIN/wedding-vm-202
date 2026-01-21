@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { Coffee, MapPin, Clock } from 'lucide-svelte';
+	import { Coffee, MapPin, Clock, Utensils, Users, Trophy } from 'lucide-svelte';
 
 	let { brunchInfo } = $props<{ brunchInfo: unknown }>();
 
@@ -17,31 +17,50 @@
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title>Lendemain & Brunch</Card.Title>
-		<Card.Description>Pour prolonger le week-end.</Card.Description>
+		<Card.Title>Dimanche 19 juillet — Le Lendemain</Card.Title>
+		<Card.Description>Prolonge le week-end avec nous !</Card.Description>
 	</Card.Header>
 	<Card.Content class="space-y-4">
-		{#if !startTime && !location && !menu}
-			<p class="text-sm text-muted-foreground">Les informations seront communiquées prochainement.</p>
-		{:else}
-			{#if startTime}
-				<div class="flex items-center gap-2 text-sm text-muted-foreground">
-					<Clock class="h-4 w-4" />
-					<span>{startTime}</span>
+		<!-- Début festivités -->
+		<div class="rounded-lg bg-stone-50 p-4">
+			<div class="flex items-center gap-2 mb-3">
+				<Clock class="h-4 w-4 text-primary" />
+				<span class="font-medium">11h00 - Début des festivités</span>
+			</div>
+			<p class="text-sm text-muted-foreground">On se retrouve pour continuer la fête !</p>
+		</div>
+
+		<!-- Brunch Fouées -->
+		<div class="rounded-lg bg-stone-50 p-4">
+			<div class="flex items-center gap-2 mb-3">
+				<Utensils class="h-4 w-4 text-primary" />
+				<span class="font-medium">12h00 - Brunch Fouées & Détente</span>
+			</div>
+			<div class="space-y-2 text-sm text-muted-foreground">
+				<div class="flex items-center gap-2">
+					<MapPin class="h-3 w-3" />
+					<span>Domaine</span>
 				</div>
-			{/if}
-			{#if location}
-				<div class="flex items-center gap-2 text-sm text-muted-foreground">
-					<MapPin class="h-4 w-4" />
-					<span>{location}</span>
+				<div class="flex items-start gap-2">
+					<Users class="h-3 w-3 mt-0.5" />
+					<span>Jeux de société, jeux de plein air, Mölkky... On profite encore !</span>
 				</div>
-			{/if}
-			{#if menu}
-				<div class="flex items-center gap-2 text-sm text-muted-foreground">
-					<Coffee class="h-4 w-4" />
-					<span>{menu}</span>
+			</div>
+		</div>
+
+		<!-- Finale Coupe du Monde -->
+		<div class="rounded-lg bg-blue-50 p-4 border border-blue-200">
+			<div class="flex items-center gap-2 mb-3">
+				<Trophy class="h-4 w-4 text-blue-600" />
+				<span class="font-medium text-blue-900">21h00 - Finale de la Coupe du Monde</span>
+			</div>
+			<div class="space-y-2 text-sm text-blue-800">
+				<div class="flex items-center gap-2">
+					<MapPin class="h-3 w-3" />
+					<span>New Jersey / Bar</span>
 				</div>
-			{/if}
-		{/if}
+				<p class="font-medium">🇫🇷 Allez les Bleus !</p>
+			</div>
+		</div>
 	</Card.Content>
 </Card.Root>

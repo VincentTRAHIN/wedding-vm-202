@@ -79,7 +79,9 @@
 				>
 					📊 Ouvrir le Dashboard Admin
 				</a>
-				<p style="font-size: 13px; color: #6b7280; margin-top: 12px;">🔒 Lien réservé à l'administration</p>
+				<p style="font-size: 13px; color: #6b7280; margin-top: 12px;">
+					🔒 Lien réservé à l'administration
+				</p>
 			</div>
 		</div>
 

@@ -20,6 +20,13 @@
 	let isOpen = $state(false);
 	let isSubmitting = $state(false);
 	let isChild = $state(guest.is_child || false);
+
+	// Reset state when dialog opens/closes
+	$effect(() => {
+		if (isOpen) {
+			isChild = guest.is_child || false;
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={isOpen}>

@@ -73,35 +73,35 @@ export const actions: Actions = {
 		if (!user) return fail(401, { message: 'Unauthorized' });
 
 		const formData = await request.formData();
-		const file = formData.get('photo') as File;
+		const files = formData.getAll('photos[]') as File[];
 		const caption = formData.get('caption') as string;
 
-		// Validate file
-		const fileValidation = validateImageFile(file);
-		if (!fileValidation.valid) {
-			return fail(400, { message: fileValidation.error });
+		// Validate number of files
+		const MAX_FILES = 10;
+		if (files.length === 0) {
+			return fail(400, { message: 'Aucune photo sélectionnée' });
+		}
+		if (files.length > MAX_FILES) {
+			return fail(400, { message: `Maximum ${MAX_FILES} photos à la fois` });
+		}
+
+		// Validate each file
+		for (const file of files) {
+			const fileValidation = validateImageFile(file);
+			if (!fileValidation.valid) {
+				return fail(400, { message: fileValidation.error });
+			}
 		}
 
 		// Validate caption if provided
-		if (caption) {
+		if (caption && caption.trim()) {
 			const captionValidation = photoCaptionSchema.safeParse(caption);
 			if (!captionValidation.success) {
 				return fail(400, { message: 'Légende invalide' });
 			}
 		}
 
-		// 1. Upload to Storage (Standard Client - Storage Policies are fine)
-		const fileExt = file.name.split('.').pop();
-		const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-		const { error: uploadError } = await supabase.storage.from('photos').upload(fileName, file);
-
-		if (uploadError) {
-			console.error('Upload Error:', uploadError);
-			return fail(500, { message: 'Failed to upload image.' });
-		}
-
-		// 2. Insert into DB (Admin Client - Bypass RLS recursion)
+		// Get guest ID
 		const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,23 +113,51 @@ export const actions: Actions = {
 
 		if (!guest) return fail(403, { message: 'Guest profile not found' });
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const { error: dbError } = await (supabaseAdmin as any).from('photos').insert({
-			storage_path: fileName,
-			guest_id: guest.id,
-			owner_id: user.id,
-			status: 'approved',
-			caption
-		});
+		// Upload each file
+		const uploadResults = [];
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			const fileExt = file.name.split('.').pop();
+			const fileName = `${user.id}/${Date.now()}-${i}.${fileExt}`;
 
-		if (dbError) {
-			if (process.env.NODE_ENV === 'development') {
-				console.error('❌ DB Insert Error:', dbError);
+			// 1. Upload to Storage
+			const { error: uploadError } = await supabase.storage.from('photos').upload(fileName, file);
+
+			if (uploadError) {
+				console.error('Upload Error:', uploadError);
+				// Clean up previously uploaded files
+				for (const result of uploadResults) {
+					await supabase.storage.from('photos').remove([result.fileName]);
+				}
+				return fail(500, { message: `Failed to upload image ${i + 1}` });
 			}
-			return fail(500, { message: 'Failed to save photo metadata.' });
+
+			// 2. Insert into DB
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const { error: dbError } = await (supabaseAdmin as any).from('photos').insert({
+				storage_path: fileName,
+				guest_id: guest.id,
+				owner_id: user.id,
+				status: 'approved',
+				caption: caption && caption.trim() ? caption : null
+			});
+
+			if (dbError) {
+				if (process.env.NODE_ENV === 'development') {
+					console.error('❌ DB Insert Error:', dbError);
+				}
+				// Clean up storage
+				await supabase.storage.from('photos').remove([fileName]);
+				for (const result of uploadResults) {
+					await supabase.storage.from('photos').remove([result.fileName]);
+				}
+				return fail(500, { message: `Failed to save photo ${i + 1} metadata` });
+			}
+
+			uploadResults.push({ fileName });
 		}
 
-		return { success: true };
+		return { success: true, count: files.length };
 	},
 
 	delete: async ({ request, locals: { user } }) => {

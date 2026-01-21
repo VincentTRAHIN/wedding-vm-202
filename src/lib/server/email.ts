@@ -48,7 +48,7 @@ export async function sendRsvpConfirmation(
 		const data = await resend.emails.send({
 			from: senderEmail,
 			to,
-			subject: 'Confirmation de votre réponse - Mariage V&M',
+			subject: 'Confirmation de ta réponse - Mariage V&M',
 			html
 		});
 		if (process.env.NODE_ENV === 'development') {

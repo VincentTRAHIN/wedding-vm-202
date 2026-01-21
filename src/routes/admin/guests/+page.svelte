@@ -11,6 +11,7 @@
 	import { Plus, Loader2, ArrowUpDown, Link } from 'lucide-svelte';
 	import EditGuestDialog from './EditGuestDialog.svelte';
 	import DeleteGuestDialog from './DeleteGuestDialog.svelte';
+	import ViewDetailsDialog from './ViewDetailsDialog.svelte';
 
 	let { data } = $props();
 	let { guests, rooms } = $derived(data);
@@ -175,6 +176,7 @@
 							</div>
 
 							<div class="flex items-center gap-2">
+								<ViewDetailsDialog {guest} />
 								<EditGuestDialog {guest} {rooms} />
 								<DeleteGuestDialog {guest} />
 							</div>
@@ -265,6 +267,7 @@
 									</Table.Cell>
 									<Table.Cell>
 										<div class="flex items-center gap-2">
+											<ViewDetailsDialog {guest} />
 											<EditGuestDialog {guest} {rooms} />
 											<DeleteGuestDialog {guest} />
 										</div>

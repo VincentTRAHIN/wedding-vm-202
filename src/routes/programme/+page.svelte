@@ -14,21 +14,21 @@
 		| { type: 'separator'; title: string; subtitle?: string };
 
 	const items: TimelineItem[] = [
-		{ type: 'separator', title: 'Samedi', subtitle: 'Jour J' },
+		{ type: 'separator', title: 'Samedi 18 juillet', subtitle: 'Jour J' },
 		{
 			type: 'event',
 			time: '15:00',
 			title: 'Ouverture des portes',
 			description: "On t'accueille au domaine. Prends le temps d'arriver tranquillement.",
-			location: 'Domaine',
+			location: "Jardin d'honneur",
 			icon: Users
 		},
 		{
 			type: 'event',
 			time: '15:30',
-			title: 'Cérémonie (début)',
+			title: 'Cérémonie',
 			description: "C'est parti pour le grand moment !",
-			location: 'Cérémonie',
+			location: "Jardin d'honneur",
 			icon: Heart
 		},
 		{
@@ -36,7 +36,7 @@
 			time: '17:30',
 			title: "Cocktail d'honneur",
 			description: 'Un verre, des petites bouchées et beaucoup de sourires.',
-			location: 'Cocktail',
+			location: "Jardin d'honneur",
 			icon: Wine
 		},
 		{
@@ -44,7 +44,7 @@
 			time: '20:00',
 			title: 'Dîner',
 			description: 'On passe à table !',
-			location: 'Dîner',
+			location: 'Chapiteau',
 			icon: Utensils
 		},
 		{
@@ -52,32 +52,40 @@
 			time: '23:00',
 			title: 'Ouverture du bal',
 			description: 'On lance la piste !',
-			location: 'Bal',
+			location: 'Chapiteau',
 			icon: Music
 		},
 		{
 			type: 'event',
 			time: '04:00',
-			title: 'Fin de soirée',
+			title: 'Fin de soirée 🌙',
 			description: 'On se dit bonne nuit (ou bonjour).',
-			location: 'Fin',
+			location: 'Ton lit',
 			icon: Music
 		},
-		{ type: 'separator', title: 'Dimanche', subtitle: 'Brunch & détente' },
+		{ type: 'separator', title: 'Dimanche 19 juillet', subtitle: 'Brunch & Finale' },
 		{
 			type: 'event',
 			time: '11:00',
-			title: 'Brunch (début)',
-			description: 'On se retrouve pour manger un bout et papoter.',
-			location: 'Brunch',
+			title: 'Début des festivités',
+			description: 'On se retrouve pour continuer la fête !',
+			location: 'Domaine',
+			icon: Users
+		},
+		{
+			type: 'event',
+			time: '12:00',
+			title: 'Brunch Fouées & Détente',
+			description: 'Jeux de société, jeux de plein air, Mölkky... On profite encore !',
+			location: 'Domaine',
 			icon: Utensils
 		},
 		{
 			type: 'event',
-			time: '14:00',
-			title: 'Après-midi Jeux & Détente',
-			description: 'Jeux, chill, et on profite encore un peu.',
-			location: 'Domaine',
+			time: '21:00',
+			title: 'Finale de la Coupe du Monde',
+			description: 'Allez les Bleus ! 🇫🇷',
+			location: 'New Jersey / Bar',
 			icon: Users
 		}
 	];

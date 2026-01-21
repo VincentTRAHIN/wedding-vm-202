@@ -5,54 +5,124 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { toast } from 'svelte-sonner';
-	import { Loader2, Upload, ImagePlus } from 'lucide-svelte';
+	import { Loader2, Upload, ImagePlus, X, Smile } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 	import imageCompression from 'browser-image-compression';
 
 	let isUploading = $state(false);
 	let isCompressing = $state(false);
 	let isDialogOpen = $state(false);
-	let selectedFile: File | null = $state(null);
-	let compressedFile: File | null = $state(null);
-	let previewUrl: string | null = $state(null);
+	let selectedFiles: File[] = $state([]);
+	let compressedFiles: Map<string, File> = $state(new Map());
+	let previewUrls: string[] = $state([]);
 	let compressionProgress = $state(0);
 	let formElement: HTMLFormElement;
+	let showEmojiPicker = $state(false);
+	let captionInput: HTMLInputElement;
+
+	const MAX_FILES = 10;
+
+	// Instagram-style emoji picker (common emojis)
+	const commonEmojis = [
+		'❤️',
+		'😍',
+		'🥰',
+		'😊',
+		'😂',
+		'🥳',
+		'🎉',
+		'✨',
+		'🌟',
+		'💕',
+		'💖',
+		'🌸',
+		'🌺',
+		'🌹',
+		'🎊',
+		'🍾',
+		'👰',
+		'🤵',
+		'💑',
+		'💍',
+		'🥂',
+		'🎂',
+		'🎶',
+		'🎵',
+		'📸',
+		'🌈',
+		'☀️',
+		'🌙',
+		'⭐',
+		'💫',
+		'🔥',
+		'👏'
+	];
 
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
-		if (input.files && input.files[0]) {
-			selectedFile = input.files[0];
-			compressedFile = null; // Reset compressed file on new selection
-			previewUrl = URL.createObjectURL(selectedFile);
+		if (input.files) {
+			const newFiles = Array.from(input.files).slice(0, MAX_FILES);
+
+			if (newFiles.length + selectedFiles.length > MAX_FILES) {
+				toast.error(`Tu peux ajouter maximum ${MAX_FILES} photos à la fois`);
+				return;
+			}
+
+			selectedFiles = [...selectedFiles, ...newFiles];
+			previewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+			compressedFiles = new Map();
 		}
 	}
 
-	async function compressAndSubmit(file: File) {
+	function removeFile(index: number) {
+		selectedFiles = selectedFiles.filter((_, i) => i !== index);
+		previewUrls = previewUrls.filter((_, i) => i !== index);
+		// Clean up object URL
+		URL.revokeObjectURL(previewUrls[index]);
+	}
+
+	function insertEmoji(emoji: string) {
+		if (captionInput) {
+			const start = captionInput.selectionStart || 0;
+			const end = captionInput.selectionEnd || 0;
+			const currentValue = captionInput.value;
+			const newValue = currentValue.substring(0, start) + emoji + currentValue.substring(end);
+			captionInput.value = newValue;
+			// Move cursor after emoji
+			const newCursorPos = start + emoji.length;
+			captionInput.setSelectionRange(newCursorPos, newCursorPos);
+			captionInput.focus();
+		}
+		showEmojiPicker = false;
+	}
+
+	async function compressFiles() {
 		isCompressing = true;
 		compressionProgress = 0;
+		const newCompressedFiles = new Map<string, File>();
 
 		const options = {
 			maxSizeMB: 0.8,
 			maxWidthOrHeight: 1920,
 			useWebWorker: true,
-			fileType: 'image/webp',
-			onProgress: (progress: number) => {
-				compressionProgress = progress;
-			}
+			fileType: 'image/webp'
 		};
 
-		try {
-			compressedFile = await imageCompression(file, options);
-			// Once compressed, re-submit the form
-			// The use:enhance hook will pick up the compressedFile
-			requestAnimationFrame(() => {
-				formElement?.requestSubmit();
-			});
-		} catch (error) {
-			console.error('Compression error:', error);
-			toast.error("Erreur lors de la compression de l'image.");
-			isCompressing = false;
+		for (let i = 0; i < selectedFiles.length; i++) {
+			const file = selectedFiles[i];
+			try {
+				const compressed = await imageCompression(file, options);
+				newCompressedFiles.set(file.name, compressed);
+				compressionProgress = Math.round(((i + 1) / selectedFiles.length) * 100);
+			} catch (error) {
+				console.error('Compression error:', error);
+				toast.error(`Erreur lors de la compression de ${file.name}`);
+			}
 		}
+
+		compressedFiles = newCompressedFiles;
+		isCompressing = false;
+		return newCompressedFiles;
 	}
 </script>
 
@@ -64,13 +134,13 @@
 		)}
 	>
 		<ImagePlus class="h-6 w-6 md:mr-2" />
-		<span class="hidden md:inline">Ajouter une photo</span>
+		<span class="hidden md:inline">Ajouter des photos</span>
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
 		<Dialog.Header>
-			<Dialog.Title>Ajouter une photo</Dialog.Title>
+			<Dialog.Title>Ajouter des photos</Dialog.Title>
 			<Dialog.Description>
-				Partagez vos meilleurs moments. La photo sera visible après validation.
+				Partage tes meilleurs moments. Maximum {MAX_FILES} photos à la fois.
 			</Dialog.Description>
 		</Dialog.Header>
 		<form
@@ -78,32 +148,40 @@
 			method="POST"
 			action="?/upload"
 			enctype="multipart/form-data"
-			use:enhance={({ formData, cancel }) => {
-				const file = formData.get('photo') as File;
+			use:enhance={async ({ formData, cancel }) => {
+				// Compress large files first
+				const filesToCompress = selectedFiles.filter((f) => f.size > 1024 * 1024);
 
-				// Check if we need compression and haven't done it yet
-				if (file && file.size > 1024 * 1024 && !compressedFile) {
+				if (filesToCompress.length > 0 && compressedFiles.size === 0) {
 					cancel();
-					compressAndSubmit(file);
+					await compressFiles();
+					requestAnimationFrame(() => {
+						formElement?.requestSubmit();
+					});
 					return;
 				}
 
-				// If we have a compressed file, use it instead
-				if (compressedFile) {
-					formData.set('photo', compressedFile, 'image.webp');
-					isCompressing = false; // Ensure compressing state is off
-				}
+				// Replace with compressed versions
+				formData.delete('photos[]');
+				selectedFiles.forEach((file, index) => {
+					const compressed = compressedFiles.get(file.name);
+					if (compressed) {
+						formData.append('photos[]', compressed, `image-${index}.webp`);
+					} else {
+						formData.append('photos[]', file);
+					}
+				});
 
 				isUploading = true;
 				return async ({ result, update }) => {
 					isUploading = false;
 					isCompressing = false;
 					if (result.type === 'success') {
-						toast.success('Photo envoyée avec succès !');
+						toast.success(`${selectedFiles.length} photo(s) envoyée(s) avec succès !`);
 						isDialogOpen = false;
-						selectedFile = null;
-						compressedFile = null;
-						previewUrl = null;
+						selectedFiles = [];
+						compressedFiles = new Map();
+						previewUrls = [];
 					} else if (result.type === 'failure') {
 						toast.error("Erreur lors de l'envoi.");
 					}
@@ -113,48 +191,61 @@
 			class="grid gap-4 py-4"
 		>
 			<div class="grid gap-2">
-				<Label for="photo" class={previewUrl ? 'sr-only' : ''}>Photo</Label>
+				<Label for="photos" class={selectedFiles.length > 0 ? 'sr-only' : ''}>Photos</Label>
 				<div class="flex w-full items-center justify-center">
 					<label
-						for="photo"
+						for="photos"
 						class={cn(
-							'flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors hover:bg-muted/50',
+							'flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors hover:bg-muted/50',
 							isUploading || isCompressing ? 'cursor-not-allowed opacity-50' : '',
-							previewUrl ? 'border-primary/50 bg-muted/20' : 'border-muted-foreground/25'
+							selectedFiles.length > 0
+								? 'border-primary/50 bg-muted/20'
+								: 'border-muted-foreground/25'
 						)}
 					>
-						{#if previewUrl}
-							<div class="relative h-full w-full p-2">
-								<img
-									src={previewUrl}
-									alt="Preview"
-									class="h-full w-full rounded-md object-contain"
-								/>
-								<div
-									class="absolute inset-0 m-2 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity hover:opacity-100"
-								>
-									<span class="flex items-center gap-2 font-medium text-white">
-										<ImagePlus class="h-5 w-5" />
-										Changer
-									</span>
-								</div>
+						{#if selectedFiles.length > 0}
+							<div class="grid w-full grid-cols-3 gap-2 p-4 sm:grid-cols-4">
+								{#each previewUrls as url, index}
+									<div class="relative aspect-square group">
+										<img
+											src={url}
+											alt="Preview {index + 1}"
+											class="h-full w-full rounded-md object-cover"
+										/>
+										<button
+											type="button"
+											onclick={() => removeFile(index)}
+											class="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"
+											disabled={isUploading || isCompressing}
+										>
+											<X class="h-4 w-4" />
+										</button>
+									</div>
+								{/each}
+								{#if selectedFiles.length < MAX_FILES}
+									<div
+										class="flex aspect-square items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/25"
+									>
+										<ImagePlus class="h-8 w-8 text-muted-foreground" />
+									</div>
+								{/if}
 							</div>
 						{:else}
 							<div
 								class="flex flex-col items-center justify-center pb-6 pt-5 text-muted-foreground"
 							>
 								<Upload class="mb-3 h-10 w-10" />
-								<p class="mb-2 text-sm font-semibold">Cliquez pour choisir une photo</p>
-								<p class="text-xs">JPG, PNG, WEBP</p>
+								<p class="mb-2 text-sm font-semibold">Clique pour choisir des photos</p>
+								<p class="text-xs">JPG, PNG, WEBP - Max {MAX_FILES} photos</p>
 							</div>
 						{/if}
 						<input
-							id="photo"
-							name="photo"
+							id="photos"
+							name="photos[]"
 							type="file"
 							accept="image/*"
+							multiple
 							class="hidden"
-							required={!selectedFile}
 							onchange={handleFileSelect}
 							disabled={isUploading || isCompressing}
 						/>
@@ -164,18 +255,45 @@
 
 			<div class="grid gap-2">
 				<Label for="caption">Légende (optionnel)</Label>
-				<Input
-					id="caption"
-					name="caption"
-					placeholder="Qui est sur la photo ?"
-					disabled={isUploading || isCompressing}
-				/>
+				<div class="relative">
+					<input
+						bind:this={captionInput}
+						id="caption"
+						name="caption"
+						placeholder="Ajoute une légende..."
+						disabled={isUploading || isCompressing}
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+					/>
+					<button
+						type="button"
+						onclick={() => (showEmojiPicker = !showEmojiPicker)}
+						class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+						disabled={isUploading || isCompressing}
+					>
+						<Smile class="h-5 w-5" />
+					</button>
+				</div>
+				{#if showEmojiPicker}
+					<div class="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
+						<div class="grid grid-cols-8 gap-2">
+							{#each commonEmojis as emoji}
+								<button
+									type="button"
+									onclick={() => insertEmoji(emoji)}
+									class="flex h-8 w-8 items-center justify-center rounded hover:bg-muted text-xl transition-colors"
+								>
+									{emoji}
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</div>
 
 			{#if isCompressing}
 				<div class="space-y-1">
 					<div class="flex justify-between text-xs text-muted-foreground">
-						<span>Optimisation de l'image...</span>
+						<span>Optimisation des images...</span>
 						<span>{compressionProgress}%</span>
 					</div>
 					<div class="h-2 w-full overflow-hidden rounded-full bg-secondary">
@@ -188,7 +306,7 @@
 			{/if}
 
 			<Dialog.Footer>
-				<Button type="submit" disabled={isUploading || isCompressing || !selectedFile}>
+				<Button type="submit" disabled={isUploading || isCompressing || selectedFiles.length === 0}>
 					{#if isUploading}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 						Envoi...
@@ -196,7 +314,7 @@
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 						Compression...
 					{:else}
-						Envoyer
+						Envoyer {selectedFiles.length > 0 ? `(${selectedFiles.length})` : ''}
 					{/if}
 				</Button>
 			</Dialog.Footer>

@@ -202,10 +202,17 @@
 	</main>
 
 	<footer class="border-t py-6 md:py-0">
-		<div class="container flex flex-col items-center justify-center gap-4 md:h-16 md:flex-row">
+		<div
+			class="container flex flex-col items-center justify-center gap-4 md:h-16 md:flex-row md:justify-between"
+		>
 			<p class="text-center text-sm leading-loose text-muted-foreground md:text-left">
 				&copy; 2026 Vincent & Mélanie. Fait avec ❤️.
 			</p>
+			<nav class="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+				<a href="/faq" class="hover:text-foreground transition-colors">FAQ</a>
+				<a href="/contact" class="hover:text-foreground transition-colors">Contact</a>
+				<a href="/legal" class="hover:text-foreground transition-colors">Mentions Légales</a>
+			</nav>
 		</div>
 	</footer>
 </div>

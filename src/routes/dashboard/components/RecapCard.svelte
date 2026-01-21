@@ -32,6 +32,15 @@
 						<strong>15h30</strong></span
 					>
 				</div>
+				<div class="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+					<Clock class="h-3 w-3" />
+					<span>Fin de soirée prévue à <strong>4h</strong> (mais reste si t'es chaud !)</span>
+				</div>
+				<div
+					class="mt-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 border border-green-200"
+				>
+					<strong>✨ Pas de Dress Code !</strong> Viens comme tu te sens à l'aise.
+				</div>
 			</div>
 		</div>
 

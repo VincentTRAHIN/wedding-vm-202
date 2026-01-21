@@ -16,7 +16,9 @@
 		</div>
 
 		<div style="padding: 40px 32px; color: #1a1a1a; line-height: 1.6;">
-			<p style="font-size: 18px; margin-bottom: 24px; color: #1a1a1a;">✨ C'est noté, {guestName} !</p>
+			<p style="font-size: 18px; margin-bottom: 24px; color: #1a1a1a;">
+				✨ C'est noté, {guestName} !
+			</p>
 
 			<p style="margin-bottom: 24px; color: #4b5563;">
 				Ta réponse est bien enregistrée. Merci pour ta confirmation ! 💌
