@@ -56,7 +56,7 @@ export const actions: Actions = {
 			});
 		}
 
-		// Redirection vers le profil avec un message de succès
-		throw redirect(303, '/profile?password_updated=true');
+		// Redirection vers le dashboard avec un message de succès
+		throw redirect(303, '/dashboard?password_updated=true');
 	}
 };

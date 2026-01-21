@@ -5,13 +5,36 @@
 	import SongRequestsCard from './components/SongRequestsCard.svelte';
 	import WeatherDressCodeCard from './components/WeatherDressCodeCard.svelte';
 	import BrunchCard from './components/BrunchCard.svelte';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 	let { guest, venue, songRequests, weather, brunchInfo } = $derived(data);
+
+	let showPasswordSuccess = $state(false);
+
+	onMount(() => {
+		if ($page.url.searchParams.get('password_updated') === 'true') {
+			showPasswordSuccess = true;
+			// Auto-hide after 5 seconds
+			setTimeout(() => {
+				showPasswordSuccess = false;
+			}, 5000);
+		}
+	});
 </script>
 
 <div class="min-h-screen bg-stone-50 py-12 md:py-24">
 	<div class="container mx-auto px-4">
+		{#if showPasswordSuccess}
+			<div
+				class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-center text-green-800"
+			>
+				<p class="font-semibold">✅ Mot de passe modifié avec succès !</p>
+				<p class="text-sm mt-1">Tu peux maintenant te connecter avec ton nouveau mot de passe.</p>
+			</div>
+		{/if}
+
 		<div class="mb-12 text-center">
 			<h1 class="mb-4 font-serif text-4xl font-bold text-primary md:text-5xl">
 				Bonjour {guest.full_name?.split(' ')[0]}
