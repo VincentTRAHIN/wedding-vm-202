@@ -14,11 +14,18 @@ if (!RESEND_API_KEY) {
 export const resend = new Resend(RESEND_API_KEY);
 export const senderEmail = SENDER_EMAIL || 'onboarding@resend.dev';
 
+// Vérifier que le sender email est correct
+if (!SENDER_EMAIL || SENDER_EMAIL === 'onboarding@resend.dev') {
+	console.error('❌ SENDER_EMAIL is not properly configured! Using fallback:', senderEmail);
+	console.error('   Please set SENDER_EMAIL in your environment variables.');
+}
+
 // Log config only in development
 if (process.env.NODE_ENV === 'development') {
 	console.log('📧 Email Config:', {
 		hasApiKey: !!RESEND_API_KEY,
-		sender: senderEmail
+		sender: senderEmail,
+		adminEmails: ADMIN_EMAILS
 	});
 }
 
