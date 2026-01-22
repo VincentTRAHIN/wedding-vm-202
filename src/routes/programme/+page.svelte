@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Users, Heart, Wine, Utensils, Music, MapPin } from 'lucide-svelte';
+	import { Users, Heart, Wine, Utensils, Music, MapPin, Trophy, Moon } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
 
 	type TimelineItem =
@@ -58,17 +58,17 @@
 		{
 			type: 'event',
 			time: '04:00',
-			title: 'Fin de soirée 🌙',
+			title: 'Fin de soirée',
 			description: 'On se dit bonne nuit (ou bonjour).',
 			location: 'Ton lit',
-			icon: Music
+			icon: Moon
 		},
 		{ type: 'separator', title: 'Dimanche 19 juillet', subtitle: 'Brunch & Finale' },
 		{
 			type: 'event',
 			time: '11:00',
 			title: 'Début des festivités',
-			description: 'On se retrouve pour continuer la fête !',
+			description: 'On se retrouve pour continuer la fête ! Mais avant on prend un petit café.',
 			location: 'Domaine',
 			icon: Users
 		},
@@ -76,7 +76,7 @@
 			type: 'event',
 			time: '12:00',
 			title: 'Brunch Fouées & Détente',
-			description: 'Jeux de société, jeux de plein air, Mölkky... On profite encore !',
+			description: 'Jeux de société, jeux de plein air, Cornhole... On profite encore !',
 			location: 'Domaine',
 			icon: Utensils
 		},
@@ -86,7 +86,7 @@
 			title: 'Finale de la Coupe du Monde',
 			description: 'Allez les Bleus ! 🇫🇷',
 			location: 'New Jersey / Bar',
-			icon: Users
+			icon: Trophy
 		}
 	];
 </script>

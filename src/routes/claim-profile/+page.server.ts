@@ -77,5 +77,24 @@ export const actions: Actions = {
 		}
 
 		throw redirect(303, '/rsvp');
+	},
+
+	cancel: async ({ locals: { supabase, user } }) => {
+		if (!user) return fail(401, { message: 'Unauthorized' });
+
+		const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
+
+		// Delete the auth user account
+		const { error } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+
+		if (error) {
+			console.error('Error deleting user:', error);
+			return fail(500, { message: 'Erreur lors de la suppression du compte.' });
+		}
+
+		// Sign out from current session
+		await supabase.auth.signOut();
+
+		throw redirect(303, '/login?cancelled=true');
 	}
 };

@@ -8,7 +8,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Badge } from '$lib/components/ui/badge';
 	import { toast } from 'svelte-sonner';
-	import { Plus, Loader2, ArrowUpDown, Link } from 'lucide-svelte';
+	import { Plus, Loader2, ArrowUpDown, Link, Info } from 'lucide-svelte';
 	import EditGuestDialog from './EditGuestDialog.svelte';
 	import DeleteGuestDialog from './DeleteGuestDialog.svelte';
 	import ViewDetailsDialog from './ViewDetailsDialog.svelte';
@@ -35,13 +35,21 @@
 		}
 	}
 
+	// Fonction pour normaliser les chaînes (supprimer les accents)
+	function normalizeString(str: string): string {
+		return str
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toLowerCase();
+	}
+
 	let sortedGuests = $derived(
 		guests
 			.filter((g: (typeof guests)[0]) => {
-				const q = searchQuery.toLowerCase();
-				return (
-					(g.full_name || '').toLowerCase().includes(q) || (g.email || '').toLowerCase().includes(q)
-				);
+				const q = normalizeString(searchQuery);
+				const name = normalizeString(g.full_name || '');
+				const email = normalizeString(g.email || '');
+				return name.includes(q) || email.includes(q);
 			})
 			.sort((a: (typeof guests)[0], b: (typeof guests)[0]) => {
 				const modifier = sortDirection === 'asc' ? 1 : -1;
@@ -55,6 +63,10 @@
 				return 0;
 			})
 	);
+
+	function hasDetails(guest: (typeof guests)[0]) {
+		return !!guest.dietary_restrictions || !!guest.message_for_couple;
+	}
 </script>
 
 <div class="grid gap-8 lg:grid-cols-3">
@@ -169,6 +181,11 @@
 									{#if guest.is_child}
 										<Badge variant="outline" class="text-[10px] h-5 px-1.5">Enfant</Badge>
 									{/if}
+									{#if hasDetails(guest)}
+										<span title="A des détails (régime/message)">
+											<Info class="h-4 w-4 text-amber-500" />
+										</span>
+									{/if}
 								</div>
 								{#if guest.email}
 									<div class="mt-1 text-xs text-muted-foreground break-words">{guest.email}</div>
@@ -239,6 +256,11 @@
 											{/if}
 											{#if guest.is_child}
 												<Badge variant="outline" class="text-[10px] h-5 px-1.5">Enfant</Badge>
+											{/if}
+											{#if hasDetails(guest)}
+												<span title="A des détails (régime/message)">
+													<Info class="h-4 w-4 text-amber-500" />
+												</span>
 											{/if}
 										</div>
 										{#if guest.email}

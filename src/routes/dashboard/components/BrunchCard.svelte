@@ -27,14 +27,16 @@
 				<Clock class="h-4 w-4 text-primary" />
 				<span class="font-medium">11h00 - Début des festivités</span>
 			</div>
-			<p class="text-sm text-muted-foreground">On se retrouve pour continuer la fête !</p>
+			<p class="text-sm text-muted-foreground">
+				On se retrouve pour continuer la fête ! Mais avant on prend un petit café.
+			</p>
 		</div>
 
 		<!-- Brunch Fouées -->
 		<div class="rounded-lg bg-stone-50 p-4">
 			<div class="flex items-center gap-2 mb-3">
 				<Utensils class="h-4 w-4 text-primary" />
-				<span class="font-medium">12h00 - Brunch Fouées & Détente</span>
+				<span class="font-medium">12h00 - Fouées & Détente</span>
 			</div>
 			<div class="space-y-2 text-sm text-muted-foreground">
 				<div class="flex items-center gap-2">
@@ -43,7 +45,7 @@
 				</div>
 				<div class="flex items-start gap-2">
 					<Users class="h-3 w-3 mt-0.5" />
-					<span>Jeux de société, jeux de plein air, Mölkky... On profite encore !</span>
+					<span>Jeux de société, jeux de plein air, Cornhole... On profite encore !</span>
 				</div>
 			</div>
 		</div>

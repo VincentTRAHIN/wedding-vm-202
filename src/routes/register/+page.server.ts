@@ -101,25 +101,8 @@ export const actions: Actions = {
 			return fail(500, { error: "Erreur inattendue lors de l'inscription." });
 		}
 
-		// 2. Vérifier si l'email existe dans la table guests (pre-seed admin)
-		const { data: existingGuest } = await supabaseAdmin
-			.from('guests')
-			.select('id')
-			.eq('email', emailValidation.data)
-			.maybeSingle();
-
-		if (existingGuest) {
-			// Lier le guest existant au nouvel Auth ID
-			await supabaseAdmin
-				.from('guests')
-				.update({ auth_id: authData.user.id })
-				.eq('id', existingGuest.id);
-
-			// Redirige vers le dashboard car déjà lié
-			throw redirect(303, '/');
-		}
-
-		// 3. Pas de guest existant -> rediriger vers claim-profile pour se lier
+		// 2. Rediriger tous les nouveaux comptes vers claim-profile
+		// L'utilisateur doit choisir son profil manuellement
 		throw redirect(303, '/claim-profile');
 	}
 };

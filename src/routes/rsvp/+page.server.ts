@@ -55,8 +55,17 @@ const rsvpSchema = z.object({
 	rsvp_status: z.enum(['present', 'absent']),
 	present_saturday: z.boolean().optional(),
 	present_sunday: z.boolean().optional(),
-	dietary_restrictions: z.string().optional(),
-	message_for_couple: z.string().max(1000, 'Message trop long (1000 caractères max)').optional()
+	dietary_restrictions: z
+		.string()
+		.nullable()
+		.optional()
+		.transform((val) => val?.trim() || null),
+	message_for_couple: z
+		.string()
+		.max(1000, 'Message trop long (1000 caractères max)')
+		.nullable()
+		.optional()
+		.transform((val) => val?.trim() || null)
 });
 
 import { sendRsvpConfirmation, sendGuestInvitation, sendAdminAlert } from '$lib/server/email';
@@ -105,8 +114,8 @@ export const actions: Actions = {
 				rsvp_status: status,
 				present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
 				present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
-				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || undefined,
-				message_for_couple: formData.get(`${prefix}message_for_couple`) || undefined
+				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
+				message_for_couple: formData.get(`${prefix}message_for_couple`) || null
 			};
 
 			const result = rsvpSchema.safeParse(rawData);

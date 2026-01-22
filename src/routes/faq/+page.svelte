@@ -18,8 +18,7 @@
 		},
 		{
 			question: 'Y a-t-il un dress code ?',
-			answer:
-				"Pas de dress code imposé ! Viens comme tu te sens à l'aise. L'idée c'est de passer un bon moment, pas de te prendre la tête avec ta tenue. Élégant décontracté si tu veux un guide, mais vraiment, fais-toi plaisir !"
+			answer: "Pas de dress code imposé ! Mais c'est un mariage quand même , donc évites les tong !"
 		},
 		{
 			question: 'Puis-je venir accompagné(e) ?',
@@ -44,7 +43,7 @@
 		{
 			question: 'Et le lendemain ?',
 			answer:
-				'On organise un brunch fouées dès 11h le dimanche, avec des jeux en tout genre (société, plein air, Mölkky...). Et à 21h, on se retrouve au bar pour la Finale de la Coupe du Monde. Allez les Bleus ! 🇫🇷'
+				'On organise un déjeuner avec des fouées à partir de 12h le Dimanche (tu peux quand même venir un peu avant si tu veux prendre un petit café), avec des jeux en tout genre (société, plein air, Cornhole...). Et à 21h, on se retrouve au bar pour la Finale de la Coupe du Monde. Allez les Bleus ! 🇫🇷'
 		},
 		{
 			question: "Je n'ai pas reçu mon invitation par email ?",

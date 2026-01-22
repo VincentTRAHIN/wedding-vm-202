@@ -3,9 +3,13 @@
 	import GuestSelector from '$lib/components/GuestSelector.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 	let selectedGuestId = $state('');
+	let showCancelDialog = $state(false);
+	let isSubmitting = $state(false);
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-stone-50 p-4">
@@ -29,7 +33,80 @@
 				</div>
 
 				<Button type="submit" class="w-full" disabled={!selectedGuestId}>C'est moi !</Button>
+
+				<div class="relative">
+					<div class="absolute inset-0 flex items-center">
+						<span class="w-full border-t"></span>
+					</div>
+					<div class="relative flex justify-center text-xs uppercase">
+						<span class="bg-background px-2 text-muted-foreground">ou</span>
+					</div>
+				</div>
+
+				<Button
+					type="button"
+					variant="outline"
+					class="w-full"
+					onclick={() => (showCancelDialog = true)}
+				>
+					Annuler et supprimer mon compte
+				</Button>
 			</form>
+
+			<div class="mt-4 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+				<p class="font-medium">Pourquoi cette étape ?</p>
+				<p class="mt-1 text-xs">
+					Pour accéder au site, tu dois t'identifier en sélectionnant ton nom dans la liste. Si tu
+					ne trouves pas ton nom ou si tu changes d'avis, tu peux annuler et supprimer ton compte.
+				</p>
+			</div>
 		</Card.Content>
 	</Card.Root>
+
+	<!-- Cancel Confirmation Dialog -->
+	<Dialog.Root bind:open={showCancelDialog}>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Annuler l'inscription ?</Dialog.Title>
+				<Dialog.Description>
+					Ton compte sera complètement supprimé et tu seras redirigé vers la page de connexion. Tu
+					pourras toujours créer un nouveau compte plus tard.
+				</Dialog.Description>
+			</Dialog.Header>
+			<form
+				method="POST"
+				action="?/cancel"
+				use:enhance={() => {
+					isSubmitting = true;
+					return async ({ result, update }) => {
+						isSubmitting = false;
+						if (result.type === 'failure') {
+							toast.error('Erreur lors de la suppression du compte.');
+						}
+						await update();
+					};
+				}}
+				class="space-y-4"
+			>
+				<Dialog.Footer class="flex-col sm:flex-row gap-2">
+					<Button
+						type="button"
+						variant="outline"
+						class="w-full sm:w-auto"
+						onclick={() => (showCancelDialog = false)}
+					>
+						Non, continuer
+					</Button>
+					<Button
+						type="submit"
+						variant="destructive"
+						class="w-full sm:w-auto"
+						disabled={isSubmitting}
+					>
+						{isSubmitting ? 'Suppression...' : 'Oui, supprimer mon compte'}
+					</Button>
+				</Dialog.Footer>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
 </div>

@@ -20,8 +20,8 @@ const VENUE = {
 	address: 'Château des Landes, 49560 Cléré-sur-Layon, Maine-et-Loire'
 } as const;
 
-// Coordonnées fournies via Google Maps embed (centre sur le lieu)
-const VENUE_COORDS: VenueCoords = { lat: 47.4756719865999, lng: -0.9339330139280028 };
+// Coordonnées GPS exactes du Château des Landes
+const VENUE_COORDS: VenueCoords = { lat: 47.0919227, lng: -0.4502939 };
 
 async function getWeatherNow(coords: VenueCoords): Promise<WeatherStatus> {
 	const url = new URL('https://api.open-meteo.com/v1/forecast');

@@ -18,44 +18,235 @@
 	let compressionProgress = $state(0);
 	let formElement: HTMLFormElement;
 	let showEmojiPicker = $state(false);
-	let captionInput: HTMLInputElement;
+	let captionInput = $state<HTMLInputElement>();
 
 	const MAX_FILES = 10;
 
-	// Instagram-style emoji picker (common emojis)
+	// Instagram-style emoji picker (comprehensive list)
+	const emojiCategories = {
+		smileys: [
+			'😀',
+			'😃',
+			'😄',
+			'😁',
+			'😅',
+			'😂',
+			'🤣',
+			'😊',
+			'😇',
+			'🙂',
+			'🙃',
+			'😉',
+			'😌',
+			'😍',
+			'🥰',
+			'😘',
+			'😗',
+			'😙',
+			'😚',
+			'😋',
+			'😛',
+			'😝',
+			'😜',
+			'🤪',
+			'🤨',
+			'🧐',
+			'🤓',
+			'😎',
+			'🥳',
+			'😏',
+			'😒',
+			'😞',
+			'😔',
+			'😟',
+			'😕',
+			'🙁',
+			'☹️',
+			'😣',
+			'😖',
+			'😫',
+			'😩',
+			'🥺'
+		],
+		hearts: [
+			'❤️',
+			'🧡',
+			'💛',
+			'💚',
+			'💙',
+			'💜',
+			'🖤',
+			'🤍',
+			'🤎',
+			'💔',
+			'❤️‍🔥',
+			'❤️‍🩹',
+			'❣️',
+			'💕',
+			'💞',
+			'💓',
+			'💗',
+			'💖',
+			'💘',
+			'💝',
+			'💟'
+		],
+		celebration: [
+			'🎉',
+			'🎊',
+			'🎈',
+			'🎁',
+			'🎀',
+			'🎂',
+			'🍾',
+			'🥂',
+			'🍻',
+			'🥳',
+			'✨',
+			'🎆',
+			'🎇',
+			'🧨',
+			'🎃',
+			'🎄',
+			'🎋',
+			'🎍',
+			'🎑'
+		],
+		wedding: [
+			'👰',
+			'🤵',
+			'💑',
+			'💏',
+			'👫',
+			'👬',
+			'👭',
+			'💍',
+			'💐',
+			'🌹',
+			'🌸',
+			'🌺',
+			'🌻',
+			'🌷',
+			'🏵️',
+			'💒',
+			'⛪'
+		],
+		nature: [
+			'🌈',
+			'☀️',
+			'🌤️',
+			'⛅',
+			'🌥️',
+			'☁️',
+			'🌦️',
+			'🌧️',
+			'⛈️',
+			'🌩️',
+			'🌙',
+			'⭐',
+			'🌟',
+			'✨',
+			'💫',
+			'⚡',
+			'🔥',
+			'💧',
+			'🌊'
+		],
+		food: [
+			'🍕',
+			'🍔',
+			'🍟',
+			'🌭',
+			'🍿',
+			'🧂',
+			'🥓',
+			'🥚',
+			'🧇',
+			'🥞',
+			'🧈',
+			'🍞',
+			'🥐',
+			'🥖',
+			'🫓',
+			'🥨',
+			'🥯',
+			'🥗',
+			'🍝',
+			'🍜',
+			'🍲',
+			'🍛',
+			'🍣',
+			'🍱',
+			'🥟',
+			'🦪',
+			'🍤',
+			'🍙',
+			'🍚',
+			'🍘',
+			'🍥',
+			'🥠',
+			'🥮',
+			'🍢',
+			'🍡',
+			'🍧',
+			'🍨',
+			'🍦',
+			'🥧',
+			'🧁',
+			'🍰',
+			'🎂',
+			'🍮',
+			'🍭',
+			'🍬',
+			'🍫',
+			'🍿',
+			'🍩',
+			'🍪',
+			'🌰',
+			'🥜'
+		],
+		gestures: [
+			'👋',
+			'🤚',
+			'🖐️',
+			'✋',
+			'🖖',
+			'👌',
+			'🤌',
+			'🤏',
+			'✌️',
+			'🤞',
+			'🤟',
+			'🤘',
+			'🤙',
+			'👈',
+			'👉',
+			'👆',
+			'🖕',
+			'👇',
+			'☝️',
+			'👍',
+			'👎',
+			'✊',
+			'👊',
+			'🤛',
+			'🤜',
+			'👏',
+			'🙌',
+			'👐',
+			'🤲',
+			'🤝',
+			'🙏'
+		]
+	};
+
 	const commonEmojis = [
-		'❤️',
-		'😍',
-		'🥰',
-		'😊',
-		'😂',
-		'🥳',
-		'🎉',
-		'✨',
-		'🌟',
-		'💕',
-		'💖',
-		'🌸',
-		'🌺',
-		'🌹',
-		'🎊',
-		'🍾',
-		'👰',
-		'🤵',
-		'💑',
-		'💍',
-		'🥂',
-		'🎂',
-		'🎶',
-		'🎵',
-		'📸',
-		'🌈',
-		'☀️',
-		'🌙',
-		'⭐',
-		'💫',
-		'🔥',
-		'👏'
+		...emojiCategories.smileys.slice(0, 15),
+		...emojiCategories.hearts.slice(0, 10),
+		...emojiCategories.celebration,
+		...emojiCategories.wedding,
+		...emojiCategories.nature.slice(0, 12),
+		...emojiCategories.gestures.slice(0, 8)
 	];
 
 	function handleFileSelect(event: Event) {
@@ -253,42 +444,51 @@
 				</div>
 			</div>
 
-			<div class="grid gap-2">
-				<Label for="caption">Légende (optionnel)</Label>
-				<div class="relative">
-					<input
-						bind:this={captionInput}
-						id="caption"
-						name="caption"
-						placeholder="Ajoute une légende..."
-						disabled={isUploading || isCompressing}
-						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
-					/>
-					<button
-						type="button"
-						onclick={() => (showEmojiPicker = !showEmojiPicker)}
-						class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-						disabled={isUploading || isCompressing}
-					>
-						<Smile class="h-5 w-5" />
-					</button>
-				</div>
-				{#if showEmojiPicker}
-					<div class="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
-						<div class="grid grid-cols-8 gap-2">
-							{#each commonEmojis as emoji}
-								<button
-									type="button"
-									onclick={() => insertEmoji(emoji)}
-									class="flex h-8 w-8 items-center justify-center rounded hover:bg-muted text-xl transition-colors"
-								>
-									{emoji}
-								</button>
-							{/each}
-						</div>
+			{#if selectedFiles.length === 1}
+				<div class="grid gap-2">
+					<Label for="caption">Légende (optionnel)</Label>
+					<div class="relative">
+						<input
+							bind:this={captionInput}
+							id="caption"
+							name="caption"
+							placeholder="Ajoute une légende..."
+							disabled={isUploading || isCompressing}
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+						/>
+						<button
+							type="button"
+							onclick={() => (showEmojiPicker = !showEmojiPicker)}
+							class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+							disabled={isUploading || isCompressing}
+						>
+							<Smile class="h-5 w-5" />
+						</button>
 					</div>
-				{/if}
-			</div>
+					{#if showEmojiPicker}
+						<div
+							class="max-h-64 overflow-y-auto rounded-lg border border-stone-200 bg-white p-3 shadow-lg"
+						>
+							<div class="grid grid-cols-8 gap-2">
+								{#each commonEmojis as emoji}
+									<button
+										type="button"
+										onclick={() => insertEmoji(emoji)}
+										class="flex h-8 w-8 items-center justify-center rounded hover:bg-muted text-xl transition-colors"
+									>
+										{emoji}
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{:else if selectedFiles.length > 1}
+				<div class="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-800">
+					📷 {selectedFiles.length} photos sélectionnées. Les légendes ne sont disponibles que pour les
+					photos individuelles.
+				</div>
+			{/if}
 
 			{#if isCompressing}
 				<div class="space-y-1">

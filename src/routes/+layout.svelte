@@ -53,12 +53,12 @@
 
 <div
 	class={cn(
-		'flex min-h-screen flex-col bg-background font-sans text-foreground',
+		'min-h-screen bg-background font-sans text-foreground',
 		theme === 'bordeaux' ? 'theme-bordeaux' : null
 	)}
 >
 	<header
-		class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+		class="fixed top-0 left-0 right-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
 		<div class="container flex h-14 items-center justify-between px-4">
 			<div class="flex items-center gap-2">
@@ -197,7 +197,7 @@
 		</div>
 	</header>
 
-	<main class="flex-1">
+	<main class="pt-14 min-h-screen">
 		{@render children()}
 	</main>
 
