@@ -8,9 +8,11 @@
 ## 📋 Résumé Exécutif
 
 ### Audit V1 - 17 janvier 2026
+
 L'audit initial a identifié et corrigé plusieurs points critiques. L'application était considérée prête pour la production.
 
 ### Audit V2 - 23 janvier 2026 ⚠️
+
 Suite aux récents développements (RSVP amélioré, Dashboard Premium, Keep-Alive), un nouvel audit complet selon **OWASP Top 10 2021** a été réalisé.
 
 **Score global**: 7.5/10 ⚠️
@@ -26,6 +28,7 @@ Suite aux récents développements (RSVP amélioré, Dashboard Premium, Keep-Ali
 **Problème**: Le fichier `.env` contenant toutes les clés secrètes a été commité dans le repository Git.
 
 **Clés exposées**:
+
 ```
 SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 RESEND_API_KEY=re_PTWHViDK_N6fCrM46E33FkohewiNpYMCj
@@ -33,10 +36,12 @@ CRON_SECRET=dev-secret-key-change-in-production
 ```
 
 **Actions à faire IMMÉDIATEMENT**:
+
 1. ✅ Régénérer `SERVICE_ROLE_KEY` sur Supabase Dashboard
 2. ✅ Régénérer `RESEND_API_KEY` sur Resend Dashboard
 3. ✅ Générer nouveau `CRON_SECRET`: `openssl rand -base64 32`
 4. ✅ Supprimer `.env` de l'historique Git:
+
 ```bash
 git rm --cached .env
 git filter-branch --force --index-filter \
@@ -52,12 +57,14 @@ git push origin --force --all
 ### A01:2021 - Broken Access Control ⚠️ (7/10)
 
 #### ✅ Points sécurisés:
+
 - Protection Admin robuste ([+layout.server.ts](src/routes/admin/+layout.server.ts))
 - RLS activé sur toutes les tables
 - Vérification ownership sur photos
 - Service Role Key usage approprié (côté serveur uniquement)
 
 #### ⚠️ Points à améliorer:
+
 1. **Bypass RLS avec SERVICE_ROLE_KEY**
    - 30+ usages du client admin dans le code
    - Risque si une requête est mal filtrée
@@ -70,22 +77,23 @@ git push origin --force --all
    ```typescript
    // ⚠️ Pas de vérification que guestId est disponible avant assignation
    addManagedGuest: async ({ request }) => {
-     const guestId = formData.get('guestId');
-     // TODO: Vérifier que targetGuest.managed_by_id et auth_id sont null
-   }
+   	const guestId = formData.get('guestId');
+   	// TODO: Vérifier que targetGuest.managed_by_id et auth_id sont null
+   };
    ```
 
 #### 🎯 Actions recommandées:
+
 ```typescript
 // src/routes/rsvp/+page.server.ts - addManagedGuest
 const { data: targetGuest } = await supabaseAdmin
-  .from('guests')
-  .select('managed_by_id, auth_id')
-  .eq('id', guestId)
-  .single();
+	.from('guests')
+	.select('managed_by_id, auth_id')
+	.eq('id', guestId)
+	.single();
 
 if (targetGuest.managed_by_id || targetGuest.auth_id) {
-  return fail(400, { message: 'Cet invité est déjà lié à un compte.' });
+	return fail(400, { message: 'Cet invité est déjà lié à un compte.' });
 }
 ```
 
@@ -94,12 +102,14 @@ if (targetGuest.managed_by_id || targetGuest.auth_id) {
 ### A02:2021 - Cryptographic Failures 🔴 (9/10 mais CRITIQUE)
 
 #### ✅ Points sécurisés:
+
 - Pas de mots de passe en clair (gestion Supabase Auth)
 - Validation forte: min 8 chars + 1 chiffre
 - Variables sensibles en environnement
 - Pas de données sensibles loguées
 
 #### 🔴 Vulnérabilités critiques:
+
 - **Fichier .env exposé dans Git** (voir section Alerte ci-dessus)
 
 ---
@@ -107,24 +117,27 @@ if (targetGuest.managed_by_id || targetGuest.auth_id) {
 ### A03:2021 - Injection ✅ (9/10)
 
 #### ✅ Points sécurisés:
+
 - Pas de SQL injection (utilisation exclusive de Supabase ORM)
 - Validation Zod systématique (20+ schémas)
 - Pas de `{@html}` dans les composants Svelte
 - Sanitization HTML disponible ([validation.ts](src/lib/server/validation.ts))
 
 #### ⚠️ Points à améliorer:
+
 - `sanitizeHtml()` définie mais **jamais utilisée**
 - Champs texte libre non sanitizés: `message_for_couple`, `dietary_restrictions`, `caption`
 
 #### 🎯 Actions recommandées:
+
 ```typescript
 // src/routes/rsvp/+page.server.ts
 import { sanitizeHtml } from '$lib/server/validation';
 
 const result = rsvpSchema.safeParse({
-  ...rawData,
-  message_for_couple: sanitizeHtml(rawData.message_for_couple || ''),
-  dietary_restrictions: sanitizeHtml(rawData.dietary_restrictions || '')
+	...rawData,
+	message_for_couple: sanitizeHtml(rawData.message_for_couple || ''),
+	dietary_restrictions: sanitizeHtml(rawData.dietary_restrictions || '')
 });
 ```
 
@@ -133,11 +146,13 @@ const result = rsvpSchema.safeParse({
 ### A04:2021 - Insecure Design ⚠️ (6/10)
 
 #### ✅ Points sécurisés:
+
 - Validation côté serveur obligatoire
 - Gestion d'erreurs correcte
 - Timing-safe comparison ([keep-alive/+server.ts](src/routes/api/keep-alive/+server.ts))
 
 #### ⚠️ Points à améliorer:
+
 1. **Rate limiting non implémenté**
    - Fonction existe mais 0 usage
    - Risque de brute-force sur login
@@ -151,20 +166,21 @@ const result = rsvpSchema.safeParse({
    - Pas de vérification des magic bytes
 
 #### 🎯 Actions recommandées:
+
 ```typescript
 // src/routes/login/+page.server.ts
 import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
-  login_password: async ({ request, getClientAddress }) => {
-    const clientIp = getClientAddress();
-    const { allowed } = checkRateLimit(`login:${clientIp}`, 5, 60000);
-    
-    if (!allowed) {
-      return fail(429, { message: 'Trop de tentatives. Réessaye dans 1 minute.' });
-    }
-    // ... reste du code
-  }
+	login_password: async ({ request, getClientAddress }) => {
+		const clientIp = getClientAddress();
+		const { allowed } = checkRateLimit(`login:${clientIp}`, 5, 60000);
+
+		if (!allowed) {
+			return fail(429, { message: 'Trop de tentatives. Réessaye dans 1 minute.' });
+		}
+		// ... reste du code
+	}
 };
 ```
 
@@ -173,6 +189,7 @@ export const actions: Actions = {
 ### A05:2021 - Security Misconfiguration ✅ (8/10)
 
 #### ✅ Points sécurisés:
+
 - Headers de sécurité robustes ([hooks.server.ts](src/hooks.server.ts))
   - `X-Frame-Options: DENY`
   - `X-Content-Type-Options: nosniff`
@@ -180,6 +197,7 @@ export const actions: Actions = {
 - Configuration Supabase correcte (RLS, Storage privé)
 
 #### ⚠️ Points à améliorer:
+
 - CSP avec `unsafe-inline` et `unsafe-eval` (nécessaire pour SvelteKit)
 - Headers seulement en production
 - `NODE_ENV` hardcodé en `.env` (devrait être runtime)
@@ -189,10 +207,12 @@ export const actions: Actions = {
 ### A06:2021 - Vulnerable Components ✅ (9/10)
 
 #### ✅ Points sécurisés:
+
 - Dépendances à jour (SvelteKit 2.48.5, Supabase 2.84.0, Zod 4.1.12)
 - Pas de CVE connues
 
 #### ⚠️ Points à améliorer:
+
 - Manque d'audit régulier (`npm audit`)
 - Recommandation: Ajouter en CI/CD
 
@@ -201,12 +221,14 @@ export const actions: Actions = {
 ### A07:2021 - Authentication Failures ✅ (8/10)
 
 #### ✅ Points sécurisés:
+
 - Gestion auth via Supabase (JWT, httpOnly cookies)
 - Validation mot de passe forte
 - Reset password sécurisé (pas d'énumération d'emails)
 - OAuth Google implémenté
 
 #### ⚠️ Points à améliorer:
+
 - Pas de MFA (recommandé pour admins)
 - Pas de session timeout visible
 - **Rate limiting manquant** (cf. A04)
@@ -216,10 +238,12 @@ export const actions: Actions = {
 ### A08:2021 - Data Integrity Failures ⚠️ (7/10)
 
 #### ✅ Points sécurisés:
+
 - Validation upload images (10MB max, types autorisés)
 - Nettoyage uploads échoués (rollback)
 
 #### ⚠️ Points à améliorer:
+
 - Validation MIME type seulement (pas de magic bytes)
 - Pas de scan antivirus
 - Pas de checksum/signature
@@ -229,16 +253,16 @@ export const actions: Actions = {
 ### A09:2021 - Logging Failures ⚠️ (6/10)
 
 #### ✅ Points sécurisés:
+
 - Logs conditionnels (`NODE_ENV !== 'production'`)
 - Pas de données sensibles loguées
 
 #### ⚠️ Points à améliorer:
+
 1. **Logging insuffisant sur actions critiques**
    - Pas de logs sur: tentatives login échouées, modifications admin, uploads, RSVP
-   
 2. **Pas de système de monitoring**
    - Pas de centralisation (Sentry, LogRocket)
-   
 3. **Logs non structurés**
    - `console.log` vs Winston/Pino
 
@@ -247,6 +271,7 @@ export const actions: Actions = {
 ### A10:2021 - SSRF ✅ (10/10)
 
 #### ✅ Points sécurisés:
+
 - Un seul appel externe (open-meteo.com)
 - URL hardcodée, pas d'input utilisateur
 - Pas d'appels dynamiques
@@ -260,6 +285,7 @@ export const actions: Actions = {
 **Fichier**: [src/routes/api/keep-alive/+server.ts](src/routes/api/keep-alive/+server.ts)
 
 **Sécurité**:
+
 - ✅ Authentification par clé secrète (`CRON_SECRET`)
 - ✅ Comparaison timing-safe (`crypto.subtle.timingSafeEqual`)
 - ✅ Vérification longueur avant comparaison
@@ -267,6 +293,7 @@ export const actions: Actions = {
 - ✅ Logs structurés
 
 **Usage**:
+
 ```bash
 curl "https://yourdomain.com/api/keep-alive?key=YOUR_CRON_SECRET"
 ```
@@ -280,11 +307,13 @@ curl "https://yourdomain.com/api/keep-alive?key=YOUR_CRON_SECRET"
 **Migration**: [20260119_add_rsvp_day_columns.sql](supabase/migrations/20260119_add_rsvp_day_columns.sql)
 
 **Champs ajoutés**:
+
 - `present_saturday` (boolean)
 - `present_sunday` (boolean)
 - `message_for_couple` (text)
 
 **Validation Zod** ([rsvp/+page.server.ts](src/routes/rsvp/+page.server.ts)):
+
 ```typescript
 const rsvpSchema = z.object({
   rsvp_status: z.enum(['present', 'absent']),
@@ -304,6 +333,7 @@ const rsvpSchema = z.object({
 ### 3. Simplification Admin ✅
 
 **Changements**:
+
 - Suppression du concept "chef de famille"
 - Interface admin épurée
 - Pas d'impact sur la sécurité (vérifications `role === 'admin'` intactes)
@@ -312,41 +342,45 @@ const rsvpSchema = z.object({
 
 ## 📊 Tableau Récapitulatif
 
-| Catégorie OWASP | Score | Statut | Priorité |
-|----------------|-------|--------|----------|
-| A01 - Broken Access Control | 7/10 | ⚠️ | **HAUTE** |
-| A02 - Cryptographic Failures | 9/10 | 🔴 | **CRITIQUE** |
-| A03 - Injection | 9/10 | ✅ | Basse |
-| A04 - Insecure Design | 6/10 | ⚠️ | **HAUTE** |
-| A05 - Security Misconfiguration | 8/10 | ✅ | Moyenne |
-| A06 - Vulnerable Components | 9/10 | ✅ | Basse |
-| A07 - Authentication Failures | 8/10 | ✅ | Moyenne |
-| A08 - Data Integrity Failures | 7/10 | ⚠️ | Moyenne |
-| A09 - Logging Failures | 6/10 | ⚠️ | Moyenne |
-| A10 - SSRF | 10/10 | ✅ | Basse |
+| Catégorie OWASP                 | Score | Statut | Priorité     |
+| ------------------------------- | ----- | ------ | ------------ |
+| A01 - Broken Access Control     | 7/10  | ⚠️     | **HAUTE**    |
+| A02 - Cryptographic Failures    | 9/10  | 🔴     | **CRITIQUE** |
+| A03 - Injection                 | 9/10  | ✅     | Basse        |
+| A04 - Insecure Design           | 6/10  | ⚠️     | **HAUTE**    |
+| A05 - Security Misconfiguration | 8/10  | ✅     | Moyenne      |
+| A06 - Vulnerable Components     | 9/10  | ✅     | Basse        |
+| A07 - Authentication Failures   | 8/10  | ✅     | Moyenne      |
+| A08 - Data Integrity Failures   | 7/10  | ⚠️     | Moyenne      |
+| A09 - Logging Failures          | 6/10  | ⚠️     | Moyenne      |
+| A10 - SSRF                      | 10/10 | ✅     | Basse        |
 
 ---
 
 ## 🎯 Plan d'Action
 
 ### 🔴 IMMÉDIAT (Avant déploiement)
+
 1. ✅ Régénérer toutes les clés exposées dans .env
 2. ✅ Supprimer .env de l'historique Git
 3. ✅ Changer `CRON_SECRET` en production
 
 ### ⚠️ HAUTE PRIORITÉ (1-2 semaines)
+
 1. ⚠️ Implémenter rate limiting sur login, register, upload, RSVP
 2. ⚠️ Ajouter vérification IDOR sur `addManagedGuest`
 3. ⚠️ Utiliser `sanitizeHtml()` sur tous les champs texte libre
 4. ⚠️ Ajouter validation magic bytes sur uploads
 
 ### 📝 MOYENNE PRIORITÉ (1 mois)
+
 1. ⚠️ Logging structuré (Winston/Pino)
 2. ⚠️ Centralisation logs (Sentry/Axiom)
 3. ⚠️ `npm audit` en CI/CD
 4. ⚠️ MFA pour admins
 
 ### 📅 LONG TERME
+
 1. ⚠️ CAPTCHA sur formulaires publics
 2. ⚠️ Scanner antivirus sur uploads (ClamAV)
 3. ⚠️ Audit externe + Pentest

@@ -40,47 +40,47 @@ Bienvenue dans la documentation complète du projet !
 
 ### 🔴 Critique & Urgent
 
-| Fichier | Description | Durée |
-|---------|-------------|-------|
-| **[ACTIONS_CRITIQUES.md](./ACTIONS_CRITIQUES.md)** | Actions immédiates avant production | 30 min |
-| **[QUICK_START_SECURITY.md](./QUICK_START_SECURITY.md)** | Guide rapide corrections | 30 min |
-| **[SYNTHESE_AUDIT.txt](./SYNTHESE_AUDIT.txt)** | Synthèse visuelle de l'audit | 2 min |
+| Fichier                                                  | Description                         | Durée  |
+| -------------------------------------------------------- | ----------------------------------- | ------ |
+| **[ACTIONS_CRITIQUES.md](./ACTIONS_CRITIQUES.md)**       | Actions immédiates avant production | 30 min |
+| **[QUICK_START_SECURITY.md](./QUICK_START_SECURITY.md)** | Guide rapide corrections            | 30 min |
+| **[SYNTHESE_AUDIT.txt](./SYNTHESE_AUDIT.txt)**           | Synthèse visuelle de l'audit        | 2 min  |
 
 ### 🔒 Sécurité
 
-| Fichier | Description | Audience |
-|---------|-------------|----------|
-| **[SECURITY_AUDIT.md](./SECURITY_AUDIT.md)** | Rapport OWASP Top 10 complet | Tech |
-| **[AUDIT_FINAL.md](./AUDIT_FINAL.md)** | Rapport d'audit V1 (17 jan) | Tous |
+| Fichier                                      | Description                  | Audience |
+| -------------------------------------------- | ---------------------------- | -------- |
+| **[SECURITY_AUDIT.md](./SECURITY_AUDIT.md)** | Rapport OWASP Top 10 complet | Tech     |
+| **[AUDIT_FINAL.md](./AUDIT_FINAL.md)**       | Rapport d'audit V1 (17 jan)  | Tous     |
 
 ### 🛠️ Configuration & Déploiement
 
-| Fichier | Description | Quand l'utiliser |
-|---------|-------------|------------------|
-| **[DEPLOYMENT.md](./DEPLOYMENT.md)** | Guide de déploiement | Avant prod |
-| **[KEEP_ALIVE.md](./KEEP_ALIVE.md)** | Config Keep-Alive Supabase | Après déploiement |
-| **[EMAIL_TESTING.md](./EMAIL_TESTING.md)** | Tester les emails | Avant prod |
+| Fichier                                    | Description                | Quand l'utiliser  |
+| ------------------------------------------ | -------------------------- | ----------------- |
+| **[DEPLOYMENT.md](./DEPLOYMENT.md)**       | Guide de déploiement       | Avant prod        |
+| **[KEEP_ALIVE.md](./KEEP_ALIVE.md)**       | Config Keep-Alive Supabase | Après déploiement |
+| **[EMAIL_TESTING.md](./EMAIL_TESTING.md)** | Tester les emails          | Avant prod        |
 
 ### ✅ Tests
 
-| Fichier | Description | Durée |
-|---------|-------------|-------|
-| **[TEST_CHECKLIST.md](./TEST_CHECKLIST.md)** | Checklist exhaustive (200+ points) | 2-3h |
-| **[TEST_PLAN.md](./TEST_PLAN.md)** | Plan de tests complet | - |
+| Fichier                                      | Description                        | Durée |
+| -------------------------------------------- | ---------------------------------- | ----- |
+| **[TEST_CHECKLIST.md](./TEST_CHECKLIST.md)** | Checklist exhaustive (200+ points) | 2-3h  |
+| **[TEST_PLAN.md](./TEST_PLAN.md)**           | Plan de tests complet              | -     |
 
 ### 📊 Planification
 
-| Fichier | Description | Audience |
-|---------|-------------|----------|
-| **[PRODUCTION_ROADMAP.md](./PRODUCTION_ROADMAP.md)** | Roadmap vers production | PM |
-| **[WORKFLOW.md](./WORKFLOW.md)** | Workflow de développement | Dev |
-| **[cdc.md](./cdc.md)** | Cahier des charges | Tous |
+| Fichier                                              | Description               | Audience |
+| ---------------------------------------------------- | ------------------------- | -------- |
+| **[PRODUCTION_ROADMAP.md](./PRODUCTION_ROADMAP.md)** | Roadmap vers production   | PM       |
+| **[WORKFLOW.md](./WORKFLOW.md)**                     | Workflow de développement | Dev      |
+| **[cdc.md](./cdc.md)**                               | Cahier des charges        | Tous     |
 
 ### 📝 Résumés & Synthèses
 
-| Fichier | Description | Format |
-|---------|-------------|--------|
-| **[RECAP_TRAVAUX.md](./RECAP_TRAVAUX.md)** | Résumé complet audit V2 | Markdown |
+| Fichier                                        | Description             | Format    |
+| ---------------------------------------------- | ----------------------- | --------- |
+| **[RECAP_TRAVAUX.md](./RECAP_TRAVAUX.md)**     | Résumé complet audit V2 | Markdown  |
 | **[SYNTHESE_AUDIT.txt](./SYNTHESE_AUDIT.txt)** | Synthèse visuelle audit | ASCII Art |
 
 ---

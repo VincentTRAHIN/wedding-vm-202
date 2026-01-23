@@ -7,6 +7,7 @@
 **Fichier créé**: [src/routes/api/keep-alive/+server.ts](../src/routes/api/keep-alive/+server.ts)
 
 **Fonctionnalités**:
+
 - ✅ Endpoint GET sécurisé avec clé secrète
 - ✅ Timing-safe comparison (`crypto.subtle.timingSafeEqual`)
 - ✅ Vérification longueur des clés avant comparaison
@@ -15,6 +16,7 @@
 - ✅ Logs structurés
 
 **Configuration**:
+
 - ✅ Variable `CRON_SECRET` ajoutée à `.env.example`
 - ✅ Variable `CRON_SECRET` ajoutée à `.env` (valeur dev)
 - ✅ Documentation complète : [docs/KEEP_ALIVE.md](./KEEP_ALIVE.md)
@@ -22,17 +24,19 @@
 **Client Supabase serveur créé**: [src/lib/server/supabase.ts](../src/lib/server/supabase.ts)
 
 **Test**:
+
 ```bash
 curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-production"
 ```
 
 **Réponse attendue**:
+
 ```json
 {
-  "status": "alive",
-  "timestamp": "2026-01-23T...",
-  "message": "Database connection maintained",
-  "guestCount": 42
+	"status": "alive",
+	"timestamp": "2026-01-23T...",
+	"message": "Database connection maintained",
+	"guestCount": 42
 }
 ```
 
@@ -43,6 +47,7 @@ curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-producti
 **Méthodologie**: Analyse statique complète du code selon OWASP Top 10 2021
 
 **Scope analysé**:
+
 - Routes admin (`src/routes/admin/`)
 - Routes API (`src/routes/api/`)
 - Routes RSVP avec nouveaux champs
@@ -53,22 +58,23 @@ curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-producti
 
 **Résultats**:
 
-| Catégorie OWASP | Score | Statut | Détails |
-|----------------|-------|--------|---------|
-| **A01 - Broken Access Control** | 7/10 | ⚠️ | RLS OK, mais rate limiting manquant |
-| **A02 - Cryptographic Failures** | 9/10 | 🔴 | .env exposé dans Git (CRITIQUE) |
-| **A03 - Injection** | 9/10 | ✅ | Zod partout, pas de SQL injection |
-| **A04 - Insecure Design** | 6/10 | ⚠️ | Rate limiting non utilisé |
-| **A05 - Security Misconfiguration** | 8/10 | ✅ | Headers OK, CSP stricte |
-| **A06 - Vulnerable Components** | 9/10 | ✅ | Dépendances à jour |
-| **A07 - Authentication Failures** | 8/10 | ✅ | Supabase Auth robuste |
-| **A08 - Data Integrity Failures** | 7/10 | ⚠️ | Upload validation basique |
-| **A09 - Logging Failures** | 6/10 | ⚠️ | Logs insuffisants |
-| **A10 - SSRF** | 10/10 | ✅ | Un seul appel externe safe |
+| Catégorie OWASP                     | Score | Statut | Détails                             |
+| ----------------------------------- | ----- | ------ | ----------------------------------- |
+| **A01 - Broken Access Control**     | 7/10  | ⚠️     | RLS OK, mais rate limiting manquant |
+| **A02 - Cryptographic Failures**    | 9/10  | 🔴     | .env exposé dans Git (CRITIQUE)     |
+| **A03 - Injection**                 | 9/10  | ✅     | Zod partout, pas de SQL injection   |
+| **A04 - Insecure Design**           | 6/10  | ⚠️     | Rate limiting non utilisé           |
+| **A05 - Security Misconfiguration** | 8/10  | ✅     | Headers OK, CSP stricte             |
+| **A06 - Vulnerable Components**     | 9/10  | ✅     | Dépendances à jour                  |
+| **A07 - Authentication Failures**   | 8/10  | ✅     | Supabase Auth robuste               |
+| **A08 - Data Integrity Failures**   | 7/10  | ⚠️     | Upload validation basique           |
+| **A09 - Logging Failures**          | 6/10  | ⚠️     | Logs insuffisants                   |
+| **A10 - SSRF**                      | 10/10 | ✅     | Un seul appel externe safe          |
 
 **Score global**: **7.5/10** ⚠️
 
 **Points forts identifiés**:
+
 - ✅ Architecture Supabase avec RLS bien configuré
 - ✅ Validation Zod systématique (20+ schémas)
 - ✅ Headers de sécurité robustes
@@ -77,6 +83,7 @@ curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-producti
 - ✅ Gestion des mots de passe sécurisée
 
 **Vulnérabilités critiques détectées**:
+
 1. 🔴 **Fichier .env exposé dans Git** (SERVICE_ROLE_KEY, RESEND_API_KEY)
 2. ⚠️ **Rate limiting défini mais jamais utilisé**
 3. ⚠️ **IDOR potentiel sur assignation managed guests**
@@ -84,23 +91,27 @@ curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-producti
 5. ⚠️ **Validation upload basée uniquement sur MIME type**
 
 **Nouveaux champs RSVP validés**:
+
 - ✅ `present_saturday` (boolean) - Validation OK
 - ✅ `present_sunday` (boolean) - Validation OK
 - ✅ `message_for_couple` (text, max 1000 chars) - Validation OK
 - ⚠️ Tous ces champs manquent de sanitization HTML
 
 **Vérifications Admin confirmées**:
+
 - ✅ Double vérification: hook global + layout server
 - ✅ Vérification du rôle depuis la DB (pas hardcodé)
 - ✅ Politiques RLS correctes
 
 **Logs et Fuites**:
+
 - ✅ Pas de mots de passe loggués
 - ✅ Logs conditionnels (dev uniquement)
 - ⚠️ Quelques emails loggués en dev (risque mineur)
 - ✅ Pas de tokens exposés
 
 **Politiques RLS Supabase**:
+
 - ✅ Toutes les tables ont RLS activé
 - ✅ Policies guests: SELECT, UPDATE correctes
 - ✅ Policies photos: ownership + admin OK
@@ -152,8 +163,9 @@ curl "http://localhost:5173/api/keep-alive?key=dev-secret-key-change-in-producti
 Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **Toutes doivent être régénérées IMMÉDIATEMENT**.
 
 **Checklist critique**:
+
 - [ ] Régénérer `SERVICE_ROLE_KEY` sur Supabase Dashboard
-- [ ] Régénérer `RESEND_API_KEY` sur Resend Dashboard  
+- [ ] Régénérer `RESEND_API_KEY` sur Resend Dashboard
 - [ ] Générer nouveau `CRON_SECRET` : `openssl rand -base64 32`
 - [ ] Supprimer `.env` de l'historique Git
 - [ ] Tester l'application après changement des clés
@@ -187,17 +199,20 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 ## 📊 Métriques Finales
 
 **Code créé**:
+
 - 3 nouveaux fichiers source
 - 4 fichiers documentation
 - ~500 lignes de code
 - ~2000 lignes de documentation
 
 **Couverture audit**:
+
 - 10 catégories OWASP analysées
 - 50+ fichiers examinés
 - 200+ lignes de code auditées
 
 **Vulnérabilités identifiées**:
+
 - 1 critique (clés exposées)
 - 4 haute priorité (rate limiting, IDOR, sanitization, upload)
 - 6 moyenne priorité (logging, MFA, etc.)
@@ -207,6 +222,7 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 ## 🎓 Enseignements
 
 ### Ce qui est bien fait:
+
 1. ✅ **Architecture Supabase** - RLS correctement configuré partout
 2. ✅ **Validation Zod** - Systématique sur tous les inputs
 3. ✅ **Headers de sécurité** - CSP stricte et headers modernes
@@ -214,6 +230,7 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 5. ✅ **Authentification robuste** - Supabase Auth avec OAuth
 
 ### Ce qui doit être amélioré:
+
 1. ⚠️ **Gestion des secrets** - .env ne doit JAMAIS être commité
 2. ⚠️ **Rate limiting** - Fonction définie mais pas utilisée
 3. ⚠️ **Sanitization** - Fonction définie mais pas appliquée
@@ -221,6 +238,7 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 5. ⚠️ **Upload validation** - Basée uniquement sur MIME type
 
 ### Bonnes pratiques à continuer:
+
 - ✅ Audit de sécurité régulier
 - ✅ Documentation exhaustive
 - ✅ Validation côté serveur systématique
@@ -231,6 +249,7 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 ## 🔗 Ressources
 
 **Documentation du projet**:
+
 - [Actions Critiques](./ACTIONS_CRITIQUES.md) - **À LIRE EN PREMIER**
 - [Audit Sécurité](./SECURITY_AUDIT.md) - Rapport complet OWASP
 - [Keep-Alive](./KEEP_ALIVE.md) - Configuration cron
@@ -238,6 +257,7 @@ Le fichier `.env` a été commité dans Git avec toutes les clés secrètes. **T
 - [Déploiement](./DEPLOYMENT.md) - Guide de déploiement
 
 **Références externes**:
+
 - [OWASP Top 10 2021](https://owasp.org/Top10/)
 - [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [SvelteKit Security](https://kit.svelte.dev/docs/security)

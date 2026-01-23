@@ -72,10 +72,10 @@ Ajoutez `CRON_SECRET` dans les secrets GitHub.
 
 ```json
 {
-  "status": "alive",
-  "timestamp": "2026-01-23T10:30:00.000Z",
-  "message": "Database connection maintained",
-  "guestCount": 42
+	"status": "alive",
+	"timestamp": "2026-01-23T10:30:00.000Z",
+	"message": "Database connection maintained",
+	"guestCount": 42
 }
 ```
 

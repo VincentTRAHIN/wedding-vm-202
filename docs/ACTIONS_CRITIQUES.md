@@ -45,6 +45,7 @@ openssl rand -base64 32
 ```
 
 Copiez le résultat et mettez à jour `.env` :
+
 ```env
 CRON_SECRET=votre-clé-aléatoire-générée
 ```
@@ -76,6 +77,7 @@ git gc --prune=now --aggressive
 ```
 
 **Alternative plus simple** (si le repo n'est pas partagé):
+
 ```bash
 # Créer un nouveau repo sans historique
 rm -rf .git
@@ -117,18 +119,18 @@ La fonction existe mais n'est pas utilisée. Ajoutez-la sur les routes critiques
 import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
-  login_password: async ({ request, locals, getClientAddress }) => {
-    const clientIp = getClientAddress();
-    const { allowed, remaining } = checkRateLimit(`login:${clientIp}`, 5, 60000);
-    
-    if (!allowed) {
-      return fail(429, { 
-        message: 'Trop de tentatives de connexion. Réessayez dans 1 minute.' 
-      });
-    }
+	login_password: async ({ request, locals, getClientAddress }) => {
+		const clientIp = getClientAddress();
+		const { allowed, remaining } = checkRateLimit(`login:${clientIp}`, 5, 60000);
 
-    // ... reste du code existant
-  }
+		if (!allowed) {
+			return fail(429, {
+				message: 'Trop de tentatives de connexion. Réessayez dans 1 minute.'
+			});
+		}
+
+		// ... reste du code existant
+	}
 };
 ```
 
@@ -140,18 +142,18 @@ export const actions: Actions = {
 import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
-  register: async ({ request, getClientAddress }) => {
-    const clientIp = getClientAddress();
-    const { allowed } = checkRateLimit(`register:${clientIp}`, 3, 3600000); // 3 par heure
-    
-    if (!allowed) {
-      return fail(429, { 
-        message: 'Trop de tentatives d\'inscription. Réessayez plus tard.' 
-      });
-    }
+	register: async ({ request, getClientAddress }) => {
+		const clientIp = getClientAddress();
+		const { allowed } = checkRateLimit(`register:${clientIp}`, 3, 3600000); // 3 par heure
 
-    // ... reste du code existant
-  }
+		if (!allowed) {
+			return fail(429, {
+				message: "Trop de tentatives d'inscription. Réessayez plus tard."
+			});
+		}
+
+		// ... reste du code existant
+	}
 };
 ```
 
@@ -163,19 +165,19 @@ export const actions: Actions = {
 import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
-  update: async ({ request, locals: { user } }) => {
-    if (!user) return fail(401);
+	update: async ({ request, locals: { user } }) => {
+		if (!user) return fail(401);
 
-    const { allowed } = checkRateLimit(`rsvp:${user.id}`, 10, 60000);
-    
-    if (!allowed) {
-      return fail(429, { 
-        message: 'Trop de mises à jour. Attendez un peu.' 
-      });
-    }
+		const { allowed } = checkRateLimit(`rsvp:${user.id}`, 10, 60000);
 
-    // ... reste du code existant
-  }
+		if (!allowed) {
+			return fail(429, {
+				message: 'Trop de mises à jour. Attendez un peu.'
+			});
+		}
+
+		// ... reste du code existant
+	}
 };
 ```
 
@@ -187,19 +189,19 @@ export const actions: Actions = {
 import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
-  upload: async ({ request, locals: { user } }) => {
-    if (!user) return fail(401);
+	upload: async ({ request, locals: { user } }) => {
+		if (!user) return fail(401);
 
-    const { allowed } = checkRateLimit(`upload:${user.id}`, 20, 3600000); // 20 par heure
-    
-    if (!allowed) {
-      return fail(429, { 
-        message: 'Limite d\'upload atteinte. Réessayez dans 1 heure.' 
-      });
-    }
+		const { allowed } = checkRateLimit(`upload:${user.id}`, 20, 3600000); // 20 par heure
 
-    // ... reste du code existant
-  }
+		if (!allowed) {
+			return fail(429, {
+				message: "Limite d'upload atteinte. Réessayez dans 1 heure."
+			});
+		}
+
+		// ... reste du code existant
+	}
 };
 ```
 
@@ -209,48 +211,48 @@ export const actions: Actions = {
 
 ```typescript
 addManagedGuest: async ({ request, locals: { user } }) => {
-  if (!user) return fail(401);
+	if (!user) return fail(401);
 
-  const formData = await request.formData();
-  const guestId = formData.get('guestId') as string;
-  
-  if (!guestId) return fail(400, { message: 'Veuillez sélectionner un invité.' });
+	const formData = await request.formData();
+	const guestId = formData.get('guestId') as string;
 
-  const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
+	if (!guestId) return fail(400, { message: 'Veuillez sélectionner un invité.' });
 
-  // Récupérer le current user
-  const { data: currentUserGuest } = await supabaseAdmin
-    .from('guests')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single();
+	const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
-  if (!currentUserGuest) return fail(400, { message: 'Profil introuvable.' });
+	// Récupérer le current user
+	const { data: currentUserGuest } = await supabaseAdmin
+		.from('guests')
+		.select('id')
+		.eq('auth_id', user.id)
+		.single();
 
-  // ✅ NOUVEAU: Vérifier que l'invité cible est disponible
-  const { data: targetGuest } = await supabaseAdmin
-    .from('guests')
-    .select('managed_by_id, auth_id')
-    .eq('id', guestId)
-    .single();
+	if (!currentUserGuest) return fail(400, { message: 'Profil introuvable.' });
 
-  if (!targetGuest) {
-    return fail(404, { message: 'Invité introuvable.' });
-  }
+	// ✅ NOUVEAU: Vérifier que l'invité cible est disponible
+	const { data: targetGuest } = await supabaseAdmin
+		.from('guests')
+		.select('managed_by_id, auth_id')
+		.eq('id', guestId)
+		.single();
 
-  if (targetGuest.managed_by_id || targetGuest.auth_id) {
-    return fail(400, { 
-      message: 'Cet invité est déjà lié à un compte ou géré par quelqu\'un.' 
-    });
-  }
+	if (!targetGuest) {
+		return fail(404, { message: 'Invité introuvable.' });
+	}
 
-  // Continuer avec l'assignation...
-  const { error } = await supabaseAdmin
-    .from('guests')
-    .update({ managed_by_id: currentUserGuest.id })
-    .eq('id', guestId);
+	if (targetGuest.managed_by_id || targetGuest.auth_id) {
+		return fail(400, {
+			message: "Cet invité est déjà lié à un compte ou géré par quelqu'un."
+		});
+	}
 
-  // ... reste du code
+	// Continuer avec l'assignation...
+	const { error } = await supabaseAdmin
+		.from('guests')
+		.update({ managed_by_id: currentUserGuest.id })
+		.eq('id', guestId);
+
+	// ... reste du code
 };
 ```
 
@@ -263,19 +265,19 @@ import { sanitizeHtml } from '$lib/server/validation';
 
 // Dans la boucle de traitement des guests
 const rawData = {
-  rsvp_status: status,
-  present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
-  present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
-  dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
-  message_for_couple: formData.get(`${prefix}message_for_couple`) || null
+	rsvp_status: status,
+	present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
+	present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
+	dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
+	message_for_couple: formData.get(`${prefix}message_for_couple`) || null
 };
 
 // ✅ NOUVEAU: Sanitize avant validation
 if (rawData.dietary_restrictions) {
-  rawData.dietary_restrictions = sanitizeHtml(rawData.dietary_restrictions);
+	rawData.dietary_restrictions = sanitizeHtml(rawData.dietary_restrictions);
 }
 if (rawData.message_for_couple) {
-  rawData.message_for_couple = sanitizeHtml(rawData.message_for_couple);
+	rawData.message_for_couple = sanitizeHtml(rawData.message_for_couple);
 }
 
 const result = rsvpSchema.safeParse(rawData);
@@ -288,7 +290,7 @@ import { sanitizeHtml } from '$lib/server/validation';
 
 // Dans l'action upload
 if (caption) {
-  caption = sanitizeHtml(caption);
+	caption = sanitizeHtml(caption);
 }
 ```
 

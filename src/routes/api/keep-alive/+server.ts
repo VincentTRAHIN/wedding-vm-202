@@ -6,9 +6,9 @@ import { supabase } from '$lib/server/supabase';
 /**
  * Keep-Alive Endpoint
  * Empêche Supabase de se mettre en veille sur les plans gratuits.
- * 
+ *
  * Usage: GET /api/keep-alive?key=YOUR_CRON_SECRET
- * 
+ *
  * Sécurité:
  * - Authentification par clé secrète (CRON_SECRET)
  * - Comparaison timing-safe pour éviter les attaques par timing
@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		// Récupération et validation de la clé
 		const providedKey = url.searchParams.get('key');
-		
+
 		if (!providedKey) {
 			throw error(401, 'Missing authentication key');
 		}
@@ -56,7 +56,6 @@ export const GET: RequestHandler = async ({ url }) => {
 			message: 'Database connection maintained',
 			guestCount: count
 		});
-
 	} catch (err) {
 		// Si c'est déjà une erreur SvelteKit, la relancer
 		if (err && typeof err === 'object' && 'status' in err) {

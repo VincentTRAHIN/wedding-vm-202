@@ -6,13 +6,13 @@
 
 ## ⏱️ Timeline
 
-| Tâche | Durée | Priorité |
-|-------|-------|----------|
+| Tâche              | Durée  | Priorité    |
+| ------------------ | ------ | ----------- |
 | Régénérer les clés | 10 min | 🔴 CRITIQUE |
-| Nettoyer Git | 5 min | 🔴 CRITIQUE |
-| Rate limiting | 10 min | ⚠️ HAUTE |
-| IDOR fix | 3 min | ⚠️ HAUTE |
-| Sanitization | 5 min | ⚠️ HAUTE |
+| Nettoyer Git       | 5 min  | 🔴 CRITIQUE |
+| Rate limiting      | 10 min | ⚠️ HAUTE    |
+| IDOR fix           | 3 min  | ⚠️ HAUTE    |
+| Sanitization       | 5 min  | ⚠️ HAUTE    |
 
 **Total**: ~30-35 minutes
 
@@ -126,10 +126,10 @@ export const actions: Actions = {
     // ✅ NOUVEAU: Rate limiting
     const clientIp = getClientAddress();
     const { allowed } = checkRateLimit(`login:${clientIp}`, 5, 60000);
-    
+
     if (!allowed) {
-      return fail(429, { 
-        message: 'Trop de tentatives. Réessayez dans 1 minute.' 
+      return fail(429, {
+        message: 'Trop de tentatives. Réessayez dans 1 minute.'
       });
     }
 
@@ -147,7 +147,7 @@ export const actions: Actions = {
   register: async ({ request, getClientAddress }) => {
     const clientIp = getClientAddress();
     const { allowed } = checkRateLimit(`register:${clientIp}`, 3, 3600000);
-    
+
     if (!allowed) {
       return fail(429, { message: 'Trop de tentatives. Réessayez plus tard.' });
     }
@@ -217,8 +217,8 @@ addManagedGuest: async ({ request, locals: { user } }) => {
   }
 
   if (targetGuest.managed_by_id || targetGuest.auth_id) {
-    return fail(400, { 
-      message: 'Cet invité est déjà lié à un compte ou géré par quelqu\'un.' 
+    return fail(400, {
+      message: 'Cet invité est déjà lié à un compte ou géré par quelqu\'un.'
     });
   }
 
@@ -239,19 +239,19 @@ import { sanitizeHtml } from '$lib/server/validation';
 
 // Dans la boucle de traitement des guests (action update)
 const rawData = {
-  rsvp_status: status,
-  present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
-  present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
-  dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
-  message_for_couple: formData.get(`${prefix}message_for_couple`) || null
+	rsvp_status: status,
+	present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
+	present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
+	dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
+	message_for_couple: formData.get(`${prefix}message_for_couple`) || null
 };
 
 // ✅ NOUVEAU: Sanitize avant validation
 if (rawData.dietary_restrictions) {
-  rawData.dietary_restrictions = sanitizeHtml(rawData.dietary_restrictions);
+	rawData.dietary_restrictions = sanitizeHtml(rawData.dietary_restrictions);
 }
 if (rawData.message_for_couple) {
-  rawData.message_for_couple = sanitizeHtml(rawData.message_for_couple);
+	rawData.message_for_couple = sanitizeHtml(rawData.message_for_couple);
 }
 
 const result = rsvpSchema.safeParse(rawData);
@@ -268,9 +268,9 @@ import { sanitizeHtml } from '$lib/server/validation';
 // Dans l'action upload
 upload: async ({ request, locals: { user } }) => {
   // ... code existant ...
-  
+
   let caption = formData.get('caption')?.toString();
-  
+
   // ✅ NOUVEAU: Sanitize caption
   if (caption) {
     caption = sanitizeHtml(caption);
@@ -339,6 +339,7 @@ Avant de passer en production :
 ## 🆘 En cas de problème
 
 ### Build échoue
+
 ```bash
 # Vérifier les imports
 npm run check
@@ -347,6 +348,7 @@ npm run check
 ```
 
 ### Clés ne marchent pas
+
 ```bash
 # Vérifier les variables d'environnement
 echo $SERVICE_ROLE_KEY
@@ -359,6 +361,7 @@ npm run dev
 ```
 
 ### Rate limiting ne fonctionne pas
+
 ```bash
 # Vérifier que checkRateLimit est bien importé
 grep -r "checkRateLimit" src/routes/

@@ -48,18 +48,18 @@
 
 #### 📊 Résultats par Catégorie OWASP
 
-| Catégorie | Score | Statut |
-|-----------|-------|--------|
-| A01 - Broken Access Control | 7/10 | ⚠️ |
-| A02 - Cryptographic Failures | 9/10 | 🔴 (.env exposé) |
-| A03 - Injection | 9/10 | ✅ |
-| A04 - Insecure Design | 6/10 | ⚠️ |
-| A05 - Security Misconfiguration | 8/10 | ✅ |
-| A06 - Vulnerable Components | 9/10 | ✅ |
-| A07 - Authentication Failures | 8/10 | ✅ |
-| A08 - Data Integrity Failures | 7/10 | ⚠️ |
-| A09 - Logging Failures | 6/10 | ⚠️ |
-| A10 - SSRF | 10/10 | ✅ |
+| Catégorie                       | Score | Statut           |
+| ------------------------------- | ----- | ---------------- |
+| A01 - Broken Access Control     | 7/10  | ⚠️               |
+| A02 - Cryptographic Failures    | 9/10  | 🔴 (.env exposé) |
+| A03 - Injection                 | 9/10  | ✅               |
+| A04 - Insecure Design           | 6/10  | ⚠️               |
+| A05 - Security Misconfiguration | 8/10  | ✅               |
+| A06 - Vulnerable Components     | 9/10  | ✅               |
+| A07 - Authentication Failures   | 8/10  | ✅               |
+| A08 - Data Integrity Failures   | 7/10  | ⚠️               |
+| A09 - Logging Failures          | 6/10  | ⚠️               |
+| A10 - SSRF                      | 10/10 | ✅               |
 
 #### 📝 Documentation Créée
 
@@ -70,18 +70,21 @@
 #### 🚀 Prochaines Étapes
 
 **AVANT déploiement** (CRITIQUE):
+
 1. ✅ Régénérer SERVICE_ROLE_KEY sur Supabase
 2. ✅ Régénérer RESEND_API_KEY sur Resend
 3. ✅ Générer nouveau CRON_SECRET
 4. ✅ Supprimer .env de l'historique Git
 
 **Cette semaine** (HAUTE priorité):
+
 1. ⚠️ Implémenter rate limiting (login, register, RSVP, upload)
 2. ⚠️ Corriger IDOR sur managed guests
 3. ⚠️ Appliquer sanitization HTML
 4. ⚠️ Tester avec [docs/TEST_CHECKLIST.md](./docs/TEST_CHECKLIST.md)
 
 **Ce mois-ci** (MOYENNE priorité):
+
 1. ⚠️ Logging structuré (Winston/Pino)
 2. ⚠️ Monitoring centralisé (Sentry)
 3. ⚠️ npm audit en CI/CD
@@ -103,26 +106,30 @@
 2. **Améliorations Code**
 
 **Nouveau fichier**: `src/lib/server/validation.ts`
-   - Schemas Zod pour tous les inputs
-   - Validation upload fichiers
-   - Sanitization HTML (XSS protection)
-   - Rate limiting basique
+
+- Schemas Zod pour tous les inputs
+- Validation upload fichiers
+- Sanitization HTML (XSS protection)
+- Rate limiting basique
 
 **Headers de Sécurité** (`src/hooks.server.ts`):
-   - Content-Security-Policy
-   - X-Frame-Options
-   - X-Content-Type-Options
-   - Et plus...
+
+- Content-Security-Policy
+- X-Frame-Options
+- X-Content-Type-Options
+- Et plus...
 
 **Gestion des Logs**:
-   - Console.log sensibles supprimés
-   - Logs conditionnels (dev uniquement)
-   - Retours structurés pour emails
+
+- Console.log sensibles supprimés
+- Logs conditionnels (dev uniquement)
+- Retours structurés pour emails
 
 **Bugs Corrigés**:
-   - Admin check hardcodé remplacé par vérification BDD
-   - Validation upload côté serveur
-   - Meilleure gestion d'erreurs
+
+- Admin check hardcodé remplacé par vérification BDD
+- Validation upload côté serveur
+- Meilleure gestion d'erreurs
 
 3. **Documentation Créée**
 
