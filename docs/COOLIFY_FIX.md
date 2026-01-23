@@ -5,6 +5,7 @@
 Le déploiement a échoué car la variable d'environnement `CRON_SECRET` n'est pas configurée dans Coolify.
 
 **Erreur**:
+
 ```
 "CRON_SECRET" is not exported by "virtual:env/static/private"
 ```
@@ -83,6 +84,7 @@ Le code a été modifié pour utiliser `$env/dynamic/private` au lieu de `$env/s
 Une fois `CRON_SECRET` ajouté, vous pourrez :
 
 1. ✅ Tester le endpoint :
+
    ```bash
    curl "https://july18.melanie.vincent-trahin.dev/api/keep-alive?key=VOTRE_CRON_SECRET"
    ```

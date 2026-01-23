@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		// Récupération de la clé secrète (runtime)
 		const CRON_SECRET = env.CRON_SECRET;
-		
+
 		if (!CRON_SECRET) {
 			console.error('[Keep-Alive] CRON_SECRET not configured');
 			throw error(500, 'Keep-Alive endpoint not configured');
