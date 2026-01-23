@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { CRON_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { supabase } from '$lib/server/supabase';
 
 /**
@@ -15,6 +15,14 @@ import { supabase } from '$lib/server/supabase';
  */
 export const GET: RequestHandler = async ({ url }) => {
 	try {
+		// Récupération de la clé secrète (runtime)
+		const CRON_SECRET = env.CRON_SECRET;
+		
+		if (!CRON_SECRET) {
+			console.error('[Keep-Alive] CRON_SECRET not configured');
+			throw error(500, 'Keep-Alive endpoint not configured');
+		}
+
 		// Récupération et validation de la clé
 		const providedKey = url.searchParams.get('key');
 
