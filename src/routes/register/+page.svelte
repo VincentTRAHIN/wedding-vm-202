@@ -155,7 +155,7 @@
 			</form>
 		</Card.Content>
 		<Card.Footer class="justify-center text-sm text-muted-foreground">
-			<a href="/login" class="text-primary hover:underline">Déjà un compte ? Te connecter</a>
+			<a href="/login" class="text-primary hover:underline">Déjà un compte ? Se connecter</a>
 		</Card.Footer>
 	</Card.Root>
 </div>
