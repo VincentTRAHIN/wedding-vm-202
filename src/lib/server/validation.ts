@@ -98,20 +98,29 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 /**
  * Rate limiting helper (simple in-memory implementation)
  * For production, use Redis or similar
+ * 
+ * Strategy:
+ * - For authenticated users (RSVP, UPLOAD): use userId to avoid blocking everyone on shared Wi-Fi
+ * - For anonymous users (LOGIN, REGISTER): use IP address
  */
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 export function checkRateLimit(
 	key: string,
 	maxRequests: number = 10,
-	windowMs: number = 60000
+	windowMs: number = 60000,
+	userId?: string // Optional: if provided, uses userId as key instead of IP
 ): { allowed: boolean; remaining: number } {
 	const now = Date.now();
-	const record = rateLimitStore.get(key);
+	
+	// Use userId as key if provided (authenticated users), otherwise use the provided key (IP)
+	const rateLimitKey = userId ? `user:${userId}:${key.split(':')[0]}` : key;
+	
+	const record = rateLimitStore.get(rateLimitKey);
 
 	if (!record || now > record.resetAt) {
 		// New window
-		rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+		rateLimitStore.set(rateLimitKey, { count: 1, resetAt: now + windowMs });
 		return { allowed: true, remaining: maxRequests - 1 };
 	}
 
@@ -120,7 +129,7 @@ export function checkRateLimit(
 	}
 
 	record.count++;
-	rateLimitStore.set(key, record);
+	rateLimitStore.set(rateLimitKey, record);
 	return { allowed: true, remaining: maxRequests - record.count };
 }
 

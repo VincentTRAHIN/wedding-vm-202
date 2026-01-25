@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, sanitizeHtml } from '$lib/server/validation';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SERVICE_ROLE_KEY } from '$env/static/private';
 import type { Database } from '$lib/types/supabase';
@@ -74,6 +75,12 @@ export const actions: Actions = {
 	update: async ({ request, locals: { user } }) => {
 		if (!user) return fail(401, { message: 'Unauthorized' });
 
+		// Rate limiting protection (uses user.id to avoid blocking everyone on shared Wi-Fi)
+		const { allowed } = checkRateLimit('rsvp', 10, 60000, user.id);
+		if (!allowed) {
+			return fail(429, { message: 'Trop de mises à jour. Attendez un peu.' });
+		}
+
 		const formData = await request.formData();
 		const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 
@@ -110,13 +117,21 @@ export const actions: Actions = {
 			// But for "Group RSVP", we usually submit all.
 			if (!status) continue;
 
-			const rawData = {
+			let rawData = {
 				rsvp_status: status,
 				present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
 				present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
 				dietary_restrictions: formData.get(`${prefix}dietary_restrictions`) || null,
 				message_for_couple: formData.get(`${prefix}message_for_couple`) || null
 			};
+
+			// Sanitize HTML to prevent XSS
+			if (rawData.dietary_restrictions) {
+				rawData.dietary_restrictions = sanitizeHtml(rawData.dietary_restrictions);
+			}
+			if (rawData.message_for_couple) {
+				rawData.message_for_couple = sanitizeHtml(rawData.message_for_couple);
+			}
 
 			const result = rsvpSchema.safeParse(rawData);
 
@@ -255,6 +270,24 @@ export const actions: Actions = {
 			.maybeSingle();
 
 		if (!currentUserGuest) return fail(400, { message: 'Guest profile not found' });
+
+		// SECURITY: Verify target guest is available (prevent IDOR)
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { data: targetGuest } = await (supabaseAdmin as any)
+			.from('guests')
+			.select('managed_by_id, auth_id')
+			.eq('id', guestId)
+			.single();
+
+		if (!targetGuest) {
+			return fail(404, { message: 'Invité introuvable.' });
+		}
+
+		if (targetGuest.managed_by_id || targetGuest.auth_id) {
+			return fail(400, {
+				message: "Cet invité est déjà lié à un compte ou géré par quelqu'un."
+			});
+		}
 
 		// Generate Invitation Code
 		const invitationCode = `GUEST-${Math.floor(1000 + Math.random() * 9000)}`;

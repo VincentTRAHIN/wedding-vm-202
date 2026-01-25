@@ -4,7 +4,7 @@ import { SERVICE_ROLE_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { Database } from '$lib/types/supabase';
 import { createClient } from '@supabase/supabase-js';
-import { emailSchema, passwordSchema } from '$lib/server/validation';
+import { emailSchema, passwordSchema, checkRateLimit } from '$lib/server/validation';
 
 export const load: PageServerLoad = async ({ locals: { session } }) => {
 	// Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
@@ -42,7 +42,17 @@ export const actions: Actions = {
 		throw redirect(303, data.url);
 	},
 
-	register: async ({ request }) => {
+	register: async ({ request, getClientAddress }) => {
+		// Rate limiting protection
+		const clientIp = getClientAddress();
+		const { allowed } = checkRateLimit(`register:${clientIp}`, 10, 3600000); // 10 par heure
+		
+		if (!allowed) {
+			return fail(429, {
+				error: "Trop de tentatives d'inscription. Réessayez plus tard."
+			});
+		}
+
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;

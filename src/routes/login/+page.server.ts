@@ -32,7 +32,17 @@ export const actions: Actions = {
 		throw redirect(303, data.url);
 	},
 
-	login_password: async ({ request, locals: { supabase } }) => {
+	login_password: async ({ request, locals: { supabase }, getClientAddress }) => {
+		// Rate limiting protection
+		const clientIp = getClientAddress();
+		const { allowed } = checkRateLimit(`login:${clientIp}`, 5, 60000);
+		
+		if (!allowed) {
+			return fail(429, {
+				message: 'Trop de tentatives de connexion. Réessayez dans 1 minute.'
+			});
+		}
+
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;

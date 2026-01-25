@@ -71,7 +71,11 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 export const actions: Actions = {
 	upload: async ({ request, locals: { supabase, user } }) => {
 		if (!user) return fail(401, { message: 'Unauthorized' });
-
+		// Rate limiting protection (100/h, uses user.id to avoid blocking everyone on shared Wi-Fi)
+		const { allowed } = checkRateLimit('upload', 100, 3600000, user.id);
+		if (!allowed) {
+			return fail(429, { message: "Limite d'upload atteinte. Réessayez dans 1 heure." });
+		}
 		const formData = await request.formData();
 		const files = formData.getAll('photos[]') as File[];
 		const caption = formData.get('caption') as string;
