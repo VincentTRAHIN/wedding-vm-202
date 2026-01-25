@@ -46,7 +46,7 @@ export const actions: Actions = {
 		// Rate limiting protection
 		const clientIp = getClientAddress();
 		const { allowed } = checkRateLimit(`register:${clientIp}`, 10, 3600000); // 10 par heure
-		
+
 		if (!allowed) {
 			return fail(429, {
 				error: "Trop de tentatives d'inscription. Réessayez plus tard."

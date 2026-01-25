@@ -98,7 +98,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 /**
  * Rate limiting helper (simple in-memory implementation)
  * For production, use Redis or similar
- * 
+ *
  * Strategy:
  * - For authenticated users (RSVP, UPLOAD): use userId to avoid blocking everyone on shared Wi-Fi
  * - For anonymous users (LOGIN, REGISTER): use IP address
@@ -112,10 +112,10 @@ export function checkRateLimit(
 	userId?: string // Optional: if provided, uses userId as key instead of IP
 ): { allowed: boolean; remaining: number } {
 	const now = Date.now();
-	
+
 	// Use userId as key if provided (authenticated users), otherwise use the provided key (IP)
 	const rateLimitKey = userId ? `user:${userId}:${key.split(':')[0]}` : key;
-	
+
 	const record = rateLimitStore.get(rateLimitKey);
 
 	if (!record || now > record.resetAt) {

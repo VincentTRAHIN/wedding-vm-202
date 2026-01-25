@@ -7,6 +7,7 @@
 ## ✅ 1. Sécurité Implémentée
 
 ### 1.1 Rate Limiting
+
 - ✅ **Login** : 5 tentatives / minute (par IP) (`src/routes/login/+page.server.ts`)
 - ✅ **Register** : 10 inscriptions / heure (par IP, augmenté de 3) (`src/routes/register/+page.server.ts`)
 - ✅ **RSVP** : 10 mises à jour / minute (par `user.id`, évite blocage Wi-Fi partagé) (`src/routes/rsvp/+page.server.ts`)
@@ -15,15 +16,18 @@
 **Note** : Stratégie différenciée pour Wi-Fi partagé (mariage) - voir [RATE_LIMITING_WEDDING.md](RATE_LIMITING_WEDDING.md)
 
 ### 1.2 Sanitization HTML
+
 - ✅ **RSVP** : `dietary_restrictions`, `message_for_couple` (`rsvp/+page.server.ts:123-128`)
 - ✅ **Gallery** : `caption` (`gallery/+page.server.ts:45-47`)
 
 ### 1.3 IDOR Protection
+
 - ✅ **Managed Guests** : Vérification stricte avant assignation (`rsvp/+page.server.ts:266-284`)
   - Check `managed_by_id` et `auth_id` avant UPDATE
   - Retourne 400 si déjà assigné
 
 ### 1.4 Keep-Alive
+
 - ✅ **Endpoint** : `/api/keep-alive` avec `CRON_SECRET` timing-safe (`api/keep-alive/+server.ts`)
 - ✅ **Fix Coolify** : Utilise `$env/dynamic/private` au lieu de `static`
 
@@ -34,6 +38,7 @@
 ### 🔴 URGENT - Sécurité des Secrets
 
 #### 2.1 Régénérer les Clés
+
 ```bash
 # 1. SERVICE_ROLE_KEY (Supabase)
 # → Aller sur console.supabase.co > Settings > API > Régénérer Service Role Key
@@ -46,6 +51,7 @@ openssl rand -base64 32
 ```
 
 #### 2.2 Supprimer .env de Git
+
 ```bash
 # ATTENTION: Votre .env actuel contient des secrets EXPOSÉS sur GitHub
 git rm --cached .env
@@ -60,6 +66,7 @@ git push
 ```
 
 #### 2.3 Configurer Coolify
+
 1. **Ajouter CRON_SECRET** :
    - Aller sur Coolify > Votre projet > Environment Variables
    - Ajouter : `CRON_SECRET=<valeur générée à l'étape 2.1>`
@@ -72,7 +79,9 @@ git push
    - `PUBLIC_SUPABASE_ANON_KEY`
 
 #### 2.4 Configurer Cron Job
+
 **Option A - EasyCron** (recommandé) :
+
 1. Créer compte sur https://www.easycron.com
 2. Créer job :
    - URL : `https://july18.melanie.vincent-trahin.dev/api/keep-alive`
@@ -82,11 +91,13 @@ git push
    - Timeout : 30 secondes
 
 **Option B - Cron-job.org** :
+
 1. Créer compte sur https://cron-job.org
 2. Créer job similaire
 
 **Option C - GitHub Actions** :
 Fichier `.github/workflows/keep-alive.yml` :
+
 ```yaml
 name: Keep Alive
 on:
@@ -107,11 +118,13 @@ jobs:
 ## ✅ 3. Fonctionnalités Vérifiées
 
 ### 3.1 Build & Deploy
+
 - ✅ **Build local** : `npm run build` réussit sans erreur
 - ✅ **Type safety** : Aucune erreur TypeScript
 - ✅ **Imports** : Tous les imports de sécurité résolus
 
 ### 3.2 Fonctionnalités Principales
+
 - ✅ **Authentification** : Login/Register avec rate limiting
 - ✅ **RSVP** : Formulaire avec sanitization et IDOR protection
 - ✅ **Gallery** : Upload avec rate limiting et sanitization
@@ -125,6 +138,7 @@ jobs:
 **Score Final : 7.5/10** (détails dans `docs/SECURITY_AUDIT.md`)
 
 ### Points Forts ✅
+
 - ✅ A01 (Broken Access Control) : 8/10
 - ✅ A02 (Cryptographic Failures) : 9/10
 - ✅ A03 (Injection) : 8/10
@@ -132,6 +146,7 @@ jobs:
 - ✅ A05 (Security Misconfiguration) : 8/10
 
 ### Points d'Amélioration ⚠️
+
 - ⚠️ A06 (Vulnerable Components) : 6/10 (dépendances à surveiller)
 - ⚠️ A07 (Identification Failures) : 6/10 (2FA recommandé pour futur)
 - ⚠️ A08 (Software Integrity) : 6/10 (SRI recommandé)
@@ -143,6 +158,7 @@ jobs:
 ## 🚀 5. Procédure de Déploiement
 
 ### Étape 1 : Sécuriser les Secrets (30 min)
+
 ```bash
 # 1. Régénérer toutes les clés (voir section 2.1)
 # 2. Supprimer .env de Git (voir section 2.2)
@@ -151,6 +167,7 @@ jobs:
 ```
 
 ### Étape 2 : Déployer (5 min)
+
 ```bash
 git add .
 git commit -m "security: Implement rate limiting, IDOR fix, HTML sanitization"
@@ -159,6 +176,7 @@ git push origin main
 ```
 
 ### Étape 3 : Configurer Keep-Alive (10 min)
+
 ```bash
 # Choisir une option (2.4) et configurer le cron job
 # Tester : curl -X POST https://july18.melanie.vincent-trahin.dev/api/keep-alive \
@@ -167,6 +185,7 @@ git push origin main
 ```
 
 ### Étape 4 : Tests Post-Déploiement (15 min)
+
 ```bash
 # 1. Login : Tester rate limiting (5 tentatives rapides)
 # 2. Register : Tester rate limiting (3+ inscriptions)
@@ -181,6 +200,7 @@ git push origin main
 ## 📊 6. Métriques de Monitoring
 
 ### À Surveiller (première semaine)
+
 - [ ] **Taux d'erreur 429** (rate limiting) → Doit être < 1%
 - [ ] **Latence API** → Doit être < 500ms
 - [ ] **Uptime Supabase** → Keep-Alive logs toutes les 10min
@@ -188,6 +208,7 @@ git push origin main
 - [ ] **Logs Resend** → Vérifier emails envoyés
 
 ### Alertes à Configurer
+
 - [ ] Coolify down > 5 min
 - [ ] Keep-Alive fail > 3 tentatives
 - [ ] Erreurs 500 > 10/heure
@@ -198,6 +219,7 @@ git push origin main
 ## 🎯 7. Checklist Finale
 
 ### Avant de Lancer
+
 - [ ] ✅ Secrets régénérés (SERVICE_ROLE_KEY, RESEND_API_KEY, CRON_SECRET)
 - [ ] ✅ .env supprimé de Git
 - [ ] ✅ Coolify configuré avec TOUTES les env vars
@@ -205,6 +227,7 @@ git push origin main
 - [ ] ✅ Tests post-déploiement passés
 
 ### Après le Lancement
+
 - [ ] Surveiller logs Coolify (première heure)
 - [ ] Tester flux complet (register → RSVP → upload)
 - [ ] Vérifier emails de confirmation
@@ -216,6 +239,7 @@ git push origin main
 ## 📞 Support & Documentation
 
 ### Ressources
+
 - **Audit Sécurité** : `docs/SECURITY_AUDIT.md`
 - **Actions Critiques** : `docs/ACTIONS_CRITIQUES.md`
 - **Quick Start** : `docs/QUICK_START_SECURITY.md`
@@ -223,6 +247,7 @@ git push origin main
 - **Déploiement** : `docs/DEPLOYMENT.md`
 
 ### Contacts d'Urgence
+
 - **Supabase Status** : https://status.supabase.com
 - **Coolify Docs** : https://coolify.io/docs
 - **Resend Status** : https://resend.com/status

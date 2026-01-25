@@ -36,7 +36,7 @@ export const actions: Actions = {
 		// Rate limiting protection
 		const clientIp = getClientAddress();
 		const { allowed } = checkRateLimit(`login:${clientIp}`, 5, 60000);
-		
+
 		if (!allowed) {
 			return fail(429, {
 				message: 'Trop de tentatives de connexion. Réessayez dans 1 minute.'
