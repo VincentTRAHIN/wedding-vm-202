@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let guestName: string;
-	export let guests: { 
-		full_name: string; 
+	export let guests: {
+		full_name: string;
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
@@ -42,7 +42,9 @@
 						<div
 							style="background-color: #ffffff; padding: 12px 16px; border-radius: 6px; margin: 12px 0;"
 						>
-							<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+							<div
+								style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"
+							>
 								<span style="font-weight: 500;">{guest.full_name}</span>
 								{#if guest.rsvp_status === 'present'}
 									<span style="color: #5E7E66; font-weight: bold;">✅ Présent</span>
@@ -53,7 +55,9 @@
 							{#if guest.rsvp_status === 'present' && (guest.present_saturday || guest.present_sunday)}
 								<div style="font-size: 12px; color: #6b7280; margin-left: 4px; margin-top: 4px;">
 									{#if guest.present_saturday}✓ Samedi 18 juillet{/if}
-									{#if guest.present_saturday && guest.present_sunday} • {/if}
+									{#if guest.present_saturday && guest.present_sunday}
+										•
+									{/if}
 									{#if guest.present_sunday}✓ Dimanche 19 juillet{/if}
 								</div>
 							{/if}

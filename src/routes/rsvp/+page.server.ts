@@ -105,8 +105,8 @@ export const actions: Actions = {
 
 		const errors: Record<string, unknown> = {};
 		let hasError = false;
-		const updatedGuestsList: { 
-			full_name: string; 
+		const updatedGuestsList: {
+			full_name: string;
 			rsvp_status: string;
 			present_saturday?: boolean | null;
 			present_sunday?: boolean | null;
@@ -174,8 +174,8 @@ export const actions: Actions = {
 				hasError = true;
 			} else {
 				// Track for emails
-				updatedGuestsList.push({ 
-					full_name: guest.full_name, 
+				updatedGuestsList.push({
+					full_name: guest.full_name,
 					rsvp_status,
 					present_saturday,
 					present_sunday
@@ -238,8 +238,8 @@ export const actions: Actions = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
 		await sendAdminAlert(
-			mainGuestName || 'Inconnu', 
-			mainGuestStatus, 
+			mainGuestName || 'Inconnu',
+			mainGuestStatus,
 			mainGuestSaturday ?? null,
 			mainGuestSunday ?? null,
 			updatedGuestsList

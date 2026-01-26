@@ -3,8 +3,8 @@
 	export let status: string;
 	export let present_saturday: boolean | null = null;
 	export let present_sunday: boolean | null = null;
-	export let guests: { 
-		full_name: string; 
+	export let guests: {
+		full_name: string;
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
@@ -46,10 +46,14 @@
 						</span>
 					{/if}
 				</div>
-				
+
 				{#if status === 'present' && (present_saturday || present_sunday)}
 					<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e5e5;">
-						<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Jours de présence</div>
+						<div
+							style="font-size: 12px; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;"
+						>
+							Jours de présence
+						</div>
 						<div style="display: flex; flex-direction: column; gap: 4px;">
 							{#if present_saturday}
 								<div style="font-size: 13px; color: #374151;">
@@ -57,9 +61,7 @@
 								</div>
 							{/if}
 							{#if present_sunday}
-								<div style="font-size: 13px; color: #374151;">
-									✓ Dimanche 19 juillet — Brunch
-								</div>
+								<div style="font-size: 13px; color: #374151;">✓ Dimanche 19 juillet — Brunch</div>
 							{/if}
 						</div>
 					</div>
@@ -83,7 +85,9 @@
 									? 'border-bottom: none;'
 									: ''}"
 							>
-								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+								<div
+									style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"
+								>
 									<span style="font-weight: 500;">{guest.full_name}</span>
 									<span
 										style="font-weight: 600; color: {guest.rsvp_status === 'present'
@@ -95,7 +99,8 @@
 								</div>
 								{#if guest.rsvp_status === 'present' && (guest.present_saturday || guest.present_sunday)}
 									<div style="font-size: 12px; color: #6b7280; margin-left: 4px;">
-										{#if guest.present_saturday}Sam.{/if}{#if guest.present_saturday && guest.present_sunday}, {/if}{#if guest.present_sunday}Dim.{/if}
+										{#if guest.present_saturday}Sam.{/if}{#if guest.present_saturday && guest.present_sunday},
+										{/if}{#if guest.present_sunday}Dim.{/if}
 									</div>
 								{/if}
 							</div>

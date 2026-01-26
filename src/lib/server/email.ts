@@ -32,8 +32,8 @@ if (process.env.NODE_ENV === 'development') {
 export async function sendRsvpConfirmation(
 	to: string,
 	guestName: string,
-	guests: { 
-		full_name: string; 
+	guests: {
+		full_name: string;
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
@@ -113,8 +113,8 @@ export async function sendAdminAlert(
 	status: string,
 	present_saturday: boolean | null,
 	present_sunday: boolean | null,
-	guests: { 
-		full_name: string; 
+	guests: {
+		full_name: string;
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
