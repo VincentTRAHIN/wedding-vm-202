@@ -3,6 +3,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Database } from '$lib/types/supabase';
 import { z } from 'zod';
 
+export const prerender = false;
+
 type WeatherStatus =
 	| {
 			status: 'available';

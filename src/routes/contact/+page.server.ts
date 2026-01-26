@@ -3,6 +3,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { resend, senderEmail } from '$lib/server/email';
 import { z } from 'zod';
 
+export const prerender = false;
+
 const contactSchema = z.object({
 	name: z.string().min(1, 'Le nom est requis'),
 	email: z.string().email('Email invalide'),
