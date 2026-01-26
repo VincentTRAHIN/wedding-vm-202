@@ -105,8 +105,15 @@ export const actions: Actions = {
 
 		const errors: Record<string, unknown> = {};
 		let hasError = false;
-		const updatedGuestsList: { full_name: string; rsvp_status: string }[] = [];
+		const updatedGuestsList: { 
+			full_name: string; 
+			rsvp_status: string;
+			present_saturday?: boolean | null;
+			present_sunday?: boolean | null;
+		}[] = [];
 		let mainGuestStatus = 'pending';
+		let mainGuestSaturday: boolean | null = null;
+		let mainGuestSunday: boolean | null = null;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		for (const guest of guests as any[]) {
@@ -167,10 +174,17 @@ export const actions: Actions = {
 				hasError = true;
 			} else {
 				// Track for emails
-				updatedGuestsList.push({ full_name: guest.full_name, rsvp_status });
+				updatedGuestsList.push({ 
+					full_name: guest.full_name, 
+					rsvp_status,
+					present_saturday,
+					present_sunday
+				});
 
 				if (guest.id === currentUserGuest.id) {
 					mainGuestStatus = rsvp_status;
+					mainGuestSaturday = rsvp_status === 'present' ? present_saturday : null;
+					mainGuestSunday = rsvp_status === 'present' ? present_sunday : null;
 				}
 
 				// Send Invitation to secondary guests if they are present, have email, and haven't received one yet
@@ -223,7 +237,13 @@ export const actions: Actions = {
 		// Send Admin Alert
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
-		await sendAdminAlert(mainGuestName || 'Inconnu', mainGuestStatus, updatedGuestsList);
+		await sendAdminAlert(
+			mainGuestName || 'Inconnu', 
+			mainGuestStatus, 
+			mainGuestSaturday ?? null,
+			mainGuestSunday ?? null,
+			updatedGuestsList
+		);
 
 		return { success: true };
 	},

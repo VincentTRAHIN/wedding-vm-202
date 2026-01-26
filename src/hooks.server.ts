@@ -57,15 +57,22 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	// 1. Routes Publiques (Login, Auth callbacks, Logout, Register, Forgot Password)
+	// 1. Routes Publiques Absolues (sans authentification)
 	const publicRoutes = [
 		'/login',
 		'/auth/callback',
 		'/logout',
 		'/register',
 		'/forgot-password',
-		'/health'
+		'/health',
+		'/legal' // Mentions légales accessibles à tous
 	];
+	
+	// Page d'accueil accessible à tous (connectés ou non)
+	if (event.url.pathname === '/') {
+		return resolve(event);
+	}
+	
 	if (publicRoutes.some((route) => event.url.pathname.startsWith(route))) {
 		return resolve(event);
 	}

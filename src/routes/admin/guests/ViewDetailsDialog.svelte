@@ -50,6 +50,29 @@
 				</div>
 			</div>
 
+			{#if guest.rsvp_status === 'present'}
+				<div class="grid grid-cols-3 gap-4">
+					<div class="font-semibold text-sm text-muted-foreground">Jours de présence</div>
+					<div class="col-span-2 space-y-1">
+						{#if guest.present_saturday}
+							<div class="flex items-center gap-2">
+								<span class="text-xs font-medium text-green-600">✓</span>
+								<span class="text-sm">Samedi 18 juillet — Cérémonie & Soirée</span>
+							</div>
+						{/if}
+						{#if guest.present_sunday}
+							<div class="flex items-center gap-2">
+								<span class="text-xs font-medium text-green-600">✓</span>
+								<span class="text-sm">Dimanche 19 juillet — Brunch</span>
+							</div>
+						{/if}
+						{#if !guest.present_saturday && !guest.present_sunday}
+							<span class="text-sm text-muted-foreground">Aucun jour sélectionné</span>
+						{/if}
+					</div>
+				</div>
+			{/if}
+
 			{#if guest.dietary_restrictions}
 				<div class="grid grid-cols-3 gap-4">
 					<div class="font-semibold text-sm text-muted-foreground">Régime alimentaire</div>

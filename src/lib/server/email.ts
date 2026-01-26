@@ -32,7 +32,12 @@ if (process.env.NODE_ENV === 'development') {
 export async function sendRsvpConfirmation(
 	to: string,
 	guestName: string,
-	guests: { full_name: string; rsvp_status: string }[]
+	guests: { 
+		full_name: string; 
+		rsvp_status: string;
+		present_saturday?: boolean | null;
+		present_sunday?: boolean | null;
+	}[]
 ) {
 	if (!RESEND_API_KEY) {
 		throw new Error('Email service not configured');
@@ -106,7 +111,14 @@ export async function sendGuestInvitation(to: string, guestName: string, inviter
 export async function sendAdminAlert(
 	mainGuestName: string,
 	status: string,
-	guests: { full_name: string; rsvp_status: string }[]
+	present_saturday: boolean | null,
+	present_sunday: boolean | null,
+	guests: { 
+		full_name: string; 
+		rsvp_status: string;
+		present_saturday?: boolean | null;
+		present_sunday?: boolean | null;
+	}[]
 ) {
 	if (!ADMIN_EMAILS) {
 		if (process.env.NODE_ENV === 'development') {
@@ -126,6 +138,8 @@ export async function sendAdminAlert(
 			props: {
 				mainGuestName,
 				status,
+				present_saturday,
+				present_sunday,
 				guests
 			}
 		});

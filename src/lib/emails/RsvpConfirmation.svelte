@@ -1,6 +1,11 @@
 <script lang="ts">
 	export let guestName: string;
-	export let guests: { full_name: string; rsvp_status: string }[] = [];
+	export let guests: { 
+		full_name: string; 
+		rsvp_status: string;
+		present_saturday?: boolean | null;
+		present_sunday?: boolean | null;
+	}[] = [];
 
 	const hasPresent = guests.some((g) => g.rsvp_status === 'present');
 </script>
@@ -35,13 +40,22 @@
 				<div style="margin: 0; padding: 0;">
 					{#each guests as guest, i (i)}
 						<div
-							style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 12px 16px; border-radius: 6px; margin: 12px 0;"
+							style="background-color: #ffffff; padding: 12px 16px; border-radius: 6px; margin: 12px 0;"
 						>
-							<span style="font-weight: 500;">{guest.full_name}</span>
-							{#if guest.rsvp_status === 'present'}
-								<span style="color: #5E7E66; font-weight: bold;">✅ Présent</span>
-							{:else}
-								<span style="color: #dc2626; font-weight: 600;">❌ Absent</span>
+							<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+								<span style="font-weight: 500;">{guest.full_name}</span>
+								{#if guest.rsvp_status === 'present'}
+									<span style="color: #5E7E66; font-weight: bold;">✅ Présent</span>
+								{:else}
+									<span style="color: #dc2626; font-weight: 600;">❌ Absent</span>
+								{/if}
+							</div>
+							{#if guest.rsvp_status === 'present' && (guest.present_saturday || guest.present_sunday)}
+								<div style="font-size: 12px; color: #6b7280; margin-left: 4px; margin-top: 4px;">
+									{#if guest.present_saturday}✓ Samedi 18 juillet{/if}
+									{#if guest.present_saturday && guest.present_sunday} • {/if}
+									{#if guest.present_sunday}✓ Dimanche 19 juillet{/if}
+								</div>
 							{/if}
 						</div>
 					{/each}
