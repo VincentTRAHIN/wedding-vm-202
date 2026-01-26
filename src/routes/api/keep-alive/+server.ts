@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { supabase } from '$lib/server/supabase';
+import { timingSafeEqual } from 'crypto';
 
 /**
  * Keep-Alive Endpoint
@@ -41,7 +42,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		// Comparaison sécurisée contre les attaques par timing
-		const isValid = crypto.subtle.timingSafeEqual(providedKeyBuffer, secretKeyBuffer);
+		const isValid = timingSafeEqual(Buffer.from(providedKeyBuffer), Buffer.from(secretKeyBuffer));
 
 		if (!isValid) {
 			throw error(401, 'Invalid authentication key');

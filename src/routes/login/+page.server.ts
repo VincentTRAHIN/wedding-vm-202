@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { emailSchema } from '$lib/server/validation';
+import { checkRateLimit } from '$lib/server/validation';
 
 export const actions: Actions = {
 	login_google: async ({ locals: { supabase }, url }) => {
