@@ -8,7 +8,7 @@ function mapPasswordUpdateError(message: string): { status: number; error: strin
 	if (normalized.includes('different from the old password')) {
 		return {
 			status: 400,
-			error: "Le nouveau mot de passe doit être différent de l’ancien."
+			error: 'Le nouveau mot de passe doit être différent de l’ancien.'
 		};
 	}
 
@@ -19,7 +19,7 @@ function mapPasswordUpdateError(message: string): { status: number; error: strin
 		return {
 			status: 401,
 			error:
-				"Le lien de réinitialisation est invalide ou expiré. Merci de relancer la procédure de mot de passe oublié."
+				'Le lien de réinitialisation est invalide ou expiré. Merci de relancer la procédure de mot de passe oublié.'
 		};
 	}
 
