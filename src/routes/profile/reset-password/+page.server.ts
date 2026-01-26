@@ -2,6 +2,41 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { passwordSchema } from '$lib/server/validation';
 
+function mapPasswordUpdateError(message: string): { status: number; error: string } {
+	const normalized = message.toLowerCase();
+
+	if (normalized.includes('different from the old password')) {
+		return {
+			status: 400,
+			error: "Le nouveau mot de passe doit être différent de l’ancien."
+		};
+	}
+
+	if (
+		normalized.includes('invalid') &&
+		(normalized.includes('token') || normalized.includes('link') || normalized.includes('expired'))
+	) {
+		return {
+			status: 401,
+			error:
+				"Le lien de réinitialisation est invalide ou expiré. Merci de relancer la procédure de mot de passe oublié."
+		};
+	}
+
+	if (normalized.includes('rate limit') || normalized.includes('too many')) {
+		return {
+			status: 429,
+			error: 'Trop de tentatives. Réessaie dans quelques minutes.'
+		};
+	}
+
+	// Fallback: message générique (on évite d’exposer un message technique brut)
+	return {
+		status: 500,
+		error: 'Une erreur est survenue lors de la mise à jour du mot de passe.'
+	};
+}
+
 export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
 	const { session } = await safeGetSession();
 
@@ -51,9 +86,8 @@ export const actions: Actions = {
 
 		if (error) {
 			console.error('Password update error:', error.message);
-			return fail(500, {
-				error: 'Une erreur est survenue lors de la mise à jour du mot de passe.'
-			});
+			const mapped = mapPasswordUpdateError(error.message);
+			return fail(mapped.status, { error: mapped.error });
 		}
 
 		// Redirection vers le dashboard avec un message de succès
