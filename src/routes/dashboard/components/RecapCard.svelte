@@ -39,7 +39,7 @@
 				<div
 					class="mt-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 border border-green-200"
 				>
-					<strong>✨ Pas de Dress Code !</strong> Mais c'est un mariage quand même , donc évites les tong !
+					<strong>✨ Pas de Dress Code !</strong> Mais c'est un mariage quand même , donc évites les tongs!
 				</div>
 			</div>
 		</div>

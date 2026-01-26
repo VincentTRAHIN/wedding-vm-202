@@ -18,7 +18,7 @@
 		},
 		{
 			question: 'Y a-t-il un dress code ?',
-			answer: "Pas de dress code imposé ! Mais c'est un mariage quand même , donc évites les tong !"
+			answer: "Pas de dress code imposé ! Mais c'est un mariage quand même , donc évites les tongs!"
 		},
 		{
 			question: 'Puis-je venir accompagné(e) ?',
