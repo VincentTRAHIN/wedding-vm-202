@@ -4,8 +4,7 @@
 
 	let { data } = $props();
 
-	let userName = $derived(data.guest?.full_name ?? 'Invité');
-	let firstName = $derived(userName.split(' ')[0]);
+	let firstName = $derived(data.guest?.full_name?.split(' ')[0] ?? '');
 	let isLoggedIn = $derived(!!data.session);
 	let hasResponded = $derived(data.guest?.rsvp_status && data.guest.rsvp_status !== 'pending');
 
@@ -42,7 +41,7 @@
 
 <div class="flex min-h-screen flex-col">
 	<!-- 1. Hero Section -->
-	<section class="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
+	<section class="relative h-[40vh] min-h-[300px] w-full overflow-hidden">
 		<!-- Background Image -->
 		<div class="absolute inset-0">
 			<img src={heroImage} alt="Vincent & Mélanie" class="h-full w-full object-cover" />
@@ -62,16 +61,16 @@
 	</section>
 
 	<!-- 2. Countdown Section -->
-	<section class="bg-stone-50 py-16 md:py-24">
+	<section class="bg-stone-50 py-8 md:py-12">
 		<div class="container mx-auto px-4">
-			<h2 class="mb-12 text-center font-serif text-3xl font-bold text-primary md:text-4xl">
+			<h2 class="mb-6 text-center font-serif text-2xl font-bold text-primary md:text-3xl">
 				Le Grand Jour Arrive
 			</h2>
 
-			<div class="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
+			<div class="mx-auto grid max-w-3xl grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
 				{#each Object.entries(timeLeft) as [unit, value] (unit)}
 					<div
-						class="flex flex-col items-center justify-center rounded-lg bg-stone-200/50 p-6 text-center shadow-sm"
+						class="flex flex-col items-center justify-center rounded-lg bg-stone-200/50 p-4 text-center shadow-sm"
 					>
 						<span class="font-sans text-4xl font-bold text-foreground md:text-5xl">
 							{value.toString().padStart(2, '0')}
@@ -92,12 +91,12 @@
 	</section>
 
 	<!-- 3. Welcome & Actions Section -->
-	<section class="bg-stone-50 pb-24 pt-8">
+	<section class="bg-stone-50 pb-12 pt-4">
 		<div class="container mx-auto max-w-2xl px-4 text-center">
-			<h2 class="mb-6 font-serif text-4xl font-bold text-foreground md:text-5xl">
-				Bienvenue {firstName ? `, ${firstName}` : ''}
+			<h2 class="mb-4 font-serif text-3xl font-bold text-foreground md:text-4xl">
+				{firstName ? `Bienvenue, ${firstName}` : 'Bienvenue'}
 			</h2>
-			<p class="mb-10 text-lg leading-relaxed text-muted-foreground">
+			<p class="mb-6 text-base leading-relaxed text-muted-foreground md:text-lg">
 				Nous sommes ravis de partager ce moment unique avec toi. Explore notre site pour trouver
 				toutes les informations nécessaires et n'oublie pas de nous faire part de ta présence.
 			</p>
