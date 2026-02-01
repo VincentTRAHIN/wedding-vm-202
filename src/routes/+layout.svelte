@@ -99,6 +99,17 @@
 									<LayoutDashboard class="h-5 w-5" />
 									Mon Espace
 								</a>
+								<a
+									href="/profile/settings"
+									class="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary {$page
+										.url.pathname === '/profile/settings'
+										? 'text-primary'
+										: 'text-muted-foreground'}"
+									onclick={() => (isMobileMenuOpen = false)}
+								>
+									<Settings class="h-5 w-5" />
+									Paramètres
+								</a>
 							{/if}
 							{#if userRole === 'admin'}
 								<a
@@ -179,6 +190,12 @@
 								<DropdownMenu.Item>
 									<LayoutDashboard class="mr-2 h-4 w-4" />
 									<span>Mon Espace</span>
+								</DropdownMenu.Item>
+							</a>
+							<a href="/profile/settings" class="contents">
+								<DropdownMenu.Item>
+									<Settings class="mr-2 h-4 w-4" />
+									<span>Paramètres</span>
 								</DropdownMenu.Item>
 							</a>
 							<DropdownMenu.Separator />
