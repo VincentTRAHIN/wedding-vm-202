@@ -98,7 +98,7 @@ export const actions: Actions = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { data: guests } = await (supabaseAdmin as any)
 			.from('guests')
-			.select('id, auth_id, managed_by_id, full_name, email, invitation_code, invitation_sent')
+			.select('id, auth_id, managed_by_id, full_name, email, invitation_sent, invitation_type')
 			.or(`id.eq.${currentUserGuest.id},managed_by_id.eq.${currentUserGuest.id}`);
 
 		if (!guests) return fail(500, { message: 'Error fetching guests' });
@@ -156,13 +156,18 @@ export const actions: Actions = {
 				message_for_couple
 			} = result.data;
 
+			// For vin_honneur guests: force saturday=true (ceremony+VH), sunday=false (no brunch)
+			const isVinHonneur = guest.invitation_type === 'vin_honneur';
+			const finalSaturday: boolean | null = rsvp_status === 'present' ? (isVinHonneur ? true : (present_saturday ?? true)) : null;
+			const finalSunday: boolean | null = rsvp_status === 'present' ? (isVinHonneur ? false : (present_sunday ?? true)) : null;
+
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const { error } = await (supabaseAdmin as any)
 				.from('guests')
 				.update({
 					rsvp_status,
-					present_saturday: rsvp_status === 'present' ? present_saturday : null,
-					present_sunday: rsvp_status === 'present' ? present_sunday : null,
+					present_saturday: finalSaturday,
+					present_sunday: finalSunday,
 					dietary_restrictions,
 					message_for_couple
 				})
@@ -177,14 +182,14 @@ export const actions: Actions = {
 				updatedGuestsList.push({
 					full_name: guest.full_name,
 					rsvp_status,
-					present_saturday,
-					present_sunday
+					present_saturday: finalSaturday,
+					present_sunday: finalSunday
 				});
 
 				if (guest.id === currentUserGuest.id) {
 					mainGuestStatus = rsvp_status;
-					mainGuestSaturday = rsvp_status === 'present' ? present_saturday : null;
-					mainGuestSunday = rsvp_status === 'present' ? present_sunday : null;
+					mainGuestSaturday = finalSaturday;
+					mainGuestSunday = finalSunday;
 				}
 
 				// Send Invitation to secondary guests if they are present, have email, and haven't received one yet
@@ -211,7 +216,8 @@ export const actions: Actions = {
 						guest.email,
 						guest.full_name,
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						(guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name || 'Un proche'
+						(guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name || 'Un proche',
+						guest.invitation_type || 'complet'
 					);
 
 					if (emailResult.success) {
@@ -230,19 +236,20 @@ export const actions: Actions = {
 		// Send Confirmation to Main Guest
 		if (user.email) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
-			await sendRsvpConfirmation(user.email, mainGuestName || 'Invité', updatedGuestsList);
+			const mainGuest = (guests as any[]).find((g) => g.id === currentUserGuest.id);
+			await sendRsvpConfirmation(user.email, mainGuest?.full_name || 'Invité', updatedGuestsList, mainGuest?.invitation_type || 'complet');
 		}
 
 		// Send Admin Alert
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const mainGuestName = (guests as any[]).find((g) => g.id === currentUserGuest.id)?.full_name;
+		const mainGuestForAlert = (guests as any[]).find((g) => g.id === currentUserGuest.id);
 		await sendAdminAlert(
-			mainGuestName || 'Inconnu',
+			mainGuestForAlert?.full_name || 'Inconnu',
 			mainGuestStatus,
 			mainGuestSaturday ?? null,
 			mainGuestSunday ?? null,
-			updatedGuestsList
+			updatedGuestsList,
+			mainGuestForAlert?.invitation_type || 'complet'
 		);
 
 		return { success: true };
@@ -309,15 +316,11 @@ export const actions: Actions = {
 			});
 		}
 
-		// Generate Invitation Code
-		const invitationCode = `GUEST-${Math.floor(1000 + Math.random() * 9000)}`;
-
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const updateData: any = {
 			managed_by_id: currentUserGuest.id,
 			is_child: isChild,
-			rsvp_status: 'present', // Always present when added via this flow
-			invitation_code: invitationCode
+			rsvp_status: 'present' // Always present when added via this flow
 			// NOTE: invitation_sent will be set to true AFTER successful email send
 		};
 
@@ -332,7 +335,7 @@ export const actions: Actions = {
 			.eq('id', guestId)
 			.is('managed_by_id', null)
 			.is('auth_id', null)
-			.select('full_name')
+			.select('full_name, invitation_type')
 			.single();
 
 		if (error) {
@@ -353,7 +356,8 @@ export const actions: Actions = {
 				const emailResult = await sendGuestInvitation(
 					email,
 					updatedGuest.full_name,
-					currentUserGuest.full_name
+					currentUserGuest.full_name,
+					updatedGuest.invitation_type || 'complet'
 				);
 
 				if (emailResult.success) {
@@ -426,7 +430,6 @@ export const actions: Actions = {
 				managed_by_id: null,
 				rsvp_status: 'pending',
 				is_child: false,
-				invitation_code: null,
 				email: null
 			})
 			.eq('id', guestId);

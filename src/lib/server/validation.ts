@@ -50,14 +50,14 @@ export const songRequestSchema = z.object({
 	artist: z.string().max(200).trim().optional()
 });
 
+// Invitation type
+export const invitationTypeSchema = z.enum(['complet', 'vin_honneur']);
+
 // Full RSVP Update Schema
 export const rsvpUpdateSchema = z.object({
 	rsvp_status: rsvpStatusSchema,
 	dietary_restrictions: dietaryRestrictionsSchema
 });
-
-// Invitation code
-export const invitationCodeSchema = z.string().length(6, 'Code invalide').toUpperCase();
 
 /**
  * Sanitize HTML to prevent XSS

@@ -69,6 +69,9 @@ Dans l'ordre, exécuter chaque fichier de `supabase/migrations/`:
 -- 16. 20251230_create_song_requests.sql
 -- 17. 20251230_seed_premium_dashboard_content.sql
 -- 18. 20251230_seed_rooms.sql
+-- 19. 20260119_add_rsvp_day_columns.sql
+-- 20. 20260122_add_invitation_sent.sql
+-- 21. 20260201_add_invitation_type_remove_code.sql
 ```
 
 ### 4. Configurer Storage

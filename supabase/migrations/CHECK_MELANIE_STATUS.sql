@@ -11,7 +11,6 @@ SELECT
   auth_id,
   rsvp_status,
   invitation_sent,
-  invitation_code,
   managed_by_id,
   is_child,
   present_saturday,

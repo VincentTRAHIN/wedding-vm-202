@@ -23,16 +23,35 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 		throw redirect(303, '/');
 	}
 
-	// Fetch unclaimed guests
+	// Fetch unclaimed guests (including managed ones — they can claim their own account)
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const { data: unclaimedGuests } = await (supabaseAdmin as any)
 		.from('guests')
-		.select('id, full_name')
+		.select('id, full_name, managed_by_id')
 		.is('auth_id', null)
 		.order('full_name');
 
+	// Resolve manager names for managed guests
+	const managedByIds = [...new Set((unclaimedGuests || []).filter((g: { managed_by_id: string | null }) => g.managed_by_id).map((g: { managed_by_id: string }) => g.managed_by_id))];
+	let managerNames: Record<string, string> = {};
+
+	if (managedByIds.length > 0) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { data: managers } = await (supabaseAdmin as any)
+			.from('guests')
+			.select('id, full_name')
+			.in('id', managedByIds);
+
+		if (managers) {
+			managerNames = Object.fromEntries(managers.map((m: { id: string; full_name: string }) => [m.id, m.full_name]));
+		}
+	}
+
 	return {
-		unclaimedGuests: unclaimedGuests || []
+		unclaimedGuests: (unclaimedGuests || []).map((g: { id: string; full_name: string; managed_by_id: string | null }) => ({
+			...g,
+			managerName: g.managed_by_id ? managerNames[g.managed_by_id] || null : null
+		}))
 	};
 };
 
@@ -51,15 +70,15 @@ export const actions: Actions = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { data: guest } = await (supabaseAdmin as any)
 			.from('guests')
-			.select('auth_id')
+			.select('auth_id, managed_by_id')
 			.eq('id', guestId)
 			.single();
 
 		if (!guest) return fail(404, { message: 'Invité introuvable.' });
 		if (guest.auth_id) return fail(400, { message: 'Cet invité a déjà été réclamé.' });
 
-		// Link
-		console.log('Claiming guest:', guestId);
+		// Link — keep managed_by_id intact for managed guests
+		console.log('Claiming guest:', guestId, guest.managed_by_id ? '(managed)' : '(standalone)');
 		console.log('User email:', user.email);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any

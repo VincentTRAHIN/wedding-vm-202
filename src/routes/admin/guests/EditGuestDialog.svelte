@@ -19,6 +19,7 @@
 
 	let isOpen = $state(false);
 	let isSubmitting = $state(false);
+	let isUnlinking = $state(false);
 	let isChild = $state(guest.is_child || false);
 
 	// Reset state when dialog opens/closes
@@ -86,6 +87,19 @@
 				/>
 			</div>
 
+			<div class="space-y-2">
+				<Label for="edit_invitation_type_{guest.id}">Type d'invitation</Label>
+				<select
+					id="edit_invitation_type_{guest.id}"
+					name="invitation_type"
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					value={guest.invitation_type || 'complet'}
+				>
+					<option value="complet">Complet</option>
+					<option value="vin_honneur">Vin d'honneur</option>
+				</select>
+			</div>
+
 			<div class="flex items-center space-x-2">
 				<Checkbox id="edit_is_child_{guest.id}" bind:checked={isChild} name="is_child" />
 				<Label
@@ -122,5 +136,37 @@
 				</Button>
 			</Dialog.Footer>
 		</form>
+
+		{#if guest.auth_id}
+			<div class="mt-4 border-t border-stone-200 pt-4">
+				<p class="mb-2 text-xs text-muted-foreground">Cet invité a un compte lié.</p>
+				<form
+					method="POST"
+					action="?/unlinkAccount"
+					use:enhance={() => {
+						isUnlinking = true;
+						return async ({ result, update }) => {
+							isUnlinking = false;
+							if (result.type === 'success') {
+								toast.success('Compte délié avec succès !');
+								isOpen = false;
+							} else if (result.type === 'failure') {
+								// eslint-disable-next-line @typescript-eslint/no-explicit-any
+								toast.error((result.data as any)?.message || 'Erreur lors de la déliaison.');
+							}
+							await update();
+						};
+					}}
+				>
+					<input type="hidden" name="id" value={guest.id} />
+					<Button type="submit" variant="destructive" size="sm" disabled={isUnlinking}>
+						{#if isUnlinking}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{/if}
+						Délier le compte
+					</Button>
+				</form>
+			</div>
+		{/if}
 	</Dialog.Content>
 </Dialog.Root>

@@ -7,6 +7,7 @@
 	let userName = $derived(data.guest?.full_name ?? 'Invité');
 	let firstName = $derived(userName.split(' ')[0]);
 	let isLoggedIn = $derived(!!data.session);
+	let hasResponded = $derived(data.guest?.rsvp_status && data.guest.rsvp_status !== 'pending');
 
 	let timeLeft = $state({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 	let timer: ReturnType<typeof setInterval>;
@@ -102,18 +103,23 @@
 			</p>
 
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
-				<Button
-					href={isLoggedIn ? '/dashboard' : '/login'}
-					variant={isLoggedIn ? 'default' : 'outline'}
-					class="h-12 w-full px-8 text-base font-semibold sm:w-auto"
-				>
-					Mon Espace Invité
+				{#if isLoggedIn && hasResponded}
+					<Button href="/rsvp" variant="outline" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
+						Voir / Modifier mon RSVP
+					</Button>
+				{:else}
+					<div class="flex flex-col items-center">
+						<Button href={isLoggedIn ? '/rsvp' : '/login'} class="h-14 w-full px-10 text-lg font-bold shadow-md sm:w-auto">
+							Confirmer Ta Présence
+						</Button>
+						<span class="mt-2 text-xs text-muted-foreground">Répondre avant le 1er mai</span>
+					</div>
+				{/if}
+				<Button href="/programme" variant="outline" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
+					Programme
 				</Button>
-				<Button href="/rsvp" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
-					Confirmer Ta Présence (RSVP)
-				</Button>
-				<Button href="/gallery" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
-					Partage Tes Souvenirs (Galerie)
+				<Button href="/gallery" variant="outline" class="h-12 w-full px-8 text-base font-semibold sm:w-auto">
+					Galerie
 				</Button>
 			</div>
 		</div>

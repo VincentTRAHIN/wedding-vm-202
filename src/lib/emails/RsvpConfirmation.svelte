@@ -6,8 +6,10 @@
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
 	}[] = [];
+	export let invitationType: string = 'complet';
 
 	const hasPresent = guests.some((g) => g.rsvp_status === 'present');
+	const isComplet = invitationType === 'complet';
 </script>
 
 <div style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #FAF9F6;">
@@ -52,13 +54,17 @@
 									<span style="color: #dc2626; font-weight: 600;">❌ Absent</span>
 								{/if}
 							</div>
-							{#if guest.rsvp_status === 'present' && (guest.present_saturday || guest.present_sunday)}
+							{#if isComplet && guest.rsvp_status === 'present' && (guest.present_saturday || guest.present_sunday)}
 								<div style="font-size: 12px; color: #6b7280; margin-left: 4px; margin-top: 4px;">
-									{#if guest.present_saturday}✓ Samedi 18 juillet{/if}
+									{#if guest.present_saturday}✓ Samedi 18 — Cérémonie, Vin d'honneur, Dîner & Soirée{/if}
 									{#if guest.present_saturday && guest.present_sunday}
 										•
 									{/if}
-									{#if guest.present_sunday}✓ Dimanche 19 juillet{/if}
+									{#if guest.present_sunday}✓ Dimanche 19 — Brunch{/if}
+								</div>
+							{:else if !isComplet && guest.rsvp_status === 'present'}
+								<div style="font-size: 12px; color: #6b7280; margin-left: 4px; margin-top: 4px;">
+									✓ Cérémonie & Vin d'honneur — Samedi 18 juillet
 								</div>
 							{/if}
 						</div>
@@ -72,7 +78,11 @@
 				>
 					<p style="color: #374151; font-weight: 500; margin: 0 0 8px 0;">🎉 Quel bonheur !</p>
 					<p style="color: #4b5563; font-size: 14px; margin: 0;">
-						On a hâte de fêter ça avec toi le <strong>18 juillet 2026</strong> ! 💕
+						{#if isComplet}
+							On a hâte de fêter ça avec toi le <strong>18 & 19 juillet 2026</strong> ! 💕
+						{:else}
+							On a hâte de te voir à la cérémonie et au vin d'honneur le <strong>18 juillet 2026</strong> ! 💕
+						{/if}
 					</p>
 				</div>
 			{:else}

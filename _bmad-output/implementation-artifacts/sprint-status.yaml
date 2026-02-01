@@ -1,0 +1,70 @@
+# generated: 2026-02-01
+# project: wedding-vm-202
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-01
+project: wedding-vm-202
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Gestion des types d'invitation (Admin)
+  epic-1: in-progress
+  1-1-migration-bdd-et-nettoyage-invitation-code: review
+  1-2-type-invitation-creation-et-modification: review
+  1-3-bulk-tagging-type-invitation: review
+  1-4-badges-colores-filtres-et-compteurs: review
+  epic-1-retrospective: optional
+
+  # Epic 2: RSVP adaptatif et notifications email
+  epic-2: in-progress
+  2-1-formulaire-rsvp-adaptatif-et-en-tete-personnalise: review
+  2-2-conservation-rsvp-au-changement-de-type: review
+  2-3-templates-email-adaptes-au-type-invitation: review
+  epic-2-retrospective: optional
+
+  # Epic 3: Programme filtre et navigation contextuelle
+  epic-3: in-progress
+  3-1-programme-par-onglets-avec-filtrage-et-hierarchie-visuelle: review
+  3-2-homepage-ctas-contextuels: review
+  epic-3-retrospective: optional
+
+  # Epic 4: Gestion de profil et association de compte
+  epic-4: in-progress
+  4-1-page-profil-settings-email-et-mot-de-passe: review
+  4-2-changement-de-profil-ce-nest-pas-moi: review
+  4-3-claim-profile-ameliore-pour-profils-managed: review
+  4-4-admin-delier-un-compte-invite: review
+  epic-4-retrospective: optional

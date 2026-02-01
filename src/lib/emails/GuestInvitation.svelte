@@ -2,6 +2,9 @@
 	export let guestName: string;
 	export let inviterName: string;
 	export let email: string;
+	export let invitationType: string = 'complet';
+
+	const isComplet = invitationType === 'complet';
 </script>
 
 <div style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #FAF9F6;">
@@ -20,12 +23,12 @@
 			<p style="font-size: 18px; margin-bottom: 24px; color: #1a1a1a;">👋 Coucou {guestName},</p>
 
 			<p style="margin-bottom: 24px; color: #4b5563;">
-				<strong>{inviterName}</strong> vient de confirmer ta présence à notre mariage ! 🎉🥳
+				<strong>{inviterName}</strong> vient de confirmer ta présence {#if isComplet}à notre mariage{:else}à notre cérémonie et vin d'honneur{/if} ! 🎉🥳
 			</p>
 
 			<p style="margin-bottom: 24px; color: #4b5563;">
 				Ton RSVP a déjà été rempli. Tu peux maintenant te connecter à notre espace invité pour
-				découvrir tous les détails du mariage, la galerie photos 📸, le programme 🗓️, et bien plus
+				découvrir tous les détails {#if isComplet}du mariage{:else}de la cérémonie{/if}, la galerie photos 📸, le programme 🗓️, et bien plus
 				encore !
 			</p>
 

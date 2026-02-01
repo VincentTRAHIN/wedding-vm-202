@@ -9,7 +9,23 @@
 	let { data } = $props();
 	let selectedGuestId = $state('');
 	let showCancelDialog = $state(false);
+	let showManagedDialog = $state(false);
 	let isSubmitting = $state(false);
+
+	let selectedGuest = $derived(
+		data.unclaimedGuests.find((g: { id: string }) => g.id === selectedGuestId)
+	);
+	let isManaged = $derived(selectedGuest?.managed_by_id);
+
+	function handleClaim() {
+		if (isManaged) {
+			showManagedDialog = true;
+		} else {
+			// Submit the form directly
+			const form = document.getElementById('claim-form') as HTMLFormElement;
+			form?.requestSubmit();
+		}
+	}
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-stone-50 p-4">
@@ -21,7 +37,13 @@
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form method="POST" action="?/claim" use:enhance class="space-y-6">
+			<form
+				id="claim-form"
+				method="POST"
+				action="?/claim"
+				use:enhance
+				class="space-y-6"
+			>
 				<div class="space-y-2">
 					<label for="guest-selector" class="text-sm font-medium">Ton nom</label>
 					<GuestSelector
@@ -32,7 +54,9 @@
 					<input type="hidden" name="guestId" value={selectedGuestId} />
 				</div>
 
-				<Button type="submit" class="w-full" disabled={!selectedGuestId}>C'est moi !</Button>
+				<Button type="button" class="w-full" disabled={!selectedGuestId} onclick={handleClaim}>
+					C'est moi !
+				</Button>
 
 				<div class="relative">
 					<div class="absolute inset-0 flex items-center">
@@ -62,6 +86,47 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
+
+	<!-- Managed Guest Confirmation Dialog -->
+	<Dialog.Root bind:open={showManagedDialog}>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Profil déjà géré</Dialog.Title>
+				<Dialog.Description>
+					{#if selectedGuest?.managerName}
+						<strong>{selectedGuest.managerName}</strong> a déjà renseigné des informations pour toi.
+						Confirmes-tu vouloir lier ce profil à ton compte ?
+					{:else}
+						Ce profil est déjà géré par un autre invité. Confirmes-tu vouloir le lier à ton compte ?
+					{/if}
+				</Dialog.Description>
+			</Dialog.Header>
+			<p class="text-sm text-muted-foreground">
+				Tu pourras accéder au site (programme, galerie, RSVP) avec ton propre compte tout en restant dans le groupe.
+			</p>
+			<Dialog.Footer class="flex-col gap-2 sm:flex-row">
+				<Button
+					type="button"
+					variant="outline"
+					class="w-full sm:w-auto"
+					onclick={() => (showManagedDialog = false)}
+				>
+					Annuler
+				</Button>
+				<Button
+					type="button"
+					class="w-full sm:w-auto"
+					onclick={() => {
+						showManagedDialog = false;
+						const form = document.getElementById('claim-form') as HTMLFormElement;
+						form?.requestSubmit();
+					}}
+				>
+					Oui, c'est bien moi
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 
 	<!-- Cancel Confirmation Dialog -->
 	<Dialog.Root bind:open={showCancelDialog}>

@@ -37,7 +37,8 @@ export async function sendRsvpConfirmation(
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
-	}[]
+	}[],
+	invitationType: string = 'complet'
 ) {
 	if (!RESEND_API_KEY) {
 		throw new Error('Email service not configured');
@@ -46,7 +47,8 @@ export async function sendRsvpConfirmation(
 		const { body: html } = render(RsvpConfirmation, {
 			props: {
 				guestName,
-				guests
+				guests,
+				invitationType
 			}
 		});
 
@@ -66,7 +68,7 @@ export async function sendRsvpConfirmation(
 	}
 }
 
-export async function sendGuestInvitation(to: string, guestName: string, inviterName: string) {
+export async function sendGuestInvitation(to: string, guestName: string, inviterName: string, invitationType: string = 'complet') {
 	if (!RESEND_API_KEY) {
 		console.error('❌ RESEND_API_KEY is not configured!');
 		throw new Error('Email service not configured');
@@ -83,7 +85,8 @@ export async function sendGuestInvitation(to: string, guestName: string, inviter
 			props: {
 				guestName,
 				inviterName,
-				email: to
+				email: to,
+				invitationType
 			}
 		});
 
@@ -118,7 +121,8 @@ export async function sendAdminAlert(
 		rsvp_status: string;
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
-	}[]
+	}[],
+	invitationType: string = 'complet'
 ) {
 	if (!ADMIN_EMAILS) {
 		if (process.env.NODE_ENV === 'development') {
@@ -140,7 +144,8 @@ export async function sendAdminAlert(
 				status,
 				present_saturday,
 				present_sunday,
-				guests
+				guests,
+				invitationType
 			}
 		});
 
@@ -160,7 +165,3 @@ export async function sendAdminAlert(
 	}
 }
 
-// Deprecated: sendInvitationEmail is now sendGuestInvitation without invitationCode
-export async function sendInvitationEmail(email: string, guestName: string, inviterName: string) {
-	return sendGuestInvitation(email, guestName, inviterName);
-}

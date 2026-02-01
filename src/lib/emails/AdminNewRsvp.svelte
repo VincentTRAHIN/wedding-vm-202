@@ -9,6 +9,11 @@
 		present_saturday?: boolean | null;
 		present_sunday?: boolean | null;
 	}[] = [];
+	export let invitationType: string = 'complet';
+
+	const typeLabel = invitationType === 'vin_honneur' ? 'Vin d\'honneur' : 'Complet';
+	const typeColor = invitationType === 'vin_honneur' ? '#ea580c' : '#5E7E66';
+	const typeBgColor = invitationType === 'vin_honneur' ? '#fff7ed' : '#f0fdf4';
 </script>
 
 <div style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #FAF9F6;">
@@ -31,7 +36,10 @@
 				<div
 					style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 12px; border-radius: 6px;"
 				>
-					<div style="font-size: 16px; font-weight: 600;">{mainGuestName}</div>
+					<div style="font-size: 16px; font-weight: 600;">
+						{mainGuestName}
+						<span style="display: inline-block; font-size: 11px; font-weight: 600; color: {typeColor}; background-color: {typeBgColor}; padding: 2px 8px; border-radius: 9999px; margin-left: 8px;">{typeLabel}</span>
+					</div>
 					{#if status === 'present'}
 						<span
 							style="display: inline-block; border-radius: 9999px; background-color: #d1fae5; padding: 4px 16px; font-size: 14px; font-weight: 600; color: #5E7E66;"
@@ -47,21 +55,27 @@
 					{/if}
 				</div>
 
-				{#if status === 'present' && (present_saturday || present_sunday)}
+				{#if status === 'present'}
 					<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e5e5;">
 						<div
 							style="font-size: 12px; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;"
 						>
-							Jours de présence
+							{invitationType === 'vin_honneur' ? 'Événements' : 'Jours de présence'}
 						</div>
 						<div style="display: flex; flex-direction: column; gap: 4px;">
-							{#if present_saturday}
+							{#if invitationType === 'vin_honneur'}
 								<div style="font-size: 13px; color: #374151;">
-									✓ Samedi 18 juillet — Cérémonie & Soirée
+									✓ Cérémonie & Vin d'honneur — Samedi 18 juillet
 								</div>
-							{/if}
-							{#if present_sunday}
-								<div style="font-size: 13px; color: #374151;">✓ Dimanche 19 juillet — Brunch</div>
+							{:else}
+								{#if present_saturday}
+									<div style="font-size: 13px; color: #374151;">
+										✓ Samedi 18 juillet — Cérémonie, Vin d'honneur, Dîner & Soirée
+									</div>
+								{/if}
+								{#if present_sunday}
+									<div style="font-size: 13px; color: #374151;">✓ Dimanche 19 juillet — Brunch</div>
+								{/if}
 							{/if}
 						</div>
 					</div>

@@ -9,7 +9,8 @@
 		guest,
 		prefix = '',
 		isRemovable = false,
-		showMessage = false
+		showMessage = false,
+		invitationType = 'complet'
 	} = $props<{
 		guest: {
 			id: string;
@@ -23,7 +24,10 @@
 		prefix?: string;
 		isRemovable?: boolean;
 		showMessage?: boolean;
+		invitationType?: string;
 	}>();
+
+	let isComplet = $derived(invitationType === 'complet');
 
 	let rsvpStatus = $state(guest.rsvp_status || 'present');
 	let presentSaturday = $state(guest.present_saturday ?? true);
@@ -99,37 +103,39 @@
 	</div>
 
 	{#if rsvpStatus === 'present'}
-		<!-- Day presence checkboxes -->
-		<div class="mb-6 space-y-3">
-			<div class="flex items-center gap-2 text-base font-medium text-foreground">
-				<Calendar class="h-4 w-4" />
-				<span>Jours de présence</span>
+		{#if isComplet}
+			<!-- Day presence checkboxes (complet only) -->
+			<div class="mb-6 space-y-3">
+				<div class="flex items-center gap-2 text-base font-medium text-foreground">
+					<Calendar class="h-4 w-4" />
+					<span>Jours de présence</span>
+				</div>
+				<div class="space-y-3 rounded-lg border border-stone-200 bg-stone-50 p-4">
+					<label class="flex cursor-pointer items-center gap-3">
+						<Checkbox
+							name="{prefix}present_saturday"
+							checked={presentSaturday}
+							onCheckedChange={(checked: boolean) => (presentSaturday = checked === true)}
+						/>
+						<span class="text-sm">
+							<span class="font-medium">Samedi 18 juillet 2026</span>
+							<span class="text-muted-foreground"> — Cérémonie, Vin d'honneur, Dîner & Soirée</span>
+						</span>
+					</label>
+					<label class="flex cursor-pointer items-center gap-3">
+						<Checkbox
+							name="{prefix}present_sunday"
+							checked={presentSunday}
+							onCheckedChange={(checked: boolean) => (presentSunday = checked === true)}
+						/>
+						<span class="text-sm">
+							<span class="font-medium">Dimanche 19 juillet 2026</span>
+							<span class="text-muted-foreground"> — Brunch</span>
+						</span>
+					</label>
+				</div>
 			</div>
-			<div class="space-y-3 rounded-lg border border-stone-200 bg-stone-50 p-4">
-				<label class="flex cursor-pointer items-center gap-3">
-					<Checkbox
-						name="{prefix}present_saturday"
-						checked={presentSaturday}
-						onCheckedChange={(checked: boolean) => (presentSaturday = checked === true)}
-					/>
-					<span class="text-sm">
-						<span class="font-medium">Samedi 18 juillet 2026</span>
-						<span class="text-muted-foreground"> — Cérémonie & Soirée</span>
-					</span>
-				</label>
-				<label class="flex cursor-pointer items-center gap-3">
-					<Checkbox
-						name="{prefix}present_sunday"
-						checked={presentSunday}
-						onCheckedChange={(checked: boolean) => (presentSunday = checked === true)}
-					/>
-					<span class="text-sm">
-						<span class="font-medium">Dimanche 19 juillet 2026</span>
-						<span class="text-muted-foreground"> — Brunch</span>
-					</span>
-				</label>
-			</div>
-		</div>
+		{/if}
 
 		<div class="space-y-3">
 			<Label for="{prefix}dietary_restrictions">Restrictions alimentaires</Label>

@@ -64,7 +64,7 @@
 						</Badge>
 					</div>
 
-					{#if data.guest.rsvp_status === 'present'}
+					{#if data.guest.rsvp_status === 'present' && data.guest.invitation_type !== 'vin_honneur'}
 						<div class="space-y-2 border-b border-stone-200 pb-4 text-left">
 							<span class="text-sm font-medium text-muted-foreground">Jours de présence :</span>
 							<div class="flex flex-wrap gap-2">
@@ -116,6 +116,15 @@
 				<h1 class="font-serif text-3xl font-bold text-foreground md:text-4xl">
 					Réponds à l'invitation
 				</h1>
+				{#if data.guest.invitation_type === 'vin_honneur'}
+					<p class="mt-3 text-base text-muted-foreground">
+						Tu es invité(e) à notre cérémonie et vin d'honneur le samedi 18 juillet !
+					</p>
+				{:else}
+					<p class="mt-3 text-base text-muted-foreground">
+						Tu es invité(e) à célébrer notre mariage le samedi 18 et dimanche 19 juillet — cérémonie, vin d'honneur, dîner, soirée et brunch !
+					</p>
+				{/if}
 				<p class="mt-2 text-sm text-muted-foreground">Confirme ta présence avant le 1er Mai 2026</p>
 			</div>
 
@@ -151,6 +160,7 @@
 							prefix="guest_{guest.id}_"
 							isRemovable={guest.id !== data.guest.id}
 							showMessage={i === 0}
+							invitationType={data.guest.invitation_type || 'complet'}
 						/>
 					{/each}
 

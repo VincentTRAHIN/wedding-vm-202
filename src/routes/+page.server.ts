@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 
 	const { data: guest, error: guestError } = await supabaseAdmin
 		.from('guests')
-		.select('id, full_name')
+		.select('id, full_name, rsvp_status')
 		.eq('auth_id', user.id)
 		.limit(1)
 		.maybeSingle();
