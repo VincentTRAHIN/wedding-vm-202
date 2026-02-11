@@ -9,7 +9,8 @@ import type { Database } from '$lib/types/supabase';
 import {
 	validateImageFile,
 	photoCaptionSchema,
-	commentContentSchema
+	commentContentSchema,
+	checkRateLimit
 } from '$lib/server/validation';
 
 export const load: PageServerLoad = async ({ locals: { user } }) => {
