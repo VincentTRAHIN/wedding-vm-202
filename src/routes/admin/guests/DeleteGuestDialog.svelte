@@ -25,7 +25,7 @@
 		<Trash2 class="h-4 w-4" />
 		<span class="sr-only">Supprimer</span>
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="sm:max-w-[450px]">
 		<Dialog.Header>
 			<Dialog.Title>Supprimer l'invité</Dialog.Title>
 			<Dialog.Description>
@@ -52,17 +52,18 @@
 					await update();
 				};
 			}}
-			class="flex justify-end gap-4 pt-4"
 		>
 			<input type="hidden" name="id" value={guest.id} />
 
-			<Button type="button" variant="outline" onclick={() => (isOpen = false)}>Annuler</Button>
-			<Button type="submit" variant="destructive" disabled={isSubmitting}>
-				{#if isSubmitting}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-				{/if}
-				Supprimer
-			</Button>
+			<div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-4 pt-4">
+				<Button type="button" variant="outline" onclick={() => (isOpen = false)} class="w-full sm:w-auto">Annuler</Button>
+				<Button type="submit" variant="destructive" disabled={isSubmitting} class="w-full sm:w-auto">
+					{#if isSubmitting}
+						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					{/if}
+					Supprimer
+				</Button>
+			</div>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>

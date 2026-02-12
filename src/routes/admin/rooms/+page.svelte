@@ -98,7 +98,7 @@
 				<p class="text-sm text-muted-foreground">Aucune chambre pour le moment.</p>
 			{:else}
 				<div class="w-full overflow-x-auto">
-					<div class="min-w-0 sm:min-w-[820px]">
+					<div class="min-w-0 sm:min-w-[720px]">
 						<Table.Root>
 							<Table.Header>
 								<Table.Row>

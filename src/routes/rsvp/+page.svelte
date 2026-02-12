@@ -164,7 +164,7 @@
 						/>
 					{/each}
 
-					<div class="flex gap-4 border-t border-stone-100 pt-4">
+					<div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 border-t border-stone-100 pt-4">
 						{#if data.guest.rsvp_status !== 'pending'}
 							<Button
 								type="button"

@@ -395,7 +395,7 @@
 						)}
 					>
 						{#if selectedFiles.length > 0}
-							<div class="grid w-full grid-cols-3 gap-2 p-4 sm:grid-cols-4">
+						<div class="grid w-full grid-cols-2 gap-2 p-4 sm:grid-cols-3 md:grid-cols-4">
 								{#each previewUrls as url, index}
 									<div class="relative aspect-square group">
 										<img

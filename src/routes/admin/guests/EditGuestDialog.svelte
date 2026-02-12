@@ -35,7 +35,7 @@
 		<Pencil class="h-4 w-4" />
 		<span class="sr-only">Modifier</span>
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="sm:max-w-[500px]">
 		<Dialog.Header>
 			<Dialog.Title>Modifier l'invité</Dialog.Title>
 			<Dialog.Description>
@@ -127,8 +127,8 @@
 				</select>
 			</div>
 
-			<Dialog.Footer>
-				<Button type="submit" disabled={isSubmitting}>
+			<Dialog.Footer class="gap-2">
+				<Button type="submit" disabled={isSubmitting} class="w-full sm:w-auto">
 					{#if isSubmitting}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 					{/if}

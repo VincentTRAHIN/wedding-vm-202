@@ -234,7 +234,7 @@
 		</div>
 
 		<!-- Right Column: Sidebar (Desktop) / Bottom Sheet (Mobile) -->
-		<div class="flex w-full flex-col bg-white md:w-[400px] md:border-l md:border-stone-200">
+		<div class="flex w-full flex-col bg-white md:w-[400px] md:max-w-[400px] md:border-l md:border-stone-200">
 			<!-- Header -->
 			<div class="flex items-center gap-3 border-b border-stone-100 p-4">
 				<div
@@ -248,7 +248,7 @@
 			</div>
 
 			<!-- Body: Comments List -->
-			<div class="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+			<div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-white max-h-[40vh] md:max-h-none">
 				<!-- Caption as first item -->
 				{#if photo.caption}
 					<div class="flex gap-3">
@@ -320,7 +320,7 @@
 			</div>
 
 			<!-- Footer: Actions & Input -->
-			<div class="border-t border-stone-100 bg-white p-4">
+			<div class="border-t border-stone-100 bg-white p-3 sm:p-4">
 				<!-- Actions Row -->
 				<div class="flex items-center gap-4 mb-3">
 					<form

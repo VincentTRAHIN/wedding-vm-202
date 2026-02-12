@@ -27,19 +27,19 @@
 		</Dialog.Header>
 
 		<div class="space-y-4 py-4">
-			<div class="grid grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 				<div class="font-semibold text-sm text-muted-foreground">Nom</div>
-				<div class="col-span-2">{guest.full_name || '-'}</div>
+				<div class="sm:col-span-2">{guest.full_name || '-'}</div>
 			</div>
 
-			<div class="grid grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 				<div class="font-semibold text-sm text-muted-foreground">Email</div>
-				<div class="col-span-2 break-words">{guest.email || '-'}</div>
+				<div class="sm:col-span-2 break-words">{guest.email || '-'}</div>
 			</div>
 
-			<div class="grid grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 				<div class="font-semibold text-sm text-muted-foreground">Statut RSVP</div>
-				<div class="col-span-2">
+				<div class="sm:col-span-2">
 					{#if guest.rsvp_status === 'present'}
 						<span class="text-green-600 font-medium">Présent</span>
 					{:else if guest.rsvp_status === 'absent'}
@@ -51,9 +51,9 @@
 			</div>
 
 			{#if guest.rsvp_status === 'present'}
-				<div class="grid grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 					<div class="font-semibold text-sm text-muted-foreground">Jours de présence</div>
-					<div class="col-span-2 space-y-1">
+					<div class="sm:col-span-2 space-y-1">
 						{#if guest.present_saturday}
 							<div class="flex items-center gap-2">
 								<span class="text-xs font-medium text-green-600">✓</span>
@@ -74,9 +74,9 @@
 			{/if}
 
 			{#if guest.dietary_restrictions}
-				<div class="grid grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 					<div class="font-semibold text-sm text-muted-foreground">Régime alimentaire</div>
-					<div class="col-span-2">{guest.dietary_restrictions}</div>
+					<div class="sm:col-span-2">{guest.dietary_restrictions}</div>
 				</div>
 			{/if}
 
@@ -90,9 +90,9 @@
 			{/if}
 
 			{#if guest.is_child}
-				<div class="grid grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 					<div class="font-semibold text-sm text-muted-foreground">Type</div>
-					<div class="col-span-2">
+					<div class="sm:col-span-2">
 						<span class="text-xs font-medium text-blue-600">Enfant (-18 ans)</span>
 					</div>
 				</div>
@@ -106,7 +106,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (isOpen = false)}>Fermer</Button>
+			<Button variant="outline" onclick={() => (isOpen = false)} class="w-full sm:w-auto">Fermer</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

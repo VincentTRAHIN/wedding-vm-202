@@ -165,11 +165,11 @@
 
 	<!-- Tabs -->
 	<div class="container mx-auto mb-12 max-w-xl px-4">
-		<div class="flex rounded-lg border border-stone-200 bg-white p-1 shadow-sm">
+		<div class="flex gap-2 sm:gap-0 rounded-lg border border-stone-200 bg-white p-1 shadow-sm">
 			<button
 				type="button"
 				class={cn(
-					'flex-1 rounded-md px-4 py-3 text-center text-sm font-semibold transition-all',
+					'flex-1 rounded-md px-3 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-semibold transition-all',
 					activeTab === 'saturday'
 						? 'bg-primary text-white shadow-sm'
 						: 'text-muted-foreground hover:text-foreground'
@@ -182,7 +182,7 @@
 				<button
 					type="button"
 					class={cn(
-						'flex-1 rounded-md px-4 py-3 text-center text-sm font-semibold transition-all',
+						'flex-1 rounded-md px-3 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-semibold transition-all',
 						activeTab === 'sunday'
 							? 'bg-primary text-white shadow-sm'
 							: 'text-muted-foreground hover:text-foreground'

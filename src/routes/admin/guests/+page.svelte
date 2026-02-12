@@ -113,7 +113,7 @@
 
 <div class="space-y-6">
 	<!-- Summary Cards Row -->
-	<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 		<!-- Total & RSVP Status -->
 		<Card.Root>
 			<Card.Content class="p-4">

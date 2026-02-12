@@ -104,7 +104,7 @@
 			<p class="text-sm text-muted-foreground">
 				Tu pourras accéder au site (programme, galerie, RSVP) avec ton propre compte tout en restant dans le groupe.
 			</p>
-			<Dialog.Footer class="flex-col gap-2 sm:flex-row">
+			<Dialog.Footer class="flex-col gap-2 sm:flex-row sm:justify-end">
 				<Button
 					type="button"
 					variant="outline"
