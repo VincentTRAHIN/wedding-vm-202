@@ -65,7 +65,8 @@ const authGuard: Handle = async ({ event, resolve }) => {
 		'/register',
 		'/forgot-password',
 		'/health',
-		'/legal' // Mentions légales accessibles à tous
+		'/legal', // Mentions légales accessibles à tous
+		'/programme' // Programme accessible à tous
 	];
 
 	// Page d'accueil accessible à tous (connectés ou non)
