@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ locals: { user } }) => {
 		guest,
 		managedGuests: managedGuests || [],
 		eligibleGuests: eligibleGuests || [],
-		RSVP_DEADLINE: '2026-05-01'
+		RSVP_DEADLINE: '2026-07-01'
 	};
 };
 
@@ -124,7 +124,7 @@ export const actions: Actions = {
 			// But for "Group RSVP", we usually submit all.
 			if (!status) continue;
 
-			let rawData = {
+			const rawData = {
 				rsvp_status: status,
 				present_saturday: formData.get(`${prefix}present_saturday`) === 'on',
 				present_sunday: formData.get(`${prefix}present_sunday`) === 'on',
@@ -158,8 +158,10 @@ export const actions: Actions = {
 
 			// For vin_honneur guests: force saturday=true (ceremony+VH), sunday=false (no brunch)
 			const isVinHonneur = guest.invitation_type === 'vin_honneur';
-			const finalSaturday: boolean | null = rsvp_status === 'present' ? (isVinHonneur ? true : (present_saturday ?? true)) : null;
-			const finalSunday: boolean | null = rsvp_status === 'present' ? (isVinHonneur ? false : (present_sunday ?? true)) : null;
+			const finalSaturday: boolean | null =
+				rsvp_status === 'present' ? (isVinHonneur ? true : (present_saturday ?? true)) : null;
+			const finalSunday: boolean | null =
+				rsvp_status === 'present' ? (isVinHonneur ? false : (present_sunday ?? true)) : null;
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const { error } = await (supabaseAdmin as any)
@@ -237,7 +239,12 @@ export const actions: Actions = {
 		if (user.email) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const mainGuest = (guests as any[]).find((g) => g.id === currentUserGuest.id);
-			await sendRsvpConfirmation(user.email, mainGuest?.full_name || 'Invité', updatedGuestsList, mainGuest?.invitation_type || 'complet');
+			await sendRsvpConfirmation(
+				user.email,
+				mainGuest?.full_name || 'Invité',
+				updatedGuestsList,
+				mainGuest?.invitation_type || 'complet'
+			);
 		}
 
 		// Send Admin Alert
